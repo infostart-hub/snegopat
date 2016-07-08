@@ -1,0 +1,230 @@
+<!--
+ Copyright (c) 2012 Muhammed Ikbal Akpaca
+
+This software is provided 'as-is', without any express or implied
+warranty. In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+   1. The origin of this software must not be misrepresented; you must not
+   claim that you wrote the original software. If you use this software
+   in a product, an acknowledgment in the product documentation would be
+   appreciated but is not required.
+
+   2. Altered source versions must be plainly marked as such, and must not be
+   misrepresented as being the original software.
+
+   3. This notice may not be removed or altered from any source
+   distribution.
+ -->
+
+<!DOCTYPE html>
+
+<head>
+
+  <title>asPEEK</title>
+
+  <!-- Local favicon doesnt work in chrome -->
+  <link rel="shortcut icon" href="img/favicon.ico" />
+
+  <!-- STYLE -->
+  <link type="text/css" rel="stylesheet" href="js/jquery/css/flick/jquery-ui-1.8.18.custom.css" />
+  <link type="text/css" rel="stylesheet" href="js/dynatree/skin/ui.dynatree.css" />
+  <link type="text/css" rel="stylesheet" href="css/asPEEK.css" />
+
+  <!-- OPEN SOURCE  -->
+  <script type="application/javascript" src="js/jquery/jquery-1.8.2.min.js"></script>
+  <script type="application/javascript" src="js/jquery/jquery.cookie.js"></script>
+  <script type="application/javascript" src="js/jquery/jquery-ui-1.9.0.custom.min.js"></script>
+  <script type="application/javascript" src="js/dynatree/jquery.dynatree.min.js"></script>
+  <script type="application/javascript" src="js/ace/src-noconflict/ace.js"></script>
+  <script type="application/javascript" src="js/shortcut/shortcut.js"></script>
+
+  <!-- asPEEK files -->
+  <script type="application/javascript" src="settings.js"></script>
+  <script type="application/javascript" src="js/Sender.js"></script>
+  <script type="application/javascript" src="js/asPEEK.js"></script>
+  <script type="application/javascript" src="js/Globals.js"></script>
+  <script type="application/javascript" src="js/Listener.js"></script>
+  <script type="application/javascript" src="js/Watcher.js"></script>
+  <script type="application/javascript" src="js/LowerBar.js"></script>
+  <script type="application/javascript" src="js/Editor.js"></script>
+  <script type="application/javascript" src="js/Breakpoints.js"></script>
+  <script type="application/javascript" src="js/Section.js"></script>
+
+
+
+  <script type="text/javascript">
+
+    $.ready = function ()
+    {
+
+      SetupDOMElements();
+
+      SetupDOMEvents();
+
+      // start listening
+      CreateWebsocket();
+
+      SetupKeybindings();
+
+      AddLocalWatcher();
+
+      AddThisWatcher();
+
+      RefreshModules();
+
+      $("#logButton").addClass('activeButton');
+
+      $("#stackWindow").draggable(
+          {
+            containment: "window"
+          });
+
+      $("#breakpointsWindow").draggable(
+          {
+            containment: "window"
+          });
+
+      $("#sectionWindow").draggable(
+          {
+            containment: "window",
+            handle: "#sectionsHeader"
+          });
+
+      elements.lowerArea.resizable(
+          {
+            handles: "n",
+            resize: LowerAreaResized,
+            minHeight: 100
+          }
+      );
+
+      elements.watcher.resizable({
+        handles: 'w',
+        minWidth: 180,
+        resize: WatcherResized
+      });
+
+
+
+      window.onunload = function()
+      {
+        websocket.close();
+      };
+
+      SetupHoverWindow();
+
+      ResizeElements();
+
+      $("#log").show();
+      $("#options").hide();
+      $("#console").hide();
+      $('#consoleInput').hide();
+      elements.tips.hide();
+
+      // resize element when window size is changed,
+      // this event also gets triggered when a jQuery resizable is resized.
+      window.onresize = function(event)
+      {
+        if(event.target !== window) // only if this is the window
+          return;
+
+        elements.lowerArea.height(window.innerHeight - elements.editorArea.height());
+
+        LowerAreaResized();
+        WatcherResized();
+
+      };
+
+      // auto refresh stability test
+      /*
+       setTimeout(function()
+       {
+       window.location.reload();
+       }, 100);
+       */
+    };
+
+  </script>
+</head>
+<body>
+
+<div id="editorArea">
+  <div id="openDocuments"></div>
+  <div id="buttons" style="position: inherit; bottom: 0; right: 8px; z-index: 5;">
+    <table>
+      <tr><td><button onclick="SendStepOver()">StepOver</button></td></tr>
+      <tr><td><button onclick="SendStepIn()">StepIn</button></td></tr>
+      <tr><td><button onclick="SendStepOut()">StepOut</button></td></tr>
+      <tr><td><button onclick="SendContinue()">Continue</button></td></tr>
+    </table>
+    <br/>
+    <table>
+      <tr><td><button onclick="SaveSection()">Save</button></td></tr>
+      <tr><td><button onclick="SendRestart()">Restart</button></td></tr>
+    </table>
+  </div>
+</div>
+
+<input id="consoleInput" placeholder="Execution awaits!"/>
+<div id="lowerArea">
+  <div id="lowerAreaButtons">
+    <button id="logButton" onclick="LowerButtonClick(event)">Log</button>
+    <button id="consoleButton" onclick="LowerButtonClick(event)">Console</button>
+    <button id="optionsButton" onclick="LowerButtonClick(event)">Options</button>
+    <button id="tipsButton" onclick="LowerButtonClick(event)">Tips</button>
+  </div>
+  <div id="log"></div>
+  <div id="console">
+    Write stuff and it shall execute in the module you selected. Just don't expect any return values.<br/>
+  </div>
+  <div id="options">
+    <button onclick="$('#buttons').toggle();">Toggle Buttons</button>
+    <button onclick="$('#sectionWindow').toggle()">Toggle Sections</button>
+    <button onclick="$('#breakpointsWindow').toggle()">Toggle Breakpoints</button>
+    <button onclick="$('#stackWindow').toggle()"> Toggle Stack</button>
+  </div>
+  <div id="tips">
+    <ul style="  list-style: inside; padding-left: 3px;">
+      <li>Click on line number in breakpoints window to jump to that line</li>
+      <li>You can remove items from your watch list. Press <b style="color:blue">'Delete'</b> key while item is selected. Only works for root items.</li>
+      <li>Use keyboard keys to debug faster. Keys are rebindable from <b style="color:blue">settings.js</b> file.</li>
+      <li>Blue round button refreshes all variable in the watch.</li>
+      <li>Click on stack description to jump to that function</li>
+      <li>CTRL+F in active editor helps you find a text and jump to it.</li>
+      <li>You don't need to stop program execution to look for global variable values.</li>
+      <li>Stepping out too much will cause program to resume till next breakpoint.</li>
+      <li>If you see a value like [REPEAT]:0x43a4afb0 this means there was a circular repeated object, asPEEK sent only address of the value.</li>
+    </ul>
+  </div>
+</div>
+
+<div id="stackWindow"></div>
+
+<div id="breakpointsWindow">
+</div>
+
+<div id="sectionWindow">
+  <div id="sectionsHeader" style="border-bottom: 1px solid; height:18px; cursor: move;">Sections:<input style="width:80px" oninput="SectionFilter(event)"/></div>
+  <ul id="sectionList" style="height: 222px; overflow-y: auto;"></ul>
+</div>
+
+<div id="watcher">
+  <table style="width:100%">
+    <tr><td><div id="connectionStatus">Trying to Connect...</div></td></tr>
+    <tr><td><select id="selectModule" style="width:100%"></select></td></tr>
+    <tr><td><input id="newVariable"  style="width:94%" placeholder="Write a variable name"/><span id="refreshButton" onclick="RefreshWatched()"></span></td></tr>
+  </table>
+</div>
+
+<div id="hoverVariable">
+  <div id="hoverVariableName">VarName</div>
+  <div id="hoverVariableTree"></div>
+</div>
+
+
+</body>

@@ -1,0 +1,118 @@
+client may send
+===============
+#assign value to a variable
+ASGN [VARNAME] [VALUE]
+
+#get global variable value. triggers VARV
+#module name can include spaces, for that we send this with ? between parameters
+GETV?[MODULENAME]?[VARNAME]
+
+#request a script section name with id. might be needed if client knows an id but no sectionname for it
+GTSI [SECTIONID]
+
+#request a complete section
+GETF [SECTIONID]
+
+#set breakpoint in a specific section
+BRKS [SECTIONID] [LINENUMBER]
+
+#remove a breakpoint from a section
+BRKR [SECTION] [LINENUMBER]
+
+#step over
+STOV
+
+#step inside
+STIN
+
+#continue
+CONT
+
+#step out
+STOU
+
+#request a variable, server will send variable only if a this is a valid request. otherwise no answer
+#SECTIONID will be used to determine module name
+REQV [SECTIONID] [VARNAME]
+
+#Save a section
+SAVE [SECTIONID] [FILECONTENTS]
+
+#Try to call restart function
+RSTR
+
+server may send
+===============
+# send a global value to client
+VARV [VARNAME] [MODULENAME] [VALUE]
+
+#send a requested variable value back to client, value is a JSON if requested variable is an object
+REQV [VARNAME] [VALUE]
+
+# send local variables
+LOCV [STACKDEPTH] [LOCALVARIABLES]
+
+#send properties of 'this' object.
+THIS [STACKDEPTH] [MEMBERS]
+
+#list of available modules
+# [MODULENAMES] is an JSON array filled with strings
+MODL [MODULENAMES]
+
+#list of contexts
+CTXL [CONTEXTNAME] [CONTEXTNAME] [CONTEXTNAME] ...
+
+#a single stack of a context
+STCK [CONTEXTNAME] [DEPTH] [LINENUMBER] [SECTIONID]
+
+#list of all sections
+#example: SCLS [{"id":0, "name":"..path/filename.as", "mod":"module1"},{"id":1, "name":"..path/filename2.as", "mod":"module2"}]
+SCLS [SECTIONLIST]
+
+#a complete section, if client doesn't recognize section id, then it may request it with SCID
+FILE [SECTIONID] [SECTIONCONTENTSCONTENTS]
+
+#a breakpoint is set a specific location
+BSET [SECTIONID] [LINENUMBER]
+
+# inform client that a script execution is stopped.
+HITL [SECTIONID] [LINENUMBER]
+
+#tells client execution is resumed. might immediately hit another breakpoint
+CONT
+
+# a script section has been modified by this client or another client. a GETF message back is recommended
+SECM [SECTIONID]
+
+# sends current stack. STACK is an array
+STCK [STACK]
+
+# a log entry, warning
+LOGW [MESSAGE]
+
+# a log entry, info
+LOGI [MESSAGE]
+
+# a log entry, error
+LOGE [MESSAGE]
+
+# a restart has occured
+RSTR
+
+PARAMETERS
+==========
+[VARNAME] = variable name. examples: player.location {location of global variable player}, bullet_speed {global variable bullet_speed}
+
+[MODULENAME] = name of the module this variable is in
+
+[CONTEXTNAME] = name of the context, angelscript has no concept of naming context. but asPEEK names them internally.
+
+[VALUE] = JSON for objects and arrays. just value for primitives
+
+[DEPTH] = current depth of stack in context
+
+[LINENUMBER] = line number in section
+
+[SECTIONID] = section id. id is assigned by asPEEK.
+
+[SECTIONNAME] = complete name of a section
