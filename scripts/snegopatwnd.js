@@ -962,6 +962,8 @@ var UpdatePage = (function () {
     };
     UpdatePage.prototype.runFossilRemote = function (command, handler) {
         var _this = this;
+        if (!this.form.remoteRepoURL)
+            return;
         var http;
         try {
             http = new ActiveXObject('MSXML2.ServerXMLHTTP.6.0');
@@ -1178,14 +1180,18 @@ var UpdatePage = (function () {
                 Message("Не удалось создать объект MSXML2.ServerXMLHTTP.6.0 для проверки прокси-сервера");
             }
             var url = this.form.remoteRepoURL;
-            if (url.slice(-1) != '/')
-                url += '/';
-            http.setProxy(2, key);
-            http.open('get', url);
+            if (!url)
+                url = 'https://snegopat.ru';
+            try {
+                http.setProxy(2, key);
+                http.open('get', url);
+            }
+            catch (e) {
+                return;
+            }
             http.onreadystatechange = function () {
                 if (http.readyState == 4) {
-                    debugger;
-                    if (http.status == 200) {
+                    if (http.status == 200 || http.status == 301 || http.status == 302) {
                         MessageBox("Прокси-сервер ответил, авторизации не требует");
                     }
                     else if (http.status == 407) {
