@@ -10,7 +10,6 @@ set curdir=%cd%
 cd /d "%~dp0..\.."
 
 if not exist data mkdir data
-if not exist data\snegopat.pfl copy core\tools\start.pfl data\snegopat.pfl > nul
 if not exist repo mkdir repo
 if not exist data\cntlm.ini copy nul data\cntlm.ini > nul
 if not exist data\proxy.cmd start "" /w mshta.exe "%~f0"
@@ -105,6 +104,7 @@ if errorlevel 1 (
 
 :updateCore
 echo.
+if not exist data\snegopat.pfl copy core\tools\start.pfl data\snegopat.pfl > nul
 call:echocolor Blue "Обновление основного репозитария"
 call:echocolor Blue "--------------------------------"
 tools\fossil set autosync off
