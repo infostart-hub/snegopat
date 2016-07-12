@@ -104,7 +104,7 @@ if errorlevel 1 (
 
 :updateCore
 echo.
-if not exist data\snegopat.pfl copy core\tools\start.pfl data\snegopat.pfl > nul
+if not exist ..\data\snegopat.pfl copy tools\start.pfl ..\data\snegopat.pfl > nul
 call:echocolor Blue "Обновление основного репозитария"
 call:echocolor Blue "--------------------------------"
 tools\fossil set autosync off
