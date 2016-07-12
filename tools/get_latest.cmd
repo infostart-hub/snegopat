@@ -78,7 +78,7 @@ if exist repo\sn.fossil goto :openCore
 echo.
 call:echocolor Blue "Клонирование репозитария снегопата"
 call:echocolor Blue "----------------------------------"
-core\tools\fossil clone "http://%name%@snegopat.ru/reborn" -A %name% repo\sn.fossil
+core\tools\fossil clone "http://%name%@snegopat.ru/new" -A %name% repo\sn.fossil
 if errorlevel 1 (
 	echo.
 	call:echocolor Red "----------------------------------------------------"
@@ -263,7 +263,7 @@ input {
 	var wsh = new ActiveXObject("WScript.Shell");
 	var env = wsh.Environment("Process");
 	var fso = new ActiveXObject('Scripting.FileSystemObject');
-	var remoteUrl = "http://snegopat.ru/reborn/";
+	var remoteUrl = "http://snegopat.ru/new/";
 	
 	(function(){
 		var pathToSettings = myFolder + "..\\..\\data\\proxy.cmd";
