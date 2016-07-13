@@ -162,7 +162,7 @@
 
 :iface IInfoBase {D1344594-BE0C-4135-BF15-753C1C75D554}
 	:virt
-	  #if ver>=8.3.6.1945
+	  #if ver>=8.3.7 | ver=8.3.6.1945
 		+2
 	  #endif
 		v8string connectString()
