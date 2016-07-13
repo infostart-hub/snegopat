@@ -844,7 +844,7 @@ var UpdatePage = (function () {
         this.remoteRepoRow.content = "Внешний репозитарий снегопата";
         this.localRepoRow.content = "Локальный репозитарий";
         if (this.localRepoExist) {
-            this.runFossilLocal('settings autosync true', false, false);
+            this.runFossilLocal('settings autosync on', false, false);
             var res = this.runFossilLocal("remote", false, false).split('\n')[0];
             if (res.match(/^http:/)) {
                 var login = res.match(/\/\/([^@]+)@/);
@@ -854,7 +854,7 @@ var UpdatePage = (function () {
             }
         }
         else
-            this.form.remoteRepoURL = "http://snegopat.ru/reborn/";
+            this.form.remoteRepoURL = "http://snegopat.ru/new/";
         if (!this.form.remoteRepoURL.length) {
             Message("Не удалось получить URL внешнего репозитария снегопата");
         }

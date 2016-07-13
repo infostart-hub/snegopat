@@ -871,7 +871,7 @@ class UpdatePage implements Page {
         this.remoteRepoRow.content = "Внешний репозитарий снегопата";
         this.localRepoRow.content = "Локальный репозитарий";
         if (this.localRepoExist) {
-            this.runFossilLocal('settings autosync true', false, false);
+            this.runFossilLocal('settings autosync on', false, false);
             var res = this.runFossilLocal("remote", false, false).split('\n')[0];
             if (res.match(/^http:/)) {
                 var login = res.match(/\/\/([^@]+)@/);
@@ -881,7 +881,7 @@ class UpdatePage implements Page {
             }
         }
         else
-            this.form.remoteRepoURL = "http://snegopat.ru/reborn/";
+            this.form.remoteRepoURL = "http://snegopat.ru/new/";
         if (!this.form.remoteRepoURL.length) {
             Message("Не удалось получить URL внешнего репозитария снегопата");
         }
@@ -986,6 +986,8 @@ class UpdatePage implements Page {
         return "";
     }
     runFossilRemote(command, handler) {
+        if (!this.form.remoteRepoURL)
+            return;
         var http: XMLHttpRequest;
         try {
             http = new ActiveXObject('MSXML2.ServerXMLHTTP.6.0');
@@ -1189,14 +1191,15 @@ class UpdatePage implements Page {
                 Message("Не удалось создать объект MSXML2.ServerXMLHTTP.6.0 для проверки прокси-сервера");
             }
             var url = this.form.remoteRepoURL;
-            if (url.slice(-1) != '/')
-                url += '/';
-            (<any>http).setProxy(2, key);
-            http.open('get', url);
+            if (!url)
+                url = 'https://snegopat.ru';
+            try {
+                (<any>http).setProxy(2, key);
+                http.open('get', url);
+            } catch (e) { return; }
             http.onreadystatechange = () => {
                 if (http.readyState == 4) {
-                debugger
-                    if (http.status == 200) {
+                    if (http.status == 200 || http.status == 301 || http.status == 302) {
                         MessageBox("Прокси-сервер ответил, авторизации не требует");
                     } else if (http.status == 407) {
                         var authMetods = [];
