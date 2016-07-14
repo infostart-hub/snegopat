@@ -236,6 +236,7 @@
 	stdcall int CreateDirectory(uint lpPathName, uint)|CreateDirectoryW
 	stdcall uint LoadLibraryEx(uint lpLibFileName, uint=0,uint dwFlags=0)|LoadLibraryExW
 	stdcall uint GetProcAddress(uint hModule,uint lpProcName)|GetProcAddress
+	stdcall void DebugBreak()|DebugBreak
 
 
 :struct LOGFONT

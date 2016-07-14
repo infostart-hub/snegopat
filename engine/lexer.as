@@ -5,90 +5,6 @@
 #pragma once
 #include "../../all.h"
 
-// Типы лексем, используемые встроенным в снегопат парсером
-enum LexemTypes
-{
-    endOfText = 0,
-    lexUnknown = 0,
-    lexRemark,      // комментарий
-    lexQuote,       // в кавычках
-    lexQuoteOpen,   // в открытых кавычках (нет завершающей кавычки)
-    lexDate,        // дата
-    lexDateOpen,    // дата без завершающего апострофа
-    lexNumber,      // число
-    lexPreproc,     // инструкция препроцессора
-    lexDirective,   // директива выполнения
-    lexLabel,       // метка
-    lexLPar,        // (
-    lexRPar,        // )
-    lexLBrt,        // [
-    lexRBrt,        // ]
-    lexEqual,       // =
-    lexComma,       // ,
-    lexSemicolon,   // ;
-    lexPlus,        // +
-    lexMinus,       // -
-    lexMult,        // *
-    lexDivide,      // /
-    lexMod,         // %
-    lexQuestion,    // ?
-    lexPeriod,      // .
-    lexLess,        // <
-    lexLessEq,      // <=
-    lexGrat,        // >
-    lexGratEq,      // >=
-    lexNotEq,       // <>
-    lexName,        // идентификатор
-    // Ключевые слова
-    kwIf,
-    kwThen,
-    kwElsIf,
-    kwEndIf,
-    kwElse,
-    kwFor,
-    kwEach,
-    kwIn,
-    kwTo,
-    kwWhile,
-    kwDo,
-    kwEndDo,
-    kwProcedure,
-    kwFunction,
-    kwEndProcedure,
-    kwEndFunction,
-    kwVar,
-    kwGoto,
-    kwReturn,
-    kwContinue,
-    kwBreak,
-    kwAnd,
-    kwOr,
-    kwNot,
-    kwTry,
-    kwExcept,
-    kwRaise,
-    kwEndTry,
-    kwNew,
-    kwExecute,
-    kwTrue,
-    kwFalse,
-    kwAddHandler,
-    kwRemoveHandler,
-    kwExport,
-    kwNull,
-    kwUndefined,
-    kwVal,
-    // Спец-токены для синтакс-парсера, добавляются в начало текста для задания под-алгоритма парсера
-    // допустимы только методы. Указывается, если анализ идет в общем модуле,
-    // или начинается с середины модуля между методами
-    onlyMeths,
-    // Указывается, если анализ начинается с части модуля, за которой нет методов
-    onlyMethsAndStatements,
-    // Указывается при анализе с начала модуля, когда после уже есть методы
-    onlyVarsAndMethods,
-    kwCount = onlyMeths - lexName - 1,
-};
-
 // Для совместимости со SnegAPI
 enum Lexems {
     ltUnknown,		// Un
@@ -271,7 +187,6 @@ bool readTextFile(v8string& result, const string& path, const string& encoding =
         params.values[1] = encoding;
     pCtxDef.getParamDefValue(methPos, 2, params.values[2]);
    
-    Value retVal;
     textDoc.callMeth(methPos, params.retVal, params.args);
     
     ITextManager&& itm = textDoc.unk;

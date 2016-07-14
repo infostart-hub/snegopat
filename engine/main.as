@@ -11,7 +11,6 @@
 string sv8ver;
 
 void main() {
-	debugger();
     sv8ver = "" + (int(v8ver >> 48) & 0xFFFF) + "." + (int(v8ver >> 32) & 0xFFFF) + "." +
         (int(v8ver >> 16) & 0xFFFF) + "." + (int(v8ver >> 0) & 0xFFFF);
 #if test = 1
