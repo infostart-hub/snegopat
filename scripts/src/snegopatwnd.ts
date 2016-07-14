@@ -1171,7 +1171,10 @@ class UpdatePage implements Page {
         Message("Возможно, прокси-сервер не запущен или вы ввели неверные имя/пароль", mInfo);
     }
     handlerbtnProxyReadНажатие() {
-        var key:string = this.wsh.RegRead("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\ProxyServer");
+        var key = '';
+        try {
+            key = this.wsh.RegRead("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\ProxyServer");
+        } catch(e){}
         if (key.length) {
             var keys = key.split(';');
             key = '';

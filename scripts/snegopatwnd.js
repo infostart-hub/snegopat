@@ -1159,7 +1159,11 @@ var UpdatePage = (function () {
         Message("Возможно, прокси-сервер не запущен или вы ввели неверные имя/пароль", mInfo);
     };
     UpdatePage.prototype.handlerbtnProxyReadНажатие = function () {
-        var key = this.wsh.RegRead("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\ProxyServer");
+        var key = '';
+        try {
+            key = this.wsh.RegRead("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\ProxyServer");
+        }
+        catch (e) { }
         if (key.length) {
             var keys = key.split(';');
             key = '';

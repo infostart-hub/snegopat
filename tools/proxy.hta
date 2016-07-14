@@ -155,8 +155,10 @@ input {
 		} catch(e) {
 			alert("Не удалось проверить прямое соединение: " + e.description);
 		}
-
-		var key = wsh.RegRead("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\ProxyServer");
+		var key = '';
+		try {
+			key = wsh.RegRead("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\ProxyServer");
+		} catch(e){}
 		if (key.length) {
 			var keys = key.split(';');
 			key = '';
