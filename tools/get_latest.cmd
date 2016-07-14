@@ -269,7 +269,10 @@ input {
 		var pathToSettings = myFolder + "..\\..\\data\\proxy.cmd";
 		if (fso.FileExists(pathToSettings)) {
 			var file = fso.OpenTextFile(pathToSettings, 1);
-			var lines = file.ReadAll().replace(/\r\n/g,'\n').split('\n');
+			var lines = [];
+			try {
+				lines = file.ReadAll().replace(/\r\n/g,'\n').split('\n');
+			} catch(e) {}	// возникает ошибка чтения, если файл пустой
 			file.Close();
 			for (var k in lines) {
 				var m = lines[k].match(/^set\s+([^=]+)=(.*)/i)
