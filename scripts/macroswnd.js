@@ -115,7 +115,7 @@ exports.MacrosWnd = (function () {
                     // Надо вставлять макросы. Если макрос один, надо вставить сразу, иначе - создать узел для аддина
                     var macroses = stdlib.toArray(addin.macroses());
                     var prefix = addin.displayName + "::";
-                    // Надо убрать из списка скрытые макросы и макросы, не попадающие в поиск. 
+                    // Надо убрать из списка скрытые макросы и макросы, не попадающие в поиск.
                     for (var kk = macroses.length; kk--;) {
                         if (macroses[kk].substr(0, 1) == "_" || !testPattern(this.pattern, prefix + macroses[kk]))
                             macroses.splice(kk, 1);
@@ -144,8 +144,11 @@ exports.MacrosWnd = (function () {
                         macrosRow.Addin = ins.name;
                         macrosRow.Картинка = 1;
                         var rowInfo = new RowInfo(TypeofObjects.Macros, { addin: addin.uniqueName, macros: mname });
-                        if (addin.object && addin.object["getMacrosInfo"])
-                            addin.object["getMacrosInfo"](mname, rowInfo.info);
+                        try {
+                            if (addin.object && addin.object["getMacrosInfo"])
+                                addin.object["getMacrosInfo"](mname, rowInfo.info);
+                        }
+                        catch (e) { }
                         var key = rowInfo.key();
                         macrosRow.rowInfo = rowInfo;
                         if (this.hotkeys.hasOwnProperty(key))
