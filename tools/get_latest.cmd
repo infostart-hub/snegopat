@@ -106,7 +106,9 @@ tools\fossil set autosync off
 :: Тут приходится извращатся. Fossil в случае ошибок обмена с сервером не выдает ошибочный код завершения
 :: а кидает сообщения в stderr. Поэтому мы таким хитрым образом запускаем fossil, записывая вывод в переменную,
 :: но меняя местами его stdout и stderr, получая в итоге в переменную stderr
-for /f "tokens=*" %%a in ('tools\fossil pull ^3^>^&1 ^1^>^&2 ^2^>^&3') do set pullErrors=%%a
+for /f "tokens=*" %%a in ('tools\fossil pull ^3^>^&1 ^1^>^&2 ^2^>^&3^|tools\fecho') do set pullErrors=%%a
+:: если пароль не сохраняли, fossil запрашивает ввод пароля, выводя сообщение в stderr
+if "%pullErrors:~0,13%"=="password for" set pullErrors=
 if not "%pullErrors%"=="" (
 	echo.
 	call:echocolor Red "%pullErrors%"
