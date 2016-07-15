@@ -342,10 +342,10 @@ class ModuleTextProcessor : TextProcessor, ModuleTextSource {
         IMDObject&& rootObj = myContainer.unk;
         bool runModeIsManaged = getRunModeIsManaged(rootObj);
         // Добавим элементы из одного из глобальных модулей
-		if (mdInfo !is null && !(mdInfo.mdPropUuid == gModStdApp) || // Модуль обычного приложения
-			(mdInfo.mdPropUuid == gModMngApp) ||                    // Модуль управляемого приложения
-			(mdInfo.mdPropUuid == gModExtCon) ||                    // Модуль внешнего соединения
-			(mdInfo.mdPropUuid == gModSeance)) {                     // Модуль сеанса
+		if (mdInfo !is null && !(mdInfo.mdPropUuid == gModStdApp || // Модуль обычного приложения
+			mdInfo.mdPropUuid == gModMngApp ||                    // Модуль управляемого приложения
+			mdInfo.mdPropUuid == gModExtCon ||                    // Модуль внешнего соединения
+			mdInfo.mdPropUuid == gModSeance)) {                     // Модуль сеанса
 			ModuleElements&& globalModuleParser = getModuleElementsParser(rootObj, runModeIsManaged ? gModMngApp : gModStdApp);
 			globalModuleParser.parse();
 			globalModuleParser.processParseResultForOtherModule(result, isite, methNames, propNames);
@@ -382,9 +382,9 @@ class ExtContextData {
     array<array<any>&&> extModules;
 
     ExtContextData(TextDocMdInfo&& mdInfo) {
-        if (mdInfo is null || mdInfo.object is null)
+		store.resize(scgLast);
+		if (mdInfo is null || mdInfo.object is null)
             return;
-        store.resize(scgLast);
         // Нужно получить поставщик информации о типах для этой конфигурации
         IMDEditService&& mdes = getMDEditService();
         IConfigMngrUI&& uicfgmngr;
