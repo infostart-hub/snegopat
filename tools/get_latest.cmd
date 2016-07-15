@@ -1,5 +1,5 @@
-:: ╨Ф╨░╨╜╨╜╤Л╨╣ ╤Д╨░╨╣╨╗ ╤Б╨╗╤Г╨╢╨╕╤В ╨┤╨╗╤П ╨┐╨╛╨╗╤Г╤З╨╡╨╜╨╕╤П ╤А╨╡╨┐╨╛╨╖╨╕╤В╨░╤А╨╕╤П ╤Б╨╜╨╡╨│╨╛╨┐╨░╤В╨░ ╨╕ ╨╡╨│╨╛ ╨┐╨╛╤Б╨╗╨╡╨┤╤Г╤О╤Й╨╡╨│╨╛ ╨╛╨▒╨╜╨╛╨▓╨╗╨╡╨╜╨╕╤П,
-:: ╨╡╤Б╨╗╨╕ ╨▓╨░╤Б ╤З╨╡╨╝-╤В╨╛ ╨╜╨╡ ╤Г╤Б╤В╤А╨░╨╕╨▓╨░╨╡╤В (╨╕╨╗╨╕ ╨╜╨╡ ╨┤╨╛╤Б╤В╤Г╨┐╨╜╨░) ╨╖╨░╨║╨╗╨░╨┤╨║╨░ "╨Ю╨▒╨╜╨╛╨▓╨╗╨╡╨╜╨╕╨╡" ╨▓ ╨╛╨║╨╜╨╡ ╤Б╨╜╨╡╨│╨╛╨┐╨░╤В╨░.
+:: Данный файл служит для получения репозитария снегопата и его последующего обновления,
+:: если вас чем-то не устраивает (или не доступна) закладка "Обновление" в окне снегопата.
 @echo off
 set curdir=%cd%
 cd /d "%~dp0..\.."
@@ -13,7 +13,7 @@ if exist data\proxy.cmd (
 ) else (
 	copy nul data\proxy.cmd > nul
 )
-:: ╨а╨░╨▒╨╛╤В╨░ ╤Б ╨┐╤А╨╛╨║╤Б╨╕
+:: Работа с прокси
 if not "%useProxy%"=="true" goto :start
 if "%proxyNtlm%"=="true" goto :ntlm
 if "%proxyUser%"=="" (
@@ -24,14 +24,14 @@ set userDelim=@
 set proxyUser=%proxyUser%:
 if "%notStorePass%"=="false" goto :setproxy
 if not exist %Windir%\System32\WindowsPowerShell\v1.0\Powershell.exe goto :vispwd
-set "psCommand=powershell -Command "$pword = read-host '╨г╨║╨░╨╢╨╕╤В╨╡ ╨┐╨░╤А╨╛╨╗╤М ╨┤╨╗╤П ╨┐╤А╨╛╨║╤Б╨╕' -AsSecureString ; ^
+set "psCommand=powershell -Command "$pword = read-host 'Укажите пароль для прокси' -AsSecureString ; ^
 $BSTR=[System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($pword); ^
 [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)""
 for /f "usebackq delims=" %%p in (`%psCommand%`) do set proxyPass=%%p
 goto :setproxy
 :vispwd
-call:echocolor Red "╨Т╨╛ ╨▓╤А╨╡╨╝╤П ╨▓╨▓╨╛╨┤╨░ ╨┐╨░╤А╨╛╨╗╤М ╨▒╤Г╨┤╨╡╤В ╨▓╨╕╨┤╨╕╨╝╤Л╨╝!!!"
-set /p proxyPass=╨Т╨▓╨╡╨┤╨╕╤В╨╡ ╨┐╨░╤А╨╛╨╗╤М ╨┤╨╗╤П ╨┐╤А╨╛╨║╤Б╨╕: 
+call:echocolor Red "Во время ввода пароль будет видимым!!!"
+set /p proxyPass=Введите пароль для прокси: 
 cls
 goto :setproxy
 :ntlm
@@ -44,10 +44,10 @@ if "%notStorePass%"=="true" (
 )
 core\tools\cntlm\cntlm -c data\cntlm.ini -s -a %ntlmAuth% -l %ntlmPort% %proxyPass% -u "%proxyUser%" %proxyAddress%
 if errorlevel 1 (
-	call:echocolor Red "╨Э╨╡ ╤Г╨┤╨░╨╗╨╛╤Б╤М ╨╖╨░╨┐╤Г╤Б╤В╨╕╤В╤М cntlm.exe"
+	call:echocolor Red "Не удалось запустить cntlm.exe"
 	goto :end
 )
-call:echocolor DarkYellow "╨Ч╨░╨┐╤Г╤Й╨╡╨╜ cntlm ╨┐╤А╨╛╨║╤Б╨╕ ╨┤╨╗╤П %proxyAddress% ╨╜╨░ ╨┐╨╛╤А╤В╤Г %ntlmPort%"
+call:echocolor DarkYellow "Запущен cntlm прокси для %proxyAddress% на порту %ntlmPort%"
 set proxyUser=
 set proxyPass=
 set proxyAddress=127.0.0.1:%ntlmPort%
@@ -62,22 +62,22 @@ if not exist repo\sn.fossil goto :getLogin
 goto :cloneCore
 :getLogin
 set name=$$$
-set /p name="╨г╨║╨░╨╢╨╕╤В╨╡ ╨╗╨╛╨│╨╕╨╜ ╨╜╨░ snegopat.ru: "
+set /p name="Укажите логин на snegopat.ru: "
 if "%name%"=="$$$" (
-	call:echocolor Red "╨Э╨╡ ╤Г╨║╨░╨╖╨░╨╜ ╨╗╨╛╨│╨╕╨╜"
+	call:echocolor Red "Не указан логин"
 	goto :end
 )
 
 :cloneCore
 if exist repo\sn.fossil goto :openCore
 echo.
-call:echocolor Blue "╨Ъ╨╗╨╛╨╜╨╕╤А╨╛╨▓╨░╨╜╨╕╨╡ ╤А╨╡╨┐╨╛╨╖╨╕╤В╨░╤А╨╕╤П ╤Б╨╜╨╡╨│╨╛╨┐╨░╤В╨░"
+call:echocolor Blue "Клонирование репозитария снегопата"
 call:echocolor Blue "----------------------------------"
 core\tools\fossil clone "http://%name%@snegopat.ru/new" -A %name% repo\sn.fossil
 if errorlevel 1 (
 	echo.
 	call:echocolor Red "----------------------------------------------------"
-	call:echocolor Red "!!! ╨Э╨╡ ╤Г╨┤╨░╨╗╨╛╤Б╤М ╨║╨╗╨╛╨╜╨╕╤А╨╛╨▓╨░╤В╤М ╤А╨╡╨┐╨╛╨╖╨╕╤В╨░╤А╨╕╨╣ ╨б╨╜╨╡╨│╨╛╨┐╨░╤В╨░ !!!"
+	call:echocolor Red "!!! Не удалось клонировать репозитарий Снегопата !!!"
 	call:echocolor Red "----------------------------------------------------"
 	goto :end
 )
@@ -86,13 +86,13 @@ if errorlevel 1 (
 cd core
 if exist _fossil_ goto :updateCore
 echo.
-call:echocolor Blue "╨Ю╤В╨║╤А╤Л╤В╨╕╨╡ ╤А╨╡╨┐╨╛╨╖╨╕╤В╨░╤А╨╕╤П"
+call:echocolor Blue "Открытие репозитария"
 call:echocolor Blue "--------------------"
 tools\fossil open ..\repo\sn.fossil
 if errorlevel 1 (
 	echo.
 	call:echocolor Red "-----------------------------------------------"
-	call:echocolor Red "!!! ╨Э╨╡ ╤Г╨┤╨░╨╗╨╛╤Б╤М ╨╛╤В╨║╤А╤Л╤В╤М ╨╛╤Б╨╜╨╛╨▓╨╜╨╛╨╣ ╤А╨╡╨┐╨╛╨╖╨╕╤В╨░╤А╨╕╨╣ !!!"
+	call:echocolor Red "!!! Не удалось открыть основной репозитарий !!!"
 	call:echocolor Red "-----------------------------------------------"
 	goto :end
 )
@@ -100,19 +100,19 @@ if errorlevel 1 (
 :updateCore
 echo.
 if not exist ..\data\snegopat.pfl copy tools\start.pfl ..\data\snegopat.pfl > nul
-call:echocolor Blue "╨Ю╨▒╨╜╨╛╨▓╨╗╨╡╨╜╨╕╨╡ ╨╛╤Б╨╜╨╛╨▓╨╜╨╛╨│╨╛ ╤А╨╡╨┐╨╛╨╖╨╕╤В╨░╤А╨╕╤П"
+call:echocolor Blue "Обновление основного репозитария"
 call:echocolor Blue "--------------------------------"
 tools\fossil set autosync off
-:: ╨в╤Г╤В ╨┐╤А╨╕╤Е╨╛╨┤╨╕╤В╤Б╤П ╨╕╨╖╨▓╤А╨░╤Й╨░╤В╤Б╤П. Fossil ╨▓ ╤Б╨╗╤Г╤З╨░╨╡ ╨╛╤И╨╕╨▒╨╛╨║ ╨╛╨▒╨╝╨╡╨╜╨░ ╤Б ╤Б╨╡╤А╨▓╨╡╤А╨╛╨╝ ╨╜╨╡ ╨▓╤Л╨┤╨░╨╡╤В ╨╛╤И╨╕╨▒╨╛╤З╨╜╤Л╨╣ ╨║╨╛╨┤ ╨╖╨░╨▓╨╡╤А╤И╨╡╨╜╨╕╤П
-:: ╨░ ╨║╨╕╨┤╨░╨╡╤В ╤Б╨╛╨╛╨▒╤Й╨╡╨╜╨╕╤П ╨▓ stderr. ╨Я╨╛╤Н╤В╨╛╨╝╤Г ╨╝╤Л ╤В╨░╨║╨╕╨╝ ╤Е╨╕╤В╤А╤Л╨╝ ╨╛╨▒╤А╨░╨╖╨╛╨╝ ╨╖╨░╨┐╤Г╤Б╨║╨░╨╡╨╝ fossil, ╨╖╨░╨┐╨╕╤Б╤Л╨▓╨░╤П ╨▓╤Л╨▓╨╛╨┤ ╨▓ ╨┐╨╡╤А╨╡╨╝╨╡╨╜╨╜╤Г╤О,
-:: ╨╜╨╛ ╨╝╨╡╨╜╤П╤П ╨╝╨╡╤Б╤В╨░╨╝╨╕ ╨╡╨│╨╛ stdout ╨╕ stderr, ╨┐╨╛╨╗╤Г╤З╨░╤П ╨▓ ╨╕╤В╨╛╨│╨╡ ╨▓ ╨┐╨╡╤А╨╡╨╝╨╡╨╜╨╜╤Г╤О stderr
+:: Тут приходится извращатся. Fossil в случае ошибок обмена с сервером не выдает ошибочный код завершения
+:: а кидает сообщения в stderr. Поэтому мы таким хитрым образом запускаем fossil, записывая вывод в переменную,
+:: но меняя местами его stdout и stderr, получая в итоге в переменную stderr
 for /f "tokens=*" %%a in ('tools\fossil pull ^3^>^&1 ^1^>^&2 ^2^>^&3') do set pullErrors=%%a
 if not "%pullErrors%"=="" (
 	echo.
 	call:echocolor Red "%pullErrors%"
 	echo.
 	call:echocolor Red "--------------------------------------------------------------"
-	call:echocolor Red "!!! ╨Э╨╡ ╤Г╨┤╨░╨╗╨╛╤Б╤М ╨┐╨╛╨╗╤Г╤З╨╕╤В╤М ╨╛╨▒╨╜╨╛╨▓╨╗╨╡╨╜╨╕╨╡ ╨╕╨╖ ╨▓╨╜╨╡╤И╨╜╨╡╨│╨╛ ╤А╨╡╨┐╨╛╨╖╨╕╤В╨░╤А╨╕╤П !!!"
+	call:echocolor Red "!!! Не удалось получить обновление из внешнего репозитария !!!"
 	call:echocolor Red "--------------------------------------------------------------"
 	tools\fossil set autosync on
 	goto :end
@@ -122,12 +122,12 @@ tools\fossil update
 if errorlevel 1 (
 	echo.
 	call:echocolor Red "---------------------------------------------------"
-	call:echocolor Red "!!! ╨Э╨╡ ╤Г╨┤╨░╨╗╨╛╤Б╤М ╨▓╤Л╨┐╨╛╨╗╨╜╨╕╤В╤М ╨╛╨▒╨╜╨╛╨▓╨╗╨╡╨╜╨╕╨╡ ╤А╨╡╨┐╨╛╨╖╨╕╤В╨░╤А╨╕╤П !!!"
+	call:echocolor Red "!!! Не удалось выполнить обновление репозитария !!!"
 	call:echocolor Red "---------------------------------------------------"
 ) else (
 	echo.
 	call:echocolor Green "--------------------------"
-	call:echocolor Green "!!! ╨Т╤Б╨╡ ╨┐╤А╨╛╤И╨╗╨╛ ╤Г╤Б╨┐╨╡╤И╨╜╨╛ !!!"
+	call:echocolor Green "!!! Все прошло успешно !!!"
 	call:echocolor Green "--------------------------"
 )
 tools\fossil set autosync on
@@ -136,7 +136,7 @@ tools\fossil set autosync on
 cd /d "%curdir%"
 if "%proxyNtlm%"=="true" (
 	taskkill /F /IM cntlm.exe >nul 2>&1
-	call:echocolor DarkYellow "╨Ю╤Б╤В╨░╨╜╨╛╨▓╨╗╨╡╨╜ cntlm ╨┐╤А╨╛╨║╤Б╨╕"
+	call:echocolor DarkYellow "Остановлен cntlm прокси"
 )
 pause
 exit /b
