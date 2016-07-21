@@ -1,71 +1,71 @@
-$engine JScript
-$uname diff_v8Reader
-$dname Backend к diff просмотру (ssf, cf)
-$addin global
+п»ї//engine: JScript
+//uname: diff_v8Reader
+//dname: Backend Рє diff РїСЂРѕСЃРјРѕС‚СЂСѓ (ssf, cf)
+//addin: global
+//addin: stdlib
 
 global.connectGlobals(SelfScript)
+var mainFolder = stdlib.getSnegopatMainFolder();
 
-var mainFolder = profileRoot.getValue("Snegopat/MainFolder")
-
-var pathTo1C = mainFolder + "\\core\\starter.exe";
+var pathTo1C = env.pathes.core + "starter.exe";
 //var pathToBase = mainFolder + "\\scripts\\dvcs\\basediff";
 
-var мФормаНастройки=null
+var РјР¤РѕСЂРјР°РќР°СЃС‚СЂРѕР№РєРё=null
 
-function macrosНастрокаv8Reader(){
+function macrosРќР°СЃС‚СЂРѕРєР°v8Reader(){
     var pathToForm=SelfScript.fullPath.replace(/js$/, 'ssf')
-    мФормаНастройки=loadScriptForm(pathToForm, SelfScript.self) // Обработку событий формы привяжем к самому скрипту
-    мФормаНастройки.ОткрытьМодально()
+    РјР¤РѕСЂРјР°РќР°СЃС‚СЂРѕР№РєРё=loadScriptForm(pathToForm, SelfScript.self) // РћР±СЂР°Р±РѕС‚РєСѓ СЃРѕР±С‹С‚РёР№ С„РѕСЂРјС‹ РїСЂРёРІСЏР¶РµРј Рє СЃР°РјРѕРјСѓ СЃРєСЂРёРїС‚Сѓ
+    РјР¤РѕСЂРјР°РќР°СЃС‚СЂРѕР№РєРё.РћС‚РєСЂС‹С‚СЊРњРѕРґР°Р»СЊРЅРѕ()
 }
 
-function мЗаписатьНастройки()
+function РјР—Р°РїРёСЃР°С‚СЊРќР°СЃС‚СЂРѕР№РєРё()
 {
-    pathToBase = мФормаНастройки.pathToBase;
+    pathToBase = РјР¤РѕСЂРјР°РќР°СЃС‚СЂРѕР№РєРё.pathToBase;
     profileRoot.setValue(pflPathToBase, pathToBase)
 }
 
-function ПриОткрытии()
+function РџСЂРёРћС‚РєСЂС‹С‚РёРё()
 {
-    мФормаНастройки.pathToBase=pathToBase
+    РјР¤РѕСЂРјР°РќР°СЃС‚СЂРѕР№РєРё.pathToBase=pathToBase
 }
 
-function pathToBaseНачалоВыбора(Элемент, СтандартнаяОбработка) {
-    лФайл=мВыбратьКаталог()
-    if(лФайл=="") return
-    Элемент.val.Значение=лФайл
+function pathToBaseРќР°С‡Р°Р»РѕР’С‹Р±РѕСЂР°(Р­Р»РµРјРµРЅС‚, РЎС‚Р°РЅРґР°СЂС‚РЅР°СЏРћР±СЂР°Р±РѕС‚РєР°) {
+    Р»Р¤Р°Р№Р»=РјР’С‹Р±СЂР°С‚СЊРљР°С‚Р°Р»РѕРі()
+    if(Р»Р¤Р°Р№Р»=="") return
+    Р­Р»РµРјРµРЅС‚.val.Р—РЅР°С‡РµРЅРёРµ=Р»Р¤Р°Р№Р»
 }
 
-function КнЗаписатьНажатие(Кнопка) {
-    мЗаписатьНастройки();
-    мФормаНастройки.Закрыть();
+function РљРЅР—Р°РїРёСЃР°С‚СЊРќР°Р¶Р°С‚РёРµ(РљРЅРѕРїРєР°) {
+    РјР—Р°РїРёСЃР°С‚СЊРќР°СЃС‚СЂРѕР№РєРё();
+    РјР¤РѕСЂРјР°РќР°СЃС‚СЂРѕР№РєРё.Р—Р°РєСЂС‹С‚СЊ();
 }
 
-function мВыбратьКаталог()
+function РјР’С‹Р±СЂР°С‚СЊРљР°С‚Р°Р»РѕРі()
 {
-    ДиалогОткрытияФайла=v8New("ДиалогВыбораФайла", РежимДиалогаВыбораФайла.ChooseDirectory)
-    ДиалогОткрытияФайла.Заголовок = "Выберите каталог расположения базы сравнения "
-    if(ДиалогОткрытияФайла.Выбрать()==false) return ""
-    return ДиалогОткрытияФайла.Каталог
+    Р”РёР°Р»РѕРіРћС‚РєСЂС‹С‚РёСЏР¤Р°Р№Р»Р°=v8New("Р”РёР°Р»РѕРіР’С‹Р±РѕСЂР°Р¤Р°Р№Р»Р°", Р РµР¶РёРјР”РёР°Р»РѕРіР°Р’С‹Р±РѕСЂР°Р¤Р°Р№Р»Р°.ChooseDirectory)
+    Р”РёР°Р»РѕРіРћС‚РєСЂС‹С‚РёСЏР¤Р°Р№Р»Р°.Р—Р°РіРѕР»РѕРІРѕРє = "Р’С‹Р±РµСЂРёС‚Рµ РєР°С‚Р°Р»РѕРі СЂР°СЃРїРѕР»РѕР¶РµРЅРёСЏ Р±Р°Р·С‹ СЃСЂР°РІРЅРµРЅРёСЏ "
+    if(Р”РёР°Р»РѕРіРћС‚РєСЂС‹С‚РёСЏР¤Р°Р№Р»Р°.Р’С‹Р±СЂР°С‚СЊ()==false) return ""
+    return Р”РёР°Р»РѕРіРћС‚РєСЂС‹С‚РёСЏР¤Р°Р№Р»Р°.РљР°С‚Р°Р»РѕРі
 }
 
-function КнНастройкаПоУмолчаниюНажатие (Кнопка) {
-    var мpathToBase = мФормаНастройки.pathToBase;
-    if (мpathToBase.length <1) {
-        var мpathToBase = mainFolder + "basediff";
+function РљРЅРќР°СЃС‚СЂРѕР№РєР°РџРѕРЈРјРѕР»С‡Р°РЅРёСЋРќР°Р¶Р°С‚РёРµ (РљРЅРѕРїРєР°) {
+    var РјpathToBase = РјР¤РѕСЂРјР°РќР°СЃС‚СЂРѕР№РєРё.pathToBase;
+    if (РјpathToBase.length <1) {
+        var РјpathToBase = mainFolder + "basediff";
         try {
-            СоздатьКаталог(мpathToBase);
-            Message("Создан каталог " + мpathToBase);
+            РЎРѕР·РґР°С‚СЊРљР°С‚Р°Р»РѕРі(РјpathToBase);
+            Message("РЎРѕР·РґР°РЅ РєР°С‚Р°Р»РѕРі " + РјpathToBase);
         } catch (e) {
-            Message("Ошибка при созаднии каталога " + мpathToBase + " описание ошибки " + e.description) ;
+            Message("РћС€РёР±РєР° РїСЂРё СЃРѕР·Р°РґРЅРёРё РєР°С‚Р°Р»РѕРіР° " + РјpathToBase + " РѕРїРёСЃР°РЅРёРµ РѕС€РёР±РєРё " + e.description) ;
             return;
         }
     }
     try {
-        var cmd = '"'+pathTo1C+'" CREATEINFOBASE File="'+мpathToBase+'"; /AddInList diff1Cv8Reader /UseTemplate "'+mainFolder + "scripts\\dvcs\\basediff\\v8reader.dt" +'"';
-        ЗапуститьПриложение(cmd, "", true);
-		мФормаНастройки.pathToBase = мpathToBase;
+        var cmd = '"'+pathTo1C+'" CREATEINFOBASE File="'+РјpathToBase+'"; /AddInList diff1Cv8Reader /UseTemplate "'+ env.pathes.addins + "dvcs\\basediff\\v8reader.dt" +'"';
+        Р—Р°РїСѓСЃС‚РёС‚СЊРџСЂРёР»РѕР¶РµРЅРёРµ(cmd, "", true);
+		РјР¤РѕСЂРјР°РќР°СЃС‚СЂРѕР№РєРё.pathToBase = РјpathToBase;
     } catch (e) {
-        Message("Ошибка при создании базы. Загрузите dt вручную и укажите путь к базе. " + mainFolder + "scripts\\dvcs\\basediff\\v8reader.dt " +e.description);
+        Message("РћС€РёР±РєР° РїСЂРё СЃРѕР·РґР°РЅРёРё Р±Р°Р·С‹. Р—Р°РіСЂСѓР·РёС‚Рµ dt РІСЂСѓС‡РЅСѓСЋ Рё СѓРєР°Р¶РёС‚Рµ РїСѓС‚СЊ Рє Р±Р°Р·Рµ. " + env.pathes.addins + "dvcs\\basediff\\v8reader.dt " +e.description);
         return;
     }
 }
@@ -73,25 +73,25 @@ function КнНастройкаПоУмолчаниюНажатие (Кнопка) {
 function diff_v8Reader(Path1, Path2) {
 
     if (pathToBase.length<1) {
-        Message("Необходимо настроить путь к служебной базе для сравнения.")
-        Message("Откройте настройки для скрипта Backend к diff просмотру (ssf, cf) и заполните их.")
+        Message("РќРµРѕР±С…РѕРґРёРјРѕ РЅР°СЃС‚СЂРѕРёС‚СЊ РїСѓС‚СЊ Рє СЃР»СѓР¶РµР±РЅРѕР№ Р±Р°Р·Рµ РґР»СЏ СЃСЂР°РІРЅРµРЅРёСЏ.")
+        Message("РћС‚РєСЂРѕР№С‚Рµ РЅР°СЃС‚СЂРѕР№РєРё РґР»СЏ СЃРєСЂРёРїС‚Р° Backend Рє diff РїСЂРѕСЃРјРѕС‚СЂСѓ (ssf, cf) Рё Р·Р°РїРѕР»РЅРёС‚Рµ РёС….")
         return
     }
     sBaseDoc = Path1.replace(/\//g, '\\');
     sNewDoc = Path2.replace(/\//g, '\\');
-    var tmpfile = ПолучитьИмяВременногоФайла("txt");
+    var tmpfile = РџРѕР»СѓС‡РёС‚СЊРРјСЏР’СЂРµРјРµРЅРЅРѕРіРѕР¤Р°Р№Р»Р°("txt");
     var TextDoc = v8New("TextDocument");
     TextDoc.AddLine(sBaseDoc)
     TextDoc.AddLine(sNewDoc)
     TextDoc.Write(tmpfile);
     var FSO = new ActiveXObject("Scripting.FileSystemObject");
     var cmd = '"'+pathTo1C+'" enterprise /RunModeOrdinaryApplication  /F"'+pathToBase+'" /C"'+FSO.GetAbsolutePathName(tmpfile)+'" ' ;
-    ЗапуститьПриложение(cmd);
+    Р—Р°РїСѓСЃС‚РёС‚СЊРџСЂРёР»РѕР¶РµРЅРёРµ(cmd);
 } //diff_v8Reader
 
 function GetExtension() {
     var result = 'ssf|cf';
-    try { //сделаем возможность работы в демо режиме снегопата. 
+    try { //СЃРґРµР»Р°РµРј РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ СЂР°Р±РѕС‚С‹ РІ РґРµРјРѕ СЂРµР¶РёРјРµ СЃРЅРµРіРѕРїР°С‚Р°. 
         events.connect(windows, "onDoModal", SelfScript.self, "GetExtension");
         events.disconnect(windows, "onDoModal", SelfScript.self, "GetExtension");
         } catch (e) {
@@ -106,15 +106,15 @@ function GetBackend() {
 
 
 function getDefaultMacros() {
-    return 'Настрокаv8Reader'
+    return 'РќР°СЃС‚СЂРѕРєР°v8Reader'
 } //getDefaultMacros
 
 ////////////////////////////////////////////////////////////////////////////////////////
-////{ Инициализация скрипта
+////{ РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СЃРєСЂРёРїС‚Р°
 ////
 
 var pflPathToBase         = "diffv8Reader/pathToBase"
 profileRoot.createValue(pflPathToBase, "", pflSnegopat);
 
 var pathToBase = profileRoot.getValue(pflPathToBase)
-////} Инициализация скрипта
+////} РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СЃРєСЂРёРїС‚Р°

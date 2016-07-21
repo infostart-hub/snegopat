@@ -1,10 +1,10 @@
-﻿$engine JScript
-$uname logview
-$dname Просмотр истории изменений
-$addin global
-$addin extfiles
-$addin stdcommands
-$addin stdlib
+﻿//engine: JScript
+//uname: logview
+//dname: Просмотр истории изменений
+//addin: global
+//addin: extfiles
+//addin: stdcommands
+//addin: stdlib
 
 
 // (c) Сосна Евгений shenja at sosna.zp.ua

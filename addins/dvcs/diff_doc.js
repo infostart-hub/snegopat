@@ -1,6 +1,6 @@
-$engine JScript
-$uname diff_doc_file
-$dname Backend к diff просмотру (doc,docx)
+п»ї//engine: JScript
+//uname: diff_doc_file
+//dname: Backend Рє diff РїСЂРѕСЃРјРѕС‚СЂСѓ (doc,docx)
 
 
 var objArgs,num,sBaseDoc,sNewDoc,sTempDoc,objScript,word,destination;

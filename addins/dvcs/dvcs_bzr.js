@@ -1,30 +1,30 @@
-$engine JScript
-$uname dvcs_bzr
-$dname Backend dvcs к bzr
-$addin global
+п»ї//engine: JScript
+//uname: dvcs_bzr
+//dname: Backend dvcs Рє bzr
+//addin: global
 
-// (c) Сосна Евгений shenja at sosna.zp.ua
-// Скрипт - Backend к bzr для отображения версионного контроля. 
+// (c) РЎРѕСЃРЅР° Р•РІРіРµРЅРёР№ shenja at sosna.zp.ua
+// РЎРєСЂРёРїС‚ - Backend Рє bzr РґР»СЏ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ РІРµСЂСЃРёРѕРЅРЅРѕРіРѕ РєРѕРЅС‚СЂРѕР»СЏ. 
 
 global.connectGlobals(SelfScript)
 
-// если не создаеться fso, необходимо в сделать в c:\windows\system32 
+// РµСЃР»Рё РЅРµ СЃРѕР·РґР°РµС‚СЊСЃСЏ fso, РЅРµРѕР±С…РѕРґРёРјРѕ РІ СЃРґРµР»Р°С‚СЊ РІ c:\windows\system32 
 // regsvr32.exe scrrun.dll 
-// после этого fso заработает. Во всем виновата корпорация добра http://social.technet.microsoft.com/Forums/ru/windowsserverru/thread/28d55900-145b-466b-93d4-74e08006c72f
+// РїРѕСЃР»Рµ СЌС‚РѕРіРѕ fso Р·Р°СЂР°Р±РѕС‚Р°РµС‚. Р’Рѕ РІСЃРµРј РІРёРЅРѕРІР°С‚Р° РєРѕСЂРїРѕСЂР°С†РёСЏ РґРѕР±СЂР° http://social.technet.microsoft.com/Forums/ru/windowsserverru/thread/28d55900-145b-466b-93d4-74e08006c72f
 var FSO = new ActiveXObject("Scripting.FileSystemObject");
 
 var WshShell = new ActiveXObject("WScript.Shell");
 var TempDir = WshShell.ExpandEnvironmentStrings("%temp%") + "\\";
-var mainFolder = profileRoot.getValue("Snegopat/MainFolder")
+var mainFolder = env.pathes.main
 
-var СоответствиеФайловИСтатусов = [];
+var РЎРѕРѕС‚РІРµС‚СЃС‚РІРёРµР¤Р°Р№Р»РѕРІРРЎС‚Р°С‚СѓСЃРѕРІ = [];
 
-var PathToOutput = TempDir + "bzrstatus.txt" // Пишем 1С файл в utf-8, выводим туда статус fossil после этого читаем его. 
+var PathToOutput = TempDir + "bzrstatus.txt" // РџРёС€РµРј 1РЎ С„Р°Р№Р» РІ utf-8, РІС‹РІРѕРґРёРј С‚СѓРґР° СЃС‚Р°С‚СѓСЃ fossil РїРѕСЃР»Рµ СЌС‚РѕРіРѕ С‡РёС‚Р°РµРј РµРіРѕ. 
 var PathToBat = TempDir + "bzrTrue.bat"
 
 function bzr_getRootCatalog(path){
     var result = "";
-    for (var key in СоответствиеФайловИСтатусов){
+    for (var key in РЎРѕРѕС‚РІРµС‚СЃС‚РІРёРµР¤Р°Р№Р»РѕРІРРЎС‚Р°С‚СѓСЃРѕРІ){
         if (path.indexOf(key)!=-1) {
             result = key
             break
@@ -35,15 +35,15 @@ function bzr_getRootCatalog(path){
         if (f.Exist()) {
             
             var TextDoc = v8New("TextDocument");
-            TextDoc.Записать(PathToOutput, "UTF-8");
-            млКаталог = f.Path;
-            TextDoc.AddLine('cd /d"' +млКаталог +'"')
+            TextDoc.Р—Р°РїРёСЃР°С‚СЊ(PathToOutput, "UTF-8");
+            РјР»РљР°С‚Р°Р»РѕРі = f.Path;
+            TextDoc.AddLine('cd /d"' +РјР»РљР°С‚Р°Р»РѕРі +'"')
             TextDoc.AddLine('bzr info >> "'+PathToOutput+'"');
             TextDoc.Write(PathToBat, 'cp866');
             ErrCode = WshShell.Run('"'+PathToBat+'"', 0, 1)
             TextDoc.Read(PathToOutput, "UTF-8");
             if (TextDoc.LineCount() == 0) {
-                return "" //что то пошло не так. 
+                return "" //С‡С‚Рѕ С‚Рѕ РїРѕС€Р»Рѕ РЅРµ С‚Р°Рє. 
             }
         
             var i=0;
@@ -54,9 +54,9 @@ function bzr_getRootCatalog(path){
                 var mathes = r.match(re);
                 if (mathes && mathes.length) {
                     rootpath = mathes[1].replace(/\//g, '\\');
-                    if (rootpath.substr(0,1) == ".") rootpath = млКаталог;
+                    if (rootpath.substr(0,1) == ".") rootpath = РјР»РљР°С‚Р°Р»РѕРі;
                     result = rootpath;
-                    СоответствиеФайловИСтатусов[result] = {};
+                    РЎРѕРѕС‚РІРµС‚СЃС‚РІРёРµР¤Р°Р№Р»РѕРІРРЎС‚Р°С‚СѓСЃРѕРІ[result] = {};
                     break
                 }
             }
@@ -81,9 +81,9 @@ function bzr_test(pathToCatalog) {
 
 function bzr_getStatusForCatalog(pathToCatalog, ValueTablesFiles) {
 
-    СоответствиеФайловИСтатусов[pathToCatalog] = {};
+    РЎРѕРѕС‚РІРµС‚СЃС‚РІРёРµР¤Р°Р№Р»РѕРІРРЎС‚Р°С‚СѓСЃРѕРІ[pathToCatalog] = {};
     
-    var СоответствиеСтатусов = СоответствиеФайловИСтатусов[pathToCatalog];
+    var РЎРѕРѕС‚РІРµС‚СЃС‚РІРёРµРЎС‚Р°С‚СѓСЃРѕРІ = РЎРѕРѕС‚РІРµС‚СЃС‚РІРёРµР¤Р°Р№Р»РѕРІРРЎС‚Р°С‚СѓСЃРѕРІ[pathToCatalog];
     var TextDoc = v8New("TextDocument");
     TextDoc.Write(PathToOutput, "UTF-8")
     var TextDoc = v8New("TextDocument");
@@ -94,7 +94,7 @@ function bzr_getStatusForCatalog(pathToCatalog, ValueTablesFiles) {
             //TextDoc.Read(PathToOutput, "UTF-8");
             TextDoc.Read(PathToOutput, "cp866 ");
             if (TextDoc.LineCount() == 0) {
-                return false //что то пошло не так. 
+                return false //С‡С‚Рѕ С‚Рѕ РїРѕС€Р»Рѕ РЅРµ С‚Р°Рє. 
             }
             var i=0;
             re = new RegExp(/.*(M|N|D|\?)\s*(.*)/);
@@ -109,19 +109,19 @@ function bzr_getStatusForCatalog(pathToCatalog, ValueTablesFiles) {
                     switch (mathes[1]) 
                     {
                         case "M":
-                        СоответствиеСтатусов[FSO.BuildPath(pathToCatalog, filename)]= "EDITED"
+                        РЎРѕРѕС‚РІРµС‚СЃС‚РІРёРµРЎС‚Р°С‚СѓСЃРѕРІ[FSO.BuildPath(pathToCatalog, filename)]= "EDITED"
                         break;
                         
                         case "N":
-                        СоответствиеСтатусов[FSO.BuildPath(pathToCatalog, filename)]= "ADDED"
+                        РЎРѕРѕС‚РІРµС‚СЃС‚РІРёРµРЎС‚Р°С‚СѓСЃРѕРІ[FSO.BuildPath(pathToCatalog, filename)]= "ADDED"
                         break;
                         
                         case "?":
-                        СоответствиеСтатусов[FSO.BuildPath(pathToCatalog, filename)]= "NOTVERSIONED"
+                        РЎРѕРѕС‚РІРµС‚СЃС‚РІРёРµРЎС‚Р°С‚СѓСЃРѕРІ[FSO.BuildPath(pathToCatalog, filename)]= "NOTVERSIONED"
                         break;
                         
                         case "D":
-                        СоответствиеСтатусов[FSO.BuildPath(pathToCatalog, filename)]= "DELETED"
+                        РЎРѕРѕС‚РІРµС‚СЃС‚РІРёРµРЎС‚Р°С‚СѓСЃРѕРІ[FSO.BuildPath(pathToCatalog, filename)]= "DELETED"
                         break;
                     }
                     continue;
@@ -132,13 +132,13 @@ function bzr_getStatusForCatalog(pathToCatalog, ValueTablesFiles) {
 } //bzr_getStatusForCatalog
 
 function bzr_getFileStatus(pathToCatalog, pathToFile){
-    var лКаталог = pathToCatalog
+    var Р»РљР°С‚Р°Р»РѕРі = pathToCatalog
     var rootCatalog = bzr_getRootCatalog(pathToFile)
     
-    СоответсвиеФайлов = СоответствиеФайловИСтатусов[rootCatalog];
-    if (СоответсвиеФайлов == undefined) return null 
+    РЎРѕРѕС‚РІРµС‚СЃРІРёРµР¤Р°Р№Р»РѕРІ = РЎРѕРѕС‚РІРµС‚СЃС‚РІРёРµР¤Р°Р№Р»РѕРІРРЎС‚Р°С‚СѓСЃРѕРІ[rootCatalog];
+    if (РЎРѕРѕС‚РІРµС‚СЃРІРёРµР¤Р°Р№Р»РѕРІ == undefined) return null 
     
-    return (СоответсвиеФайлов[pathToFile] == undefined) ? null : СоответсвиеФайлов[pathToFile]
+    return (РЎРѕРѕС‚РІРµС‚СЃРІРёРµР¤Р°Р№Р»РѕРІ[pathToFile] == undefined) ? null : РЎРѕРѕС‚РІРµС‚СЃРІРёРµР¤Р°Р№Р»РѕРІ[pathToFile]
     
 } //bzr_getFileStatus
 
@@ -164,24 +164,24 @@ function bzr_add(pathToFile, param2) {
 function bzr_run(pathToFile){
     var rootCatalog = bzr_getRootCatalog(pathToFile);
     var TextDoc = v8New("TextDocument");
-    ЗапуститьПриложение('bzr explorer "'+rootCatalog+'"', "", false);
+    Р—Р°РїСѓСЃС‚РёС‚СЊРџСЂРёР»РѕР¶РµРЅРёРµ('bzr explorer "'+rootCatalog+'"', "", false);
     TextDoc = null;
 } //bzr_run
 
 function bzr_getFileAtRevision(pathToFile, rev){
     
     var TextDoc = v8New("TextDocument");
-    TextDoc.Записать(PathToOutput, "UTF-8");
+    TextDoc.Р—Р°РїРёСЃР°С‚СЊ(PathToOutput, "UTF-8");
     
     var f = v8New("File", pathToFile);
     if (!f.Exist()) 
     {
-        Message(" файла физически не существует...") 
+        Message(" С„Р°Р№Р»Р° С„РёР·РёС‡РµСЃРєРё РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚...") 
         return null;
     }
     var rootCatalog = bzr_getRootCatalog(pathToFile)
     if (rev.length !=0) {
-        var filerev = FSO.BuildPath(TempDir, rev+f.Имя);
+        var filerev = FSO.BuildPath(TempDir, rev+f.РРјСЏ);
         TextDoc.AddLine('cd /d "' +rootCatalog +'"')
         TextDoc.AddLine('bzr cat -r '+rev +' "'+pathToFile +'" > ' + filerev)
         TextDoc.Write(PathToBat, 'cp866');
@@ -216,11 +216,11 @@ function bzr_commit(pathToFile, message) {
     return ErrCode
 } //bzr_commit
 
-function bzr_getFilePathToDiff(param1, param2) { //текущая версия файла с предыдущей...
+function bzr_getFilePathToDiff(param1, param2) { //С‚РµРєСѓС‰Р°СЏ РІРµСЂСЃРёСЏ С„Р°Р№Р»Р° СЃ РїСЂРµРґС‹РґСѓС‰РµР№...
     
     var TextDoc = v8New("TextDocument");
-    TextDoc.Записать(PathToOutput, "UTF-8");
-    // возвращать будем структру, path1 и path2 
+    TextDoc.Р—Р°РїРёСЃР°С‚СЊ(PathToOutput, "UTF-8");
+    // РІРѕР·РІСЂР°С‰Р°С‚СЊ Р±СѓРґРµРј СЃС‚СЂСѓРєС‚СЂСѓ, path1 Рё path2 
     var pathToFile = param1;
     var rootCatalog = bzr_getRootCatalog(pathToFile);
     param2.insert("path1", pathToFile);
@@ -229,7 +229,7 @@ function bzr_getFilePathToDiff(param1, param2) { //текущая версия файла с предыд
     var f = v8New("File", pathToFile);
     if (!f.Exist()) return false
     var path2 = GetTempFileName(f.Extension.substr(1));
-    // Запусим shell и найдем версии файлов. 
+    // Р—Р°РїСѓСЃРёРј shell Рё РЅР°Р№РґРµРј РІРµСЂСЃРёРё С„Р°Р№Р»РѕРІ. 
     TextDoc.Clear();
     TextDoc.AddLine('cd /d "' +rootCatalog +'"')
     TextDoc.AddLine('bzr cat "'+pathToFile+'" > "' +path2+'"');
@@ -237,8 +237,8 @@ function bzr_getFilePathToDiff(param1, param2) { //текущая версия файла с предыд
     
     ErrCode = WshShell.Run('"'+PathToBat+'"', 0, 1)
     var f = v8New("File", path2);
-    if (!f.Exist()) { // Файл будет все равно, но пустой. Думаю простят. 
-        Message("Неудачная попытка создать файл с последней версией!");
+    if (!f.Exist()) { // Р¤Р°Р№Р» Р±СѓРґРµС‚ РІСЃРµ СЂР°РІРЅРѕ, РЅРѕ РїСѓСЃС‚РѕР№. Р”СѓРјР°СЋ РїСЂРѕСЃС‚СЏС‚. 
+        Message("РќРµСѓРґР°С‡РЅР°СЏ РїРѕРїС‹С‚РєР° СЃРѕР·РґР°С‚СЊ С„Р°Р№Р» СЃ РїРѕСЃР»РµРґРЅРµР№ РІРµСЂСЃРёРµР№!");
     }
     
     param2.insert("path2", path2);
@@ -265,7 +265,7 @@ function bzr_remove(pathToFile) {
 function bzr_revert(pathToFile, ver) {
     var rootCatalog = bzr_getRootCatalog(pathToFile);
     var TextDoc = v8New("TextDocument");
-    TextDoc.Записать(PathToBat, "UTF-8");
+    TextDoc.Р—Р°РїРёСЃР°С‚СЊ(PathToBat, "UTF-8");
     TextDoc.AddLine('cd /d"' +rootCatalog +'"')
     var cmd = (ver.length>0) ? 'bzr revert -r '+ver+' "' +pathToFile+'"' : 'bzr revert  "' +pathToFile+'"';
     TextDoc.AddLine(cmd);
@@ -276,13 +276,13 @@ function bzr_revert(pathToFile, ver) {
 } //bzr_revert
 
 
-function bzr_getLog(pathToFile, limit) { //если каталог, тогда информация для каталога, если файл, тогда лог для файла. 
-    //Возвращаем массив со стурктурой:
-    // arrary[0]['version':122333, 'comment':"Че то написали", 'author':"sosna", 'date':"2012-04-01"]
+function bzr_getLog(pathToFile, limit) { //РµСЃР»Рё РєР°С‚Р°Р»РѕРі, С‚РѕРіРґР° РёРЅС„РѕСЂРјР°С†РёСЏ РґР»СЏ РєР°С‚Р°Р»РѕРіР°, РµСЃР»Рё С„Р°Р№Р», С‚РѕРіРґР° Р»РѕРі РґР»СЏ С„Р°Р№Р»Р°. 
+    //Р’РѕР·РІСЂР°С‰Р°РµРј РјР°СЃСЃРёРІ СЃРѕ СЃС‚СѓСЂРєС‚СѓСЂРѕР№:
+    // arrary[0]['version':122333, 'comment':"Р§Рµ С‚Рѕ РЅР°РїРёСЃР°Р»Рё", 'author':"sosna", 'date':"2012-04-01"]
     var result = []
     f = v8New("File", pathToFile);
     if (!f.Exist()) return result
-    //Проверим, есть ли он под версионным контролем у нас.
+    //РџСЂРѕРІРµСЂРёРј, РµСЃС‚СЊ Р»Рё РѕРЅ РїРѕРґ РІРµСЂСЃРёРѕРЅРЅС‹Рј РєРѕРЅС‚СЂРѕР»РµРј Сѓ РЅР°СЃ.
     var rootCatalog = bzr_getRootCatalog(pathToFile);
     var TextDoc = v8New("TextDocument");
     TextDoc.AddLine('cd /d "'+rootCatalog+'"');
@@ -306,7 +306,7 @@ function bzr_getLog(pathToFile, limit) { //если каталог, тогда информация для ка
         var re = new RegExp(/(\d*):\s(.*)\s([0-9]{4}-[0-9]{2}-[0-9]{2})\s(.*)/);
         var mathes = r.match(re);
         if (mathes && mathes.length) {
-            // это первая строка, дальше пойдет id ревизи и т.д.
+            // СЌС‚Рѕ РїРµСЂРІР°СЏ СЃС‚СЂРѕРєР°, РґР°Р»СЊС€Рµ РїРѕР№РґРµС‚ id СЂРµРІРёР·Рё Рё С‚.Рґ.
             result[index] = {"version":mathes[1], "comment":''+mathes[4], "date":mathes[3], "author":mathes[2]}
             index++;
         }
@@ -345,7 +345,7 @@ function bzr_getInfo(pathToFile, ver) {
 
 function bzr_getListBranch(pathToFile, index) {
     
-    // для bzr возвращать будет отмену, при этом вызывать bzr qcoloswitch для каталога. 
+    // РґР»СЏ bzr РІРѕР·РІСЂР°С‰Р°С‚СЊ Р±СѓРґРµС‚ РѕС‚РјРµРЅСѓ, РїСЂРё СЌС‚РѕРј РІС‹Р·С‹РІР°С‚СЊ bzr qcoloswitch РґР»СЏ РєР°С‚Р°Р»РѕРіР°. 
     var result = false;
     var rootCatalog = bzr_getRootCatalog(pathToFile);
     var TextDoc = v8New("TextDocument");
@@ -372,18 +372,18 @@ function Backend_bzr(command, param1, param2) {
     switch (command) 
     {
     case "CATALOGSTATUS":
-        // Добавляем в хвост подпись.
+        // Р”РѕР±Р°РІР»СЏРµРј РІ С…РІРѕСЃС‚ РїРѕРґРїРёСЃСЊ.
         result = bzr_getStatusForCatalog(param1, "");
         break;
     case "FILESTATUS":
         result = bzr_getFileStatus(param1, param2)
         break;
     case "GETFILESMISSUNG":
-        //result = {} //Заглушка. 
+        //result = {} //Р—Р°РіР»СѓС€РєР°. 
         break;
     case "DIFF":
         //result = bzr_getFilePathToDiff(param1, param2)
-        Message("Заглушка, еще не реализована команда DIFF");
+        Message("Р—Р°РіР»СѓС€РєР°, РµС‰Рµ РЅРµ СЂРµР°Р»РёР·РѕРІР°РЅР° РєРѕРјР°РЅРґР° DIFF");
         break;
     case "ADD":
         result = bzr_add(param1, param2)
@@ -394,7 +394,7 @@ function Backend_bzr(command, param1, param2) {
     case "RUN":
         result = bzr_run(param1, param2)
         break;
-    case "SHOWLOG": // старое, пока оставляем. 
+    case "SHOWLOG": // СЃС‚Р°СЂРѕРµ, РїРѕРєР° РѕСЃС‚Р°РІР»СЏРµРј. 
         //result = fossil_showlog(param1);
         break
     case "SHOWDIFF":
@@ -419,10 +419,10 @@ function Backend_bzr(command, param1, param2) {
         result = bzr_getInfo(param1, param2);
         break
     case "GETLISTBRANCH":
-        result = bzr_getListBranch(param1); //возвращаем result {"valuelist":v8New("ValueList"), "index": индекс ветки текущей} или false...
+        result = bzr_getListBranch(param1); //РІРѕР·РІСЂР°С‰Р°РµРј result {"valuelist":v8New("ValueList"), "index": РёРЅРґРµРєСЃ РІРµС‚РєРё С‚РµРєСѓС‰РµР№} РёР»Рё false...
         break
     case "SWITHBRANCH":
-        result = bzr_swithBranch(param1, param2); //выполняет действие... возвращает true || false
+        result = bzr_swithBranch(param1, param2); //РІС‹РїРѕР»РЅСЏРµС‚ РґРµР№СЃС‚РІРёРµ... РІРѕР·РІСЂР°С‰Р°РµС‚ true || false
         break;
 
     }

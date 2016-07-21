@@ -1,8 +1,8 @@
-﻿$engine JScript
-$uname PreCommitHookRedmine
-$dname Хук перед помещением в хранилище  
-$addin stdlib
-$addin stdcommands
+﻿//engine: JScript
+//uname: PreCommitHookRedmine
+//dname: Хук перед помещением в хранилище  
+//addin: stdlib
+//addin: stdcommands
 
 // (c) Сосна Евгений <shenja@sosna.zp.ua>
 // Зроблено в Україні. 
