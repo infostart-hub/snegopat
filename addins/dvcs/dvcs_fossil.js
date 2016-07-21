@@ -1,7 +1,7 @@
-﻿$engine JScript
-$uname dvcs_fossil
-$dname Backend к dvcs fossil
-$addin global
+﻿//engine: JScript
+//uname: dvcs_fossil
+//dname: Backend к dvcs fossil
+//addin: global
 
 // (c) Сосна Евгений shenja at sosna.zp.ua
 // Скрипт - Backend к fossil для отображения версионного контроля. 

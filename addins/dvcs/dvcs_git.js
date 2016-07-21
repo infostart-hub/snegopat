@@ -1,8 +1,8 @@
-﻿$engine JScript
-$uname dvcs_git
-$dname Backend dvcs к git
-$addin stdlib
-$addin global
+﻿//engine: JScript
+//uname: dvcs_git
+//dname: Backend dvcs к git
+//addin: stdlib
+//addin: global
 
 // (c) Сосна Евгений shenja at sosna.zp.ua
 // Скрипт - Backend к bzr для отображения версионного контроля. 
