@@ -10,8 +10,7 @@ TextWnd&& activeTextWnd;
 // Это интерфейс обработчика событий в тексте.
 // В-зависимости от назначенного текстовому документу расширения (встроенный язык, язык запросов и т.п.)
 // создается соответствующий расширению текстовый процессор. Именно он и обрабатывает события в текстовом окне
-interface TextProcessor
-{
+interface TextProcessor {
     // Подключение/отключение к документу
     void setTextDoc(TextDoc&& textDoc);
     // Подключение нового окна редактора
@@ -46,8 +45,7 @@ class EmptyTextProcessor : TextProcessor {
     иначе очень весёлые глюки. Хотя когда нужно сделать несколько вставок подряд,
     кэш можно сбросить только после последней вставки.
 */
-void insertInSelection(ITextEditor&& pEditor, TextManager&& pTM, ITextManager&& pITM, const string& txt, bool bClearCache, bool needIndent)
-{
+void insertInSelection(ITextEditor&& pEditor, TextManager&& pTM, ITextManager&& pITM, const string& txt, bool bClearCache, bool needIndent) {
     string text(txt);
     TextPosition tpStart, tpCaretAfter;
     pEditor.getSelection(tpStart, tpCaretAfter, false);
@@ -101,8 +99,7 @@ void insertInSelection(ITextEditor&& pEditor, TextManager&& pTM, ITextManager&& 
         vu.updateAllViews();
 }
 
-TextProcessor&& createTextProcessor(const Guid& g)
-{
+TextProcessor&& createTextProcessor(const Guid& g) {
     if (g == gTextExtModule || g == gTextExtModule1) {
         return ModuleTextProcessor();
     }
@@ -111,20 +108,17 @@ TextProcessor&& createTextProcessor(const Guid& g)
 
 TextDocStorage textDocStorage;
 
-class TextDocStorage
-{
+class TextDocStorage {
     array<TextDoc&&> openedDocs;
 
-    TextDoc&& find(ITextManager&& itm)
-    {
+    TextDoc&& find(ITextManager&& itm) {
         for (uint idx = 0, size = openedDocs.length(); idx < size; idx++) {
             if (openedDocs[idx].itm is itm)
                 return openedDocs[idx];
         }
         return null;
     }
-    TextDoc&& find(TextManager&& tm)
-    {
+    TextDoc&& find(TextManager&& tm) {
         for (uint idx = 0, size = openedDocs.length(); idx < size; idx++) {
             if (openedDocs[idx].tm is tm)
                 return openedDocs[idx];
@@ -132,8 +126,7 @@ class TextDocStorage
         return null;
     }
     void store(TextDoc&& tdoc) { openedDocs.insertLast(&&tdoc); }
-    void remove(TextDoc&& doc)
-    {
+    void remove(TextDoc&& doc) {
         for (uint idx = 0, size = openedDocs.length(); idx < size; idx++) {
             if (openedDocs[idx] is doc) {
                 openedDocs.removeAt(idx);
@@ -159,8 +152,7 @@ class TextDocStorage
 };
 
 // Вызывается из перехвата при создании окна текстового редактора
-void onCreateTextWnd(IWindowView&& pWnd, bool bControl)
-{
+void onCreateTextWnd(IWindowView&& pWnd, bool bControl) {
     if (bControl) {
         IControlDesign&& ctrl = pWnd.unk;
         if (ctrl !is null && ctrl.getMode() != ctrlRunning)
@@ -188,22 +180,19 @@ void onCreateTextWnd(IWindowView&& pWnd, bool bControl)
 
 // Вызывается из перехвата при смене расширения текстового редактора
 // (т.е. в меню текст выбрали тип текста - Встроеный язык, язык запросов, и т.п.)
-void changeTextExtender(ITextManager&& itm, const Guid& textExtender)
-{
+void changeTextExtender(ITextManager&& itm, const Guid& textExtender) {
     TextDoc&& tdoc = textDocStorage.find(itm);
     if (tdoc !is null)
         tdoc.setTextExtenderType(textExtender);
 }
 
 NoCaseMap<TextDocMdInfo&&> openedMdObjects;
-string keyForSearchOpenedMD(IMDObject&& obj, const Guid& propUuid)
-{
+string keyForSearchOpenedMD(IMDObject&& obj, const Guid& propUuid) {
     return "" + obj.self + "|" + propUuid;
 }
 
 class TextDocMdInfo {
-    TextDocMdInfo(IAssistantData&& data, TextDoc&& doc)
-    {
+    TextDocMdInfo(IAssistantData&& data, TextDoc&& doc) {
         &&owner = doc;
         IUnknown&& unk;
         data.object(unk);
@@ -214,10 +203,12 @@ class TextDocMdInfo {
             &&container = getMDObjectWrapper(object).get_container()._container();
         openedMdObjects.insert(keyForSearchOpenedMD(object, mdPropUuid), this);
     }
-    void detach()
-    {
+    void detach() {
         openedMdObjects.remove(keyForSearchOpenedMD(object, mdPropUuid));
         &&owner = null;
+		&&object = null;
+		&&container = null;
+		&&extObject = null;
     }
     TextDoc&& owner;
     IMDObject&& object;
@@ -228,25 +219,21 @@ class TextDocMdInfo {
 
 // Класс, который хранит различную инфу о текстовом документе.
 // Важно, у одного текстового документа может быть открыто несколько окон
-class TextDoc
-{
+class TextDoc {
     ITextManager&&   itm;
     TextManager&&    tm;
     TextProcessor&&  tp;
     array<TextWnd&&> views;
     TextDocMdInfo&&  mdInfo;
-    ~TextDoc()
-    {
+    ~TextDoc() {
         //Print("delete TextDoc");
     }
-    void attachView(TextWnd&& wnd)
-    {
+    void attachView(TextWnd&& wnd) {
         &&wnd.textDoc = this;
         views.insertLast(&&wnd);
         tp.connectEditor(wnd);
     }
-    void detachView(TextWnd&& wnd)
-    {
+    void detachView(TextWnd&& wnd) {
         if (wnd is activeTextWnd)
             &&activeTextWnd = null;
         for (uint idx = 0, size = views.length(); idx < size; idx++) {
@@ -256,14 +243,14 @@ class TextDoc
             }
         }
         if (views.length() == 0) { // Закрыли последнее окно
-            if (mdInfo !is null)
+			tp.setTextDoc(null);
+			&&tp = null;
+			if (mdInfo !is null)
                 mdInfo.detach();
-            tp.setTextDoc(null);
             textDocStorage.remove(this);
         }
     }
-    void setTextExtenderType(const Guid& g)
-    {
+    void setTextExtenderType(const Guid& g) {
         if (mdInfo is null && (g == gTextExtModule || g == gTextExtModule1)) {
             ITxtEdtExtender&& ext;
             getTxtEdtService().getExtender(ext, itm, g);
@@ -283,13 +270,14 @@ class TextDoc
             if (data !is null)
                 &&mdInfo = TextDocMdInfo(data, this);
         }
+		if (tp !is null)
+			tp.setTextDoc(null);
         &&tp = createTextProcessor(g);
         tp.setTextDoc(this);
         for (uint k = 0, m = views.length(); k < m; k++)
             tp.connectEditor(views[k]);
     }
-    TextWnd&& findWnd(ITextEditor&& editor)
-    {
+    TextWnd&& findWnd(ITextEditor&& editor) {
         for (uint i = 0, im = views.length; i < im; i++) {
             TextWnd&& wnd = views[i];
             if (wnd.ted is editor)
@@ -299,8 +287,7 @@ class TextDoc
     }
 };
 
-class TextWnd
-{
+class TextWnd {
     ASWnd&&        wnd;            // сабклассер текстового окна, перенаправляет указанные события оконной процедуры в скриптовый обработчик
     HWND           hWnd;           // WinAPI хэндл окна
     ITextEditor&&  ted;            // Интерфейс редактора 1С
@@ -309,17 +296,15 @@ class TextWnd
     bool           isControl;      // Является ли окно тектовым контролом или полноценным view
     ITextWindow&&  iwnd;           // Скриптовая обертка
     
-    TextWnd(IWindowView&& v, bool isCtrl)
-    {
+    TextWnd(IWindowView&& v, bool isCtrl) {
         isControl = isCtrl;
         hWnd = v.hwnd();
         &&wnd = attachWndToFunction(hWnd, WndFunc(this.WndProc),
-            array<uint> = { WM_KEYDOWN, WM_SYSKEYDOWN, WM_CHAR, WM_DESTROY, WM_SETFOCUS, WM_KILLFOCUS });
+            array<uint> = { WM_KEYDOWN, WM_SYSKEYDOWN, WM_CHAR, WM_DESTROY, WM_SETFOCUS, WM_KILLFOCUS});
         &&ted = v.unk;
     }
     // Это функция обработчик оконных сообщений сабклассированного окна
-    uint WndProc(uint msg, uint w, uint l)
-    {
+    uint WndProc(uint msg, uint w, uint l) {
         switch (msg) {
         case WM_SETFOCUS:
             &&activeTextWnd = this;
@@ -341,26 +326,22 @@ class TextWnd
         }
         return wnd.doDefault();
     }
-    ~TextWnd()
-    {
+    ~TextWnd() {
         //Print("delete TextWnd");
     }
-    uint onKeyDown(uint w, uint l)
-    {
-        if(!textDoc.tp.onKeyDown(this, w, l))
+    uint onKeyDown(uint w, uint l) {
+        if (!textDoc.tp.onKeyDown(this, w, l))
             return wnd.doDefault();
         return 0;
     }
-    uint onChar(uint16 symb)
-    {
+    uint onChar(uint16 symb) {
         // сначала дадим отработать штатным механизмам
         uint res = wnd.doDefault();
         // Дальше работает текстовый процессор, назначенный этому тексту
         textDoc.tp.afterChar(this, symb);
         return res;
     }
-    ITextWindow&& getComWrapper()
-    {
+    ITextWindow&& getComWrapper() {
         if (iwnd is null)
             &&iwnd = ITextWindow(this);
         return iwnd;

@@ -31,13 +31,11 @@ class ModuleElements {
     uint                            allowedPreprocContextes = uint(-1);
     bool                            parsed = false;
 
-    ModuleElements()
-    {
+    ModuleElements() {
         smartItems.resize(elLast);
     }
 
-    void clearResults()
-    {
+    void clearResults() {
         for (uint i = 0; i < elLast; i++)
             smartItems[i].resize(0);
         &&modStruct = null;
@@ -45,8 +43,7 @@ class ModuleElements {
         parsed = false;
     }
 
-    void parse()
-    {
+    void parse() {
         if (parsed)
             return;
         clearResults();
@@ -63,12 +60,10 @@ class ModuleElements {
         }
         parsed = true;
     }
-    uint preprocContextForLine(uint line)
-    {
+    uint preprocContextForLine(uint line) {
         return modStruct.preprocContextForLine(line);
     }
-    void processParseResultForCurrentModule(ParseMethodResult&& res, IntelliSite&& isite, NoCaseSet& methNames, NoCaseSet& propNames)
-    {
+    void processParseResultForCurrentModule(ParseMethodResult&& res, IntelliSite&& isite, NoCaseSet& methNames, NoCaseSet& propNames) {
         if (res.isFlagSet(allowProcedure)) {
             isite.addItemGroup(checkAccess(resetExclude(smartItems[elProc]), res.allowedAccesses));
             isite.addItemGroup(checkAccess(resetExclude(smartItems[elProcEx]), res.allowedAccesses));
@@ -88,8 +83,7 @@ class ModuleElements {
         for (uint i = 0, im = modStruct.varsCount(); i < im; i++)
             propNames.insert(modStruct.var(i).name);
     }
-    void processParseResultForOtherModule(ParseMethodResult&& res, IntelliSite&& isite, NoCaseSet& methNames, NoCaseSet& propNames)
-    {
+    void processParseResultForOtherModule(ParseMethodResult&& res, IntelliSite&& isite, NoCaseSet& methNames, NoCaseSet& propNames) {
         if (currentModule is this)
             return;
         if (res.isFlagSet(allowProcedure))
@@ -105,22 +99,19 @@ class ModuleElements {
     }
 };
 
-array<SmartBoxItem&&>&& resetExclude(array<SmartBoxItem&&>&& items)
-{
+array<SmartBoxItem&&>&& resetExclude(array<SmartBoxItem&&>&& items) {
     for (uint i = 0, im = items.length; i < im; i++)
         items[i].d.exclude = false;
     return items;
 }
 
 
-array<SmartBoxItem&&>&& checkAccess(array<SmartBoxItem&&>&& items, uint access)
-{
+array<SmartBoxItem&&>&& checkAccess(array<SmartBoxItem&&>&& items, uint access) {
     // Тут должен быть цикл, устанавливающий exclude взависимости от доступности метода/переменной
     return items;
 }
 
-array<SmartBoxItem&&>&& checkNamesInSet(array<SmartBoxItem&&>&& items, NoCaseSet& set)
-{
+array<SmartBoxItem&&>&& checkNamesInSet(array<SmartBoxItem&&>&& items, NoCaseSet& set) {
     for (uint i = 0, im = items.length; i < im; i++) {
         SmartBoxItem&& it = items[i];
         if (set.contains(it.d.descr))
@@ -134,13 +125,11 @@ array<SmartBoxItem&&>&& checkNamesInSet(array<SmartBoxItem&&>&& items, NoCaseSet
 class MDModuleTextSource : ModuleTextSource {
     IMDObject&& mdObj;
     Guid mdProp;
-    MDModuleTextSource(IMDObject&& obj, const Guid& g)
-    {
+    MDModuleTextSource(IMDObject&& obj, const Guid& g) {
         &&mdObj = obj;
         mdProp = g;
     }
-    void getModuleSourceText(v8string& text)
-    {
+    void getModuleSourceText(v8string& text) {
         IMDEditHelper&& peh;
         getMDEditService().getEditHelper(peh, mdObj);
         if (peh !is null) {
@@ -158,21 +147,18 @@ class MDModuleTextSource : ModuleTextSource {
     }
 };
 
-string moduleName(IMDObject&& obj, const Guid& mdProp)
-{
+string moduleName(IMDObject&& obj, const Guid& mdProp) {
     return mdObjFullName(obj) + "." + mdPropName(mdProp);
 }
 
 NoCaseMap<ModuleElements&&> allModuleElements;
 
-ModuleElements&& findModuleElementsParser(IMDObject&& obj, const Guid& mdProp)
-{
+ModuleElements&& findModuleElementsParser(IMDObject&& obj, const Guid& mdProp) {
     auto find = allModuleElements.find(keyForSearchOpenedMD(obj, mdProp));
     return find.isEnd() ? null : find.value;
 }
 
-ModuleElements&& getModuleElementsParser(IMDObject&& obj, const Guid& mdProp, ModuleTextSource&& src = null)
-{
+ModuleElements&& getModuleElementsParser(IMDObject&& obj, const Guid& mdProp, ModuleTextSource&& src = null) {
     ModuleElements&& me = findModuleElementsParser(obj, mdProp);
     if (me is null) {
         &&me = ModuleElements();
@@ -183,8 +169,7 @@ ModuleElements&& getModuleElementsParser(IMDObject&& obj, const Guid& mdProp, Mo
     return me;
 }
 
-void removeModuleElementsParser(ModuleElements&& me, IMDObject&& obj, const Guid& mdProp)
-{
+void removeModuleElementsParser(ModuleElements&& me, IMDObject&& obj, const Guid& mdProp) {
     &&me.source = null;
     allModuleElements.remove(keyForSearchOpenedMD(obj, mdProp));
 }
@@ -192,16 +177,14 @@ void removeModuleElementsParser(ModuleElements&& me, IMDObject&& obj, const Guid
 class ModuleMethodItem : SmartBoxInsertableItem, MethodInsertable {
     ModuleElements&& owner;
     ModuleStructMethod&& info;
-    ModuleMethodItem(ModuleElements&& o, ModuleStructMethod&& i)
-    {
+    ModuleMethodItem(ModuleElements&& o, ModuleStructMethod&& i) {
         super(i.name, imgPublicMethod);
         &&owner = o;
         &&info = i;
         paramsCount = i.paramsCount();
         isFunction = i.isFunction;
     }
-    void textForTooltip(string& text)
-    {
+    void textForTooltip(string& text) {
         text = (isFunction ? "Функция " : "Процедура ") + info.name + "(";
         if (paramsCount > 0) {
             for (uint i = 0, im = paramsCount - 1; i < im; i++)
@@ -221,14 +204,12 @@ class ModuleMethodItem : SmartBoxInsertableItem, MethodInsertable {
 class ModuleVarItem : SmartBoxInsertableItem {
     ModuleElements&& owner;
     ModuleStructVar&& info;
-    ModuleVarItem(ModuleElements&& o, ModuleStructVar&& i)
-    {
+    ModuleVarItem(ModuleElements&& o, ModuleStructVar&& i) {
         super(i.name, imgPublicVar);
         &&owner = o;
         &&info = i;
     }
-    void textForTooltip(string& text)
-    {
+    void textForTooltip(string& text) {
         text = "Перем " + info.name;
         if (info.isExport)
             text += " Экспорт";
@@ -241,13 +222,11 @@ class ModuleVarItem : SmartBoxInsertableItem {
 
 class LocalVarSmartItem: SmartBoxInsertableItem {
     LocalVarItem&& info;
-    LocalVarSmartItem(LocalVarItem&& i)
-    {
+    LocalVarSmartItem(LocalVarItem&& i) {
         super(i.name, imgLocalVar);
         &&info = i;
     }
-    void textForTooltip(string& text)
-    {
+    void textForTooltip(string& text) {
         if (info.type == lvParam)
             text = "Параметр ";
         else if (info.type == lvVar)
@@ -259,20 +238,75 @@ class LocalVarSmartItem: SmartBoxInsertableItem {
 };
 
 class CommonModuleItem : SmartBoxInsertableItem {
-    CommonModuleItem(const string& name)
-    {
+    CommonModuleItem(const string& name) {
         super(name, imgCmnModule);
     }
-    void textForTooltip(string& text)
-    {
+    void textForTooltip(string& text) {
         text = "Общий модуль " + d.descr;
     }
-    void textForInsert(string&out text)
-    {
+    void textForInsert(string&out text) {
         text = d.descr + ".";
     }
-    void afterInsert(TextWnd&& editor)
-    {
+    void afterInsert(TextWnd&& editor) {
         showV8Assist();
     }
 };
+
+namespace Delimeters {
+
+enum Types {
+	parenthesis,
+	parenthesisWithBackSpace,
+	squareBracket,
+	quote,
+	date,
+	question,
+	lastType,
+};
+
+class Item : SmartBoxInsertableItem {
+	string tt;
+	string ins;
+	bool noActivate;
+	bool needSemicolon;
+
+	Item(const string& name, const string& t, const string& i, bool na = false, bool ns = false) {
+		super(name, imgParenthesis);
+		d.hotOrder = uint(-1);
+		tt = t;
+		ins = i;
+		noActivate = na;
+		needSemicolon = ns;
+	}
+
+	void textForTooltip(string& text) {
+		text = tt;
+	}
+	void textForInsert(string&out text) {
+		text = ins;
+		if (needSemicolon && getIntelliSite().isLineTailEmpty())
+			text += ";";
+	}
+	void afterInsert(TextWnd&& editor) {
+		if (!noActivate)
+			showV8Assist();
+	}
+};
+
+array<Item&&>&& items;
+
+Item&& getDelimeter(Types type) {
+	if (items is null) {
+		&&items = array<Item&&> = {
+			Item("(...)",	"Вставить скобки", "(¦)"),
+			Item("(...)",	"Вставить скобки", "\x8(\"¦\")"),
+			Item("[...]",	"Вставить квадратные скобки", "[¦]"),
+			Item("\"...\"", "Вставить кавычки", "\"¦\""),
+			Item("'...'",	"Вставить дату", "'¦'"),
+			Item("(, , )",	"Вставить после знака вопроса", "(¦, , )", true, true)
+		};
+	}
+	return items[type];
+}
+
+}//namespace Delimeters

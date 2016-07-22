@@ -19,6 +19,7 @@ const uint16 spaceSymbol = '∙';
 // Элементы, которые вставляются из списка, должны наследоваться от этого класса
 class SmartBoxInsertableItem : SmartBoxItem
 {
+class SmartBoxInsertableItem : SmartBoxItem {
     SmartBoxInsertableItem(const string& descr, imagesIdx img)
     {
         super(descr, img);
@@ -265,8 +266,7 @@ class IntelliSite : SmartBoxSite {
     }
 
     // Реализация интерфейса взаимодействия со списком
-    void onDoSelect(SmartBoxItemBaseIface&& pSelected)
-    {
+    void onDoSelect(SmartBoxItemBaseIface&& pSelected) {
         SmartBoxInsertableItem&& ins = cast<SmartBoxInsertableItem>(pSelected);
         if (ins !is null) {
             TextPosition tpStart = caretPos;
@@ -277,6 +277,11 @@ class IntelliSite : SmartBoxSite {
             ins.updateInsertPosition(textWnd, tpStart, tpEnd, notIndent);
             string text;
             ins.textForInsert(text);
+			while ('\x8' == text[0]) {
+				if (tpStart.col > 1)
+					tpStart.col--;
+				text.remove(0);
+			}
             editor.setSelection(tpStart, tpEnd, false, false);
             insertInSelection(editor, textWnd.textDoc.tm, textWnd.textDoc.itm, text, true, !notIndent);
             updateHotOrder(ins);
@@ -438,15 +443,15 @@ class IntelliSite : SmartBoxSite {
             array<SmartBoxItem&&>&& group = itemsGroup[i];
             for (uint k = 0, km = group.length; k < km; k++) {
                 SmartBoxItem&& item = group[k];
-                item.d.hotOrder = hotItems.find(item.d.key) + 1;
+				if (item.d.hotOrder != uint(-1))
+					item.d.hotOrder = hotItems.find(item.d.key) + 1;
             }
         }
     }
     void updateHotOrder(SmartBoxItem&& item)
     {
-        if (item.d.hotOrder > 0) {
+        if (item.d.hotOrder > 0 && item.d.hotOrder != uint(-1))
             hotItems.removeAt(item.d.hotOrder - 1);
-        }
         hotItems.insertLast(item.d.key);
         if (hotItems.length > maxHotOrderItems())
             hotItems.removeAt(0);
@@ -466,6 +471,9 @@ class IntelliSite : SmartBoxSite {
         //    root.deleteValue(hotOrderDataPath);
         root.createAndSetValue(hotOrderDataPath, gpflBaseUser, Value(v8string(join(hotItems, "\n"))));
     }
+	bool isLineTailEmpty() {
+		return getTextLine(textWnd.textDoc.tm, caretPos.line).substr(caretPos.col - 1).replace(indentRex, "").isEmpty();
+	}
 };
 
 class TextEditorSettingChangeNotifier {

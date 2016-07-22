@@ -207,13 +207,13 @@ class ModuleTextProcessor : TextProcessor, ModuleTextSource {
             return false;
         //	Делаем автозамены: ? ++ -- += -= *= /= %= 
         uint len = lineBegin.length;
-        /*
+        
         if ('?' == symbol) {
-            IntelliSite& is = IntelliSite::get();
-            is.addItem(Delimeters::getDelimeter(Delimeters::question));
-            is.show(CString(), pTxtWnd);
-            return TRUE;
-        }*/
+            IntelliSite&& ist = getIntelliSite();
+			ist.addItem(Delimeters::getDelimeter(Delimeters::question));
+            ist.show(pTxtWnd, "");
+            return true;
+        }
         // Для начала определим, надо ли вообще делать автозамену
         if (len < 3)
             return false;
@@ -316,6 +316,10 @@ class ModuleTextProcessor : TextProcessor, ModuleTextSource {
         // Добавим ключевые слова
         getKeywordsGroup().processParseResult(parseResult, isite);
         // Добавим разделители
+		if (parseResult.isFlagSet(wantDefVal)) {
+			isite.addItem(Delimeters::getDelimeter(Delimeters::quote));
+			isite.addItem(Delimeters::getDelimeter(Delimeters::date));
+		}
         // Добавим типы
         addTypes(parseResult, isite);
         // Для вставки некоторых элементов нужна информация о результатах парсинга
@@ -580,13 +584,17 @@ void addV8stock(ParseMethodResult&& result, IntelliSite&& isite, NoCaseSet& meth
 }
 
 void addTypes(ParseMethodResult&& result, IntelliSite&& isite) {
-    if (result.isFlagSet(allowNewTypes)) {
-        isite.addItemGroup(checkAccess(resetExclude(v8stock[stockTypeNames, langCmn]), result.allowedAccesses));
-        if (0 != (useLangs & useLangEng))
-            isite.addItemGroup(checkAccess(resetExclude(v8stock[stockTypeNames, langEng]), result.allowedAccesses));
-        if (0 != (useLangs & useLangRus))
-            isite.addItemGroup(checkAccess(resetExclude(v8stock[stockTypeNames, langRus]), result.allowedAccesses));
-    }
+    if (result.isFlagSet(allowNewTypes))
+		addTypeStores(isite, result.allowedAccesses);
+}
+
+void addTypeStores(IntelliSite&& isite, uint allowedAccesses) {
+	isite.addItemGroup(checkAccess(resetExclude(v8stock[stockTypeNames, langCmn]), allowedAccesses));
+	if (0 != (useLangs & useLangEng))
+		isite.addItemGroup(checkAccess(resetExclude(v8stock[stockTypeNames, langEng]), allowedAccesses));
+	if (0 != (useLangs & useLangRus))
+		isite.addItemGroup(checkAccess(resetExclude(v8stock[stockTypeNames, langRus]), allowedAccesses));
+	isite.addItem(Delimeters::getDelimeter(Delimeters::parenthesisWithBackSpace));
 }
 
 void showV8Assist() {

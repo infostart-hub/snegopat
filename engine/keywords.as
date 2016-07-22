@@ -40,7 +40,7 @@ class Keywords {
         KeywordItem("Except", "Except\n", formatAfterInsert),
         KeywordItem("Raise", "Raise ¦;"),
         KeywordItem("EndTry", "EndTry;\n", formatAfterInsert),
-        KeywordItem("New", "New "), // todo сделать сразу выбор типов после вставки
+        KeywordItem("New", "New ", selectTypeAfterInsert),
         KeywordItem("Execute", "Execute(\"¦\");"),
         KeywordItem("True", "True"),
         KeywordItem("False", "False"),
@@ -82,7 +82,7 @@ class Keywords {
         KeywordItem("Исключение", "Исключение\n", formatAfterInsert),
         KeywordItem("ВызватьИсключение", "ВызватьИсключение ¦;"),
         KeywordItem("КонецПопытки", "КонецПопытки;\n", formatAfterInsert),
-        KeywordItem("Новый", "Новый "),
+        KeywordItem("Новый", "Новый ", selectTypeAfterInsert),
         KeywordItem("Выполнить", "Выполнить(\"¦\");"),
         KeywordItem("Истина", "Истина"),
         KeywordItem("Ложь", "Ложь"),
@@ -181,4 +181,10 @@ void formatAfterInsert(KeywordItem& item, TextWnd&& editor)
 void insertForReturn(KeywordItem& item, string& text)
 {
     text += (lastParseMethodResult.isFlagSet(inProcedure) ? "" : " ¦") + ";";
+}
+
+void selectTypeAfterInsert(KeywordItem& item, TextWnd&& editor) {
+	IntelliSite&& ist = getIntelliSite();
+	addTypeStores(ist, lastParseMethodResult.allowedAccesses);
+	ist.show(editor, "");
 }

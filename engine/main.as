@@ -25,8 +25,7 @@ void main() {
 
 // Заполняем таблицу, в которой указан класс символа. Таблица используется в snegopat.dll, но
 // для заполнения используются функции V*.
-void initSymbolClassTable()
-{
+void initSymbolClassTable() {
     for (uint k = 0; k <= 32; k++)
         mem::byte[symbolClassTable + k] = symbSpace;
     for (uint k = 33; k < 0x10000; k++) {
@@ -41,8 +40,7 @@ TrapVirtualStdCall trProfileOpen;
 // Подключение к дереву настроек файла snegopat.pfl
 // Для обеспечения портабельности файл лежит в каталоге снегопата, поэтому
 // этот каталог должен быть доступен для записи.
-void initSnegopatProfile()
-{
+void initSnegopatProfile() {
 	trProfileOpen.setTrap(getProfileService(), IProfileService_open, IProfileService_openTrap);
 }
 
@@ -71,8 +69,7 @@ OptionsEntry oeEnableTextWork("EnableTextWork", function(v){v = true; },
 	function(v){v.getBoolean(enableTextWork); setTextHooks(); if (enableTextWork) Message("Подсказка снегопата заработает только во вновь открытых окнах"); return false; });
 
 // Установка различных перехватов, связанных с текстовыми окнами/документами
-bool setTextHooks()
-{
+bool setTextHooks() {
 	if (!enableTextWork) {
 		disableAllTextTraps();
 		textDocStorage.disableTextWork();
@@ -122,8 +119,7 @@ bool setTextHooks()
 	return true;
 }
 
-uint TxtDoc_createView(IDocument& doc, uint pView)
-{
+uint TxtDoc_createView(IDocument& doc, uint pView) {
     trTxtEdtDoc_createView.swap();
     IUnknown&& unk;
     doc.createView(unk);
@@ -169,8 +165,7 @@ void disableAllTextTraps() {
 
 
 funcdef bool WV_CreateWindow(IWindowView&, HWND parentWindow);
-bool TxtEdtCtrl_createWindow(IWindowView& view, HWND parentWindow)
-{
+bool TxtEdtCtrl_createWindow(IWindowView& view, HWND parentWindow) {
 #if test = 1
     dumpVtable(&&view, "_TxtEdtCtrl_createWindow");
 #endif
@@ -181,8 +176,7 @@ bool TxtEdtCtrl_createWindow(IWindowView& view, HWND parentWindow)
     return res;
 }
 
-bool TxtEdtView_createWindow(IWindowView& view, HWND parentWindow)
-{
+bool TxtEdtView_createWindow(IWindowView& view, HWND parentWindow) {
 #if test = 1
     dumpVtable(&&view, "_TxtEdtView_createWindow");
 #endif
@@ -193,24 +187,21 @@ bool TxtEdtView_createWindow(IWindowView& view, HWND parentWindow)
     return res;
 }
 
-bool TxtEdtCommand_onExecute(ICommandTarget& tgt, const Command& command)
-{
+bool TxtEdtCommand_onExecute(ICommandTarget& tgt, const Command& command) {
 #if test = 1
     dumpVtable(&&tgt, "_TxtEdtCommand_onExecute");
 #endif
     return checkCommandAndHideSmartBox(tgt, command, trTxtEdtCommand_onExecute);
 }
 
-bool TxtCtrCommand_onExecute(ICommandTarget& tgt, const Command& command)
-{
+bool TxtCtrCommand_onExecute(ICommandTarget& tgt, const Command& command) {
 #if test = 1
     dumpVtable(&&tgt, "_TxtCtrCommand_onExecute");
 #endif
     return checkCommandAndHideSmartBox(tgt, command, trTxtCtrCommand_onExecute);
 }
 
-int TxtMgrOper_setExtender(ITextManager_Operations& to, const Guid& clsid)
-{
+int TxtMgrOper_setExtender(ITextManager_Operations& to, const Guid& clsid) {
 #if test = 1
     dumpVtable(&&to, "_TxtMgrOper_setExtender");
 #endif
