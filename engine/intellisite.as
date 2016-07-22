@@ -17,8 +17,6 @@ const string hotOrderDataPath = "Snegopat/HotWords";
 const uint16 spaceSymbol = '∙';
 
 // Элементы, которые вставляются из списка, должны наследоваться от этого класса
-class SmartBoxInsertableItem : SmartBoxItem
-{
 class SmartBoxInsertableItem : SmartBoxItem {
     SmartBoxInsertableItem(const string& descr, imagesIdx img)
     {
