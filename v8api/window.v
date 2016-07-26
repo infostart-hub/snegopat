@@ -215,6 +215,14 @@
 		0x18
 		Vector childsIds
 
+:iface IFormViewCore {B1C6A8A6-BC9F-11D4-9437-004095E12FC7}
+	:virt
+	+1
+	+1 //IForm& getForm()
+	bool updateData(bool save, int controlId)
+	void endDialog(int result)
+	void setFormSize(const Size& size, bool inDLU = true)
+
 :struct ViewContextListNode
 	:props
 		uint next

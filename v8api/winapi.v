@@ -16,6 +16,7 @@
 :tdef LPARAM uint32
 
 :enum WndMessages
+	0xF		WM_PAINT
 	0x100	WM_KEYDOWN
 	0x104	WM_SYSKEYDOWN
 	0x101	WM_KEYUP

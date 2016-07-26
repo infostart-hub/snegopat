@@ -29,9 +29,80 @@
 :virt
     bool getCellFormat(IV8Bookmark& bkmk, uint colId, Value& value, CellFormat& cellFormat)
 
+
+:enum RowActivateType
+    eNone
+    eUp
+    eCenter
+    eDown
+    eChangeBookmark
+    eShowTreeLevel
+
+
+:iface IGrid {3E93994E-5ED7-4D28-9B45-13193B37888E}
+:virt
+#if ver >= 8.3.8
+	+3
+#else
+	+2
+#endif
+	bool setDataSource(IV8DataSource& dataSource, uint gridUISource = 0)
+	IV8DataSource& getDataSource()
+    IGridUISource& getUISource()
+
+#if ver >= 8.3.8
+	16
+#elif ver >=8.3.7
+	15
+#elif ver > 8.3.1945
+	13
+#elif ver > 8.3.6.1920
+    14
+#elif ver >= 8.3
+	12
+#else
+	11
+#endif
+	void setCurrentColumnId(uint id)
+	uint getCurrentColumnId()
+	+1
+	bool setActiveCell(IV8Bookmark&, uint id, bool show, RowActivateType at, int, int)
+
+#if ver >=8.3.7
+	44
+#elif ver > 8.3.1945
+	42
+#elif ver > 8.3.6.1920
+	43
+#elif ver >= 8.3
+	40
+#else
+	39
+#endif
+	uint getCurrentLine(IV8Bookmark@&)
+	bool expandLine(IV8Bookmark& bkmk, bool expand, bool expandChildren, bool show = true)
+	bool isExpandedLine(IV8Bookmark& bkmk)
+
+#if ver >= 8.3.8
+	58
+#elif ver > 8.3.1945
+	56
+#elif ver > 8.3.6.1920
+	57
+#elif ver >= 8.3
+	53
+ #else
+	52
+ #endif
+	CheckState getCellCheck(IV8Bookmark& bkmk, uint id)
+	void setCellCheck(IV8Bookmark& bkmk, uint id, CheckState st)
+	+1
+	uint columnsCount()
+
+
 :struct ImageInfo
 :props
-	uint image	// IUnknown
+	uint image
 	Point posInPicture
 	uint paintStyle
 :meths

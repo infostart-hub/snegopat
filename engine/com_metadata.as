@@ -781,7 +781,21 @@ bool loadObject(IV8DataFile&& file, IUnknown&& obj)
     return true;
 }
 
-class IObjectProperties {};
+class IObjectProperties {
+	int get_count() {
+		return 0;
+	}
+	string propName(int idx) {
+		return "";
+	}
+	Variant getValue(Variant idx) {
+		return Variant();
+	}
+	void setValue(Variant idx, Variant val) {
+	}
+	void activateProperty(Variant idx) {
+	}
+};
 
 IMDContainer&& getIBMDCont()
 {

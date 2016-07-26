@@ -144,6 +144,12 @@
 	+1
 	void getValue(Value& value, bool bMake = true)
 
+:iface IDataControlEx {4154059F-F2F1-4A3F-96AE-A814BAD3A80A}
+:virt
+    void supportedTypes(Vector& types, bool& supportDomain)
+    void setTypeDomain(const TypeDomainPattern& typeDomain)
+    void getTypeDomain(TypeDomainPattern& typeDomain)
+
 :iface IFldEdit {4F663FCF-8942-4475-9E36-4D2ED7405F40}
 :virt
 	void test()

@@ -5,18 +5,15 @@
 #pragma once
 #include "../../all.h"
 
-void initWorkWithMainFrame()
-{
+void initWorkWithMainFrame() {
     getEventService().subscribe(eventCreateFrame, AStoIUnknown(EventTopLevelFrame(), IID_IEventRecipient));
 }
 
 ITopLevelFrame&& mainFrame;
 ITopLevelFrame&& coreMainFrame;
 
-class EventTopLevelFrame
-{
-    void onEvent(const Guid&in eventID, long val, IUnknown& obj)
-    {
+class EventTopLevelFrame {
+    void onEvent(const Guid&in eventID, long val, IUnknown& obj) {
         ITopLevelFrame&& frame = obj;
         if (frame !is null) {
             if (mainFrame is null) {
@@ -43,15 +40,13 @@ class MyCommandState {
     string descr;
     string tooltip;
 
-    MyCommandState()
-    {
+    MyCommandState() {
         p = 0;
         bEnable = bChecked = false;
     }
     uint id() { return _idc.self;}
     int param(){return p;}
-    uint object(uint i)
-    {
+    uint object(uint i) {
         mem::dword[i] = 0;
         return i;
     }
@@ -71,8 +66,7 @@ class MyCommandState {
 
 class MyCommandStateList {
     uint count = 0;
-    void setCount(uint c)
-    {
+    void setCount(uint c) {
         //Message("Set cmd list count " + c);
         count = c;
     }
@@ -83,8 +77,7 @@ class CommandState {
     MyCommandStateList lstState;
     ICmdSateImpl&& allState;
 
-    CommandState(const CommandID& id, bool withList)
-    {
+    CommandState(const CommandID& id, bool withList) {
         currentProcess().createByClsid(CLSID_CmdStateImpl, IID_ICmdSateImpl, allState);
         allState.setCommand(id, AStoIUnknown(&&cmdState, IID_ICommandState));
         if (withList)
@@ -99,16 +92,14 @@ enum stateFlags {
     cmdStateChecked = 4,    // команда помечена
 };
 
-uint commandState(const CommandID& cmd, int subCommand = -1)
-{
+uint commandState(const CommandID& cmd, int subCommand = -1) {
     CommandState&& st = getMainFrameCommandState(cmd);
     if (st !is null)
         return cmdStateHandler | (!st.cmdState.bEnable ? 0 : cmdStateEnabled) | (!st.cmdState.bChecked ? 0 : cmdStateChecked);
     return 0;
 }
 
-CommandState&& getMainFrameCommandState(const CommandID& cmd, int subCommand = -1)
-{
+CommandState&& getMainFrameCommandState(const CommandID& cmd, int subCommand = -1) {
     //Message("Get state of " + cmd.group + " - " + cmd.num + " sc=" + subCommand);
     if (coreMainFrame !is null) {
         ICommandReceiver&& cmdReceiver = coreMainFrame.unk;
@@ -117,18 +108,17 @@ CommandState&& getMainFrameCommandState(const CommandID& cmd, int subCommand = -
     return null;
 }
 
-CommandState&& getCommandState(const CommandID& cmd, int subCommand, ICommandReceiver&& cmdReceiver)
-{
+CommandState&& getCommandState(const CommandID& cmd, int subCommand, ICommandReceiver&& cmdReceiver) {
     if (cmdReceiver !is null && cmdReceiver.hasHandler(cmd)) {
         CommandState st(cmd, subCommand == -1);
+		st.cmdState.p = subCommand;
         cmdReceiver.updateState(cast<IUnknown>(st.allState));
         return st;
     }
     return null;
 }
 
-bool sendCommandToCmdRecv(const CommandID& cmd, int subCommandIdx, ICommandReceiver&& pCmdRcv)
-{
+bool sendCommandToCmdRecv(const CommandID& cmd, int subCommandIdx, ICommandReceiver&& pCmdRcv) {
     if (pCmdRcv !is null) {
         if (pCmdRcv.hasHandler(cmd)) {
             pCmdRcv.transmitCommand(Command(cmd, subCommandIdx));
@@ -138,8 +128,7 @@ bool sendCommandToCmdRecv(const CommandID& cmd, int subCommandIdx, ICommandRecei
     return false;
 }
 
-bool sendCommandToMainFrame(const CommandID& cmd, int subCommandIdx = 0)
-{
+bool sendCommandToMainFrame(const CommandID& cmd, int subCommandIdx = 0) {
     //Message("Send " + cmd.group + " - " + cmd.num + " sc=" + subCommandIdx);
     if (coreMainFrame !is null) {
         ICommandReceiver&& pCmdRcv = coreMainFrame.unk;
@@ -152,8 +141,7 @@ array<PVV&&> idleHandlers;
 array<PVV&&> idleHandlersSingle;
 class IdleHandler {
     bool first = true;
-    bool onIdle(int count)
-    {
+    bool onIdle(int count) {
         if (first) {
             first = false;
             initPackets(piOnFirstIdle);
@@ -167,8 +155,7 @@ class IdleHandler {
         }
         return false;
     }
-    int unknown()
-    {
+    int unknown() {
         return idleHandlerUnknownFuncAnswer;
     }
 };

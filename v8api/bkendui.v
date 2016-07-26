@@ -10,25 +10,37 @@
 #endif
 	void openView(IFramedView& view, const ViewPosition& pos=ViewPosition(), int openIn=0, bool activate=true, const Guid& g=IID_NULL, const Rect& r=kEmptyRect)
 ////////////////////////////////////////////////////////
-// Предупреждение
+// Открыть диалог и Предупреждение
 #if ver >= 8.3.7
-	21
+	20
 #elif ver >= 8.3.6
-    20
-#elif ver >= 8.3.5
     19
-#else
+#elif ver >= 8.3.5
     18
+#else
+    17
 #endif
+  #if ver < 8.3.4
+	save int doModal1(IFramedView& pView, int i1, int i2, int i3, int i4, int i5, int i6, int i7, int i8)
+  #else
+	save int doModal1(IFramedView& pView, int i1, int i2, int i3, int i4, int i5, int i6, int i7, int i8, int i9)
+  #endif
+
 #if ver < 8.3
     save int messageBox(const v8string&in text, uint type=0, uint timeout=0, uint caption=0, HWND parent=uint(-1), mbp& param=mbp(), int i1=0, int i2=0, int i3=0)
 #else
     save int messageBox(const v8string&in text, uint type=0, uint timeout=0, uint caption=0, HWND parent=uint(-1), mbp& param=mbp(), int i1=0, int i2=0, int i3=0, int i4=0, int i5=0)
 #endif
 
+	+1
+
+  #if ver < 8.3.4
+	save int doModal2(IFramedView& pView, int i1, int i2, int i3, int i4, int i5, int i6, int i7)
+  #else
+	save int doModal2(IFramedView& pView, int i1, int i2, int i3, int i4, int i5, int i6, int i7, int i8)
+  #endif
 ////////////////////////////////////////////////////////
 // Модальное состояние
-	+2
 	ModalStates currentModalState()
 
 ////////////////////////////////////////////////////////

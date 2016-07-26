@@ -6,8 +6,7 @@
 
 // синглтон списка снегопата
 IntelliSite&& oneIntelliSite;
-IntelliSite&& getIntelliSite()
-{
+IntelliSite&& getIntelliSite() {
     if (oneIntelliSite is null)
         &&oneIntelliSite = IntelliSite();
     return oneIntelliSite;
@@ -18,19 +17,15 @@ const uint16 spaceSymbol = '∙';
 
 // Элементы, которые вставляются из списка, должны наследоваться от этого класса
 class SmartBoxInsertableItem : SmartBoxItem {
-    SmartBoxInsertableItem(const string& descr, imagesIdx img)
-    {
+    SmartBoxInsertableItem(const string& descr, imagesIdx img) {
         super(descr, img);
     }
-    void textForInsert(string&out text)
-    {
+    void textForInsert(string&out text) {
         text = d.descr;
     }
-    void updateInsertPosition(TextWnd& wnd, TextPosition& start, TextPosition& end, bool& notIndent)
-    {
+    void updateInsertPosition(TextWnd& wnd, TextPosition& start, TextPosition& end, bool& notIndent) {
     }
-    void afterInsert(TextWnd&& editor)
-    {
+    void afterInsert(TextWnd&& editor) {
     }
 };
 
@@ -44,8 +39,7 @@ uint getBoxWidth() { return boxWidth; }
 bool allowMultyFilter;
 bool isAllowMultyFilter() { return allowMultyFilter; }
 
-uint maxHotOrderItems()
-{
+uint maxHotOrderItems() {
     return 100;
 }
 
@@ -95,8 +89,7 @@ class IntelliSite : SmartBoxSite {
     bool bAllowMultyFilter;
     array<string>&& hotItems;
     //ToolTip							m_templateToolTip;
-    IntelliSite()
-    {
+    IntelliSite() {
         fontSize.cx = 0;
         clearAllItems();
         // Подпишемся на событие изменения настроек текстового редактора,
@@ -108,31 +101,26 @@ class IntelliSite : SmartBoxSite {
         exitAppHandlers.insertLast(PVV(this.saveHotOrder));
     }
     // Очистка элементов
-    void clearAllItems()
-    {
+    void clearAllItems() {
         itemsGroup.resize(0);
         itemsGroup.insertLast(array<SmartBoxItem&&>()); // Добавляем пустую группу для отдельных элементов
     }
     // Добавление группы элементов для показа в списке
-    void addItemGroup(array<SmartBoxItem&&>&& group)
-    {
+    void addItemGroup(array<SmartBoxItem&&>&& group) {
         itemsGroup.insertLast(group);
     }
     // Добавление одного элемента для показа в списке
-    void addItem(SmartBoxItem&& item)
-    {
+    void addItem(SmartBoxItem&& item) {
         itemsGroup[0].insertLast(item);
     }
     // Активен ли сейчас список
-    bool isActive() const
-    {
+    bool isActive() const {
         return editor !is null;
     }
     // Показать список. Вызывается после заполнения его необходимыми элементами.
     // Указывается начальная строка для первой фильтрации.
     // Возвращает true, если список показан, false - не показан
-    bool show(TextWnd&& twnd, const string& beginOfWord, const string& selected = "", bool snegoList = true)
-    {
+    bool show(TextWnd&& twnd, const string& beginOfWord, const string& selected = "", bool snegoList = true) {
         //debugger();
         if (isActive())
             return false;
@@ -204,21 +192,18 @@ class IntelliSite : SmartBoxSite {
         ShowCaret(textWnd.hWnd);
         return true;
     }
-    void setBoxPosition(uint itemsCount)
-    {
+    void setBoxPosition(uint itemsCount) {
         uint height = smartBox.fullHeight(itemsCount > maxItems ? maxItems : itemsCount);
         SetWindowPos(smartBox.hwnd, HWND(HWND_TOPMOST), boxCornerPosition.x, boxIsUnderLine ? boxCornerPosition.y : boxCornerPosition.y - height,
                      boxWidth, height, SWP_SHOWWINDOW);
     }
-    private void readSettings()
-    {
+    private void readSettings() {
         boxWidth = getBoxWidth();
         bAllowMultyFilter = isAllowMultyFilter();
         if (fontSize.cx == 0)
             getFontSize();
     }
-    private void getFontSize()
-    {
+    private void getFontSize() {
         ITxtEdtOptions&& params = editor.unk;
         Font font;
         params.getFont(font);
@@ -228,8 +213,7 @@ class IntelliSite : SmartBoxSite {
     }
 
     // Метод фильтрует существующие элементы, создавая массив с удовлетворяющему фильтру элементами
-    array<SmartBoxItem&&>&& filter()
-    {
+    array<SmartBoxItem&&>&& filter() {
         array<SmartBoxItem&&> result;
 
         if (posInBuffer == 0) {
@@ -290,8 +274,7 @@ class IntelliSite : SmartBoxSite {
             ins.afterInsert(tw);
         }
     }
-    bool onKeydown(uint wParam, uint lParam)
-    {
+    bool onKeydown(uint wParam, uint lParam) {
         switch (wParam) {
         case VK_ESCAPE:
             hide();
@@ -339,8 +322,7 @@ class IntelliSite : SmartBoxSite {
         }
         return false;
     }
-    void onChar(uint wParam, uint lParam)
-    {
+    void onChar(uint wParam, uint lParam) {
         if ((GetKeyState(VK_CONTROL) & 0x8000) > 0 || VK_BACK == wParam)
             return;
         wchar_t symbol = wParam;
@@ -359,8 +341,7 @@ class IntelliSite : SmartBoxSite {
         buffer.insert(posInBuffer, symbol);
         moveCaret(1);
     }
-    bool onKillFocus(HWND hNewWnd)
-    {
+    bool onKillFocus(HWND hNewWnd) {
         if (!bInHide) {
             if (hNewWnd == textWnd.hWnd) {
                 SetFocus(smartBox.hwnd);
@@ -371,8 +352,7 @@ class IntelliSite : SmartBoxSite {
         hide();
         return true;
     }
-    void hide(SmartBoxInsertableItem&& insert = null)
-    {
+    void hide(SmartBoxInsertableItem&& insert = null) {
         if (bInHide)
             return;
         bInHide = true;
@@ -402,14 +382,12 @@ class IntelliSite : SmartBoxSite {
         // Уведомим текстовый процессор о закрытии списка
         tw.textDoc.tp.itemInserted(tw, insert);
     }
-    void hideAndSend(uint msg, uint wParam, uint lParam)
-    {
+    void hideAndSend(uint msg, uint wParam, uint lParam) {
         HWND hWnd = textWnd.hWnd;
         hide();
         SendMessage(hWnd, msg, wParam, lParam);
     }
-    void moveCaret(int step)
-    {
+    void moveCaret(int step) {
         caretPos.col += step;
         posInBuffer += step;
         xCaret += fontSize.cx * step;
@@ -435,8 +413,7 @@ class IntelliSite : SmartBoxSite {
             editor.updateView();
         }
     }
-    void setHotOrderForItems()
-    {
+    void setHotOrderForItems() {
         for (uint i = 0, im = itemsGroup.length; i < im; i++) {
             array<SmartBoxItem&&>&& group = itemsGroup[i];
             for (uint k = 0, km = group.length; k < km; k++) {
@@ -446,23 +423,20 @@ class IntelliSite : SmartBoxSite {
             }
         }
     }
-    void updateHotOrder(SmartBoxItem&& item)
-    {
+    void updateHotOrder(SmartBoxItem&& item) {
         if (item.d.hotOrder > 0 && item.d.hotOrder != uint(-1))
             hotItems.removeAt(item.d.hotOrder - 1);
         hotItems.insertLast(item.d.key);
         if (hotItems.length > maxHotOrderItems())
             hotItems.removeAt(0);
     }
-    void loadHotOrder()
-    {
+    void loadHotOrder() {
         IProfileFolder&& root = getProfileRoot();
         v8string data;
         root.getString(hotOrderDataPath, data);
         &&hotItems = data.str.split("\n");
     }
-    void saveHotOrder()
-    {
+    void saveHotOrder() {
         IProfileFolder&& root = getProfileRoot();
         //Value val;
         //if (root.getValue(v8string(hotOrderDataPath), val))
@@ -475,8 +449,7 @@ class IntelliSite : SmartBoxSite {
 };
 
 class TextEditorSettingChangeNotifier {
-    void onEvent(const Guid&in eventID, long val, IUnknown& obj)
-    {
+    void onEvent(const Guid&in eventID, long val, IUnknown& obj) {
         oneIntelliSite.fontSize.cx = oneIntelliSite.fontSize.cy = 0;
     }
 };
@@ -485,8 +458,7 @@ class TextEditorSettingChangeNotifier {
 mixin class MethodInsertable {
     bool isFunction;
     uint paramsCount;
-    void textForInsert(string&out text)
-    {
+    void textForInsert(string&out text) {
         text = d.descr + "(";
         if (paramsCount > 0)
             text += "¦";
@@ -495,16 +467,13 @@ mixin class MethodInsertable {
             text += ";";
     }
 };
-
-bool compareUcaseLetters(const string& test, const string& pattern)
-{
+bool compareUcaseLetters(const string& test, const string& pattern) {
     return test.extract(ucaseLetterRex).beginFrom(pattern);
 }
 
 // Метод-перехватчик обработки команд текстовым окном.
 funcdef bool TE_onExecute(ICommandTarget&, const Command&);
-bool checkCommandAndHideSmartBox(ICommandTarget& tgt, const Command& command, TrapVirtualStdCall& trap)
-{
+bool checkCommandAndHideSmartBox(ICommandTarget& tgt, const Command& command, TrapVirtualStdCall& trap) {
     //Message("" + command.id.group + " " + command.id.num);
     // При посылании команды текстовому окну открыт список снегопата
     if (oneIntelliSite !is null && oneIntelliSite.isActive()) {

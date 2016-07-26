@@ -4,10 +4,8 @@
 #pragma once
 #include "../../all.h"
 
-
 // Открытие ssf для конструирования
-void designScriptForm(const string& path)
-{
+void designScriptForm(const string& path) {
     IUnknown&& test;
     IConfigMngrUI&& configMngrUI;
     getMDEditService().getTemplatesMainConfigMngrUI(configMngrUI);
@@ -114,8 +112,7 @@ void designScriptForm(const string& path)
     checkSaveFormTrapped();
 }
 
-void designInternalForm(const string path)
-{
+void designInternalForm(const string path) {
     IDocumentFactory&& dfp;
     currentProcess().createByClsid(CLSID_FormDocumentFactory, IID_IDocumentFactory, dfp);
     if (dfp !is null) {
@@ -135,8 +132,7 @@ void designInternalForm(const string path)
     }
 }
 
-bool loadScriptForm(string path, IDispatch&& eventHandler, const string& eventPrefix, Value&out result)
-{
+bool loadScriptForm(string path, IDispatch&& eventHandler, const string& eventPrefix, Value&out result) {
     path = findFullPath(path);
     if (path.isEmpty())
         return false;
@@ -195,8 +191,7 @@ class ScriptRuntimeModule {
     IDispatch&& pEventObject;
     string eventPrefix;
 
-    ScriptRuntimeModule(IDispatch&& pObj, const string& prefix)
-    {
+    ScriptRuntimeModule(IDispatch&& pObj, const string& prefix) {
         &&pEventObject = pObj;
         eventPrefix = prefix;
     }
@@ -206,8 +201,7 @@ class ScriptRuntimeModule {
     void setPropVal(int, const Value&){}
     void getPropVal(int, Value&){}
     // Поиск номера метода
-    int findMeth(const v8string& name)
-    {
+    int findMeth(const v8string& name) {
         if (pEventObject !is null) {
             int result;
             if (pEventObject.findMember(eventPrefix + name, result)) {
@@ -219,16 +213,14 @@ class ScriptRuntimeModule {
     }
     // получение количества параметров. Не все IDispatch поддерживают это.
     // JScript и VBScript - поддерживают.
-    int getParamsCount(int meth)
-    {
+    int getParamsCount(int meth) {
         int ret;
         if (pEventObject !is null && pEventObject.getParamsCount(meth, ret))
             return ret;
         return 0;
     }
     // Вызов метода. В params приходит вектор, содержащий указатели на Value
-    bool call(int meth, Value& retVal, Vector& params, bool)
-    {
+    bool call(int meth, Value& retVal, Vector& params, bool) {
         if (pEventObject is null)
             return false;
         uint paramsCount = params.count(4);
@@ -253,8 +245,7 @@ class ScriptRuntimeModule {
         return false;
     }
     //uint context(IContext&&& ctx)
-    uint context(uint p)
-    {
+    uint context(uint p) {
         //&&ctx = null;
         mem::dword[p] = 0;
         return p;
@@ -264,18 +255,15 @@ class ScriptRuntimeModule {
 // Обёртка для имитации передачи аргументов в скрипты по-ссылке
 class ParamsWrapper {
     ValueRef&& value;
-    ParamsWrapper(ValueRef&& v)
-    {
+    ParamsWrapper(ValueRef&& v) {
         &&value = v;
     }
-    Variant get_val()
-    {
+    Variant get_val() {
         Variant ret;
         val2var(value.ref, ret);
         return ret;
     }
-    void set_val(Variant& newVal)
-    {
+    void set_val(Variant& newVal) {
         var2val(newVal, value.ref);
     }
 };
@@ -290,8 +278,7 @@ class ParamsWrapper {
 // ее надо сохранять исключительно с расширением ssf - snegopat script form.
 TrapVirtualStdCall trFileOpenUrl;
 bool saveFormTrapped = false;
-uint FileSystem_openURL(IFileSystem& fs, IFile&&&file, const URL& url, int mode)
-{
+uint FileSystem_openURL(IFileSystem& fs, IFile&&&file, const URL& url, int mode) {
     string path = url.url;
     if ((mode & fomOut) != 0) {
         if (url.url.str.substr(-4).compareNoCase(".ssf") == 0)
@@ -312,8 +299,7 @@ uint FileSystem_openURL(IFileSystem& fs, IFile&&&file, const URL& url, int mode)
     trFileOpenUrl.swap();
     return res;
 }
-void checkSaveFormTrapped()
-{
+void checkSaveFormTrapped() {
     if (!saveFormTrapped) {
         saveFormTrapped = true;
         IFileSystem&& fs = currentProcess().getService(IID_IFileSystem);
@@ -334,8 +320,7 @@ TrapVirtualStdCall trFormStyle;
 
 // Покер
 funcdef void FlocalFrame(IFramedView&, WndType, Guid&, uint&);
-void localFrameTrap(IFramedView& v, WndType type, Guid& id, uint& style)
-{
+void localFrameTrap(IFramedView& v, WndType type, Guid& id, uint& style) {
     FlocalFrame&& original;
     trFormStyle.getOriginal(&&original);
     original(v, type, id, style);
@@ -343,13 +328,11 @@ void localFrameTrap(IFramedView& v, WndType type, Guid& id, uint& style)
         style &= ~wsCloseOnEscape;
 }
 // Куртизанки
-int mdiTypeTrap(IFramedView&)
-{
+int mdiTypeTrap(IFramedView&) {
     return 0;
 }
 
-void patchMyFormVtable(IFramedView&& view)
-{
+void patchMyFormVtable(IFramedView&& view) {
     // Для начала создадим при необходимости копию таблицы
     if (customFormVtable == 0) {
         customFormVtable = malloc(30 * 4);  // 30 функций достаточно

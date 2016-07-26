@@ -160,8 +160,7 @@ RegExp ucaseLetterRex("\\p{Upper}");
 RegExp scriptTagsRex("""^(?://(\w+)\:|\$(\w+))[ \t]*(.*?)\s*?\n""");
 
 // Проверка, завершается ли строка текста открытым литералом
-bool isLineEndWithOpenQuote(const string& line)
-{
+bool isLineEndWithOpenQuote(const string& line) {
     auto res = line.match(quotesRex);
     return res.matches > 0 && (res.len(res.matches - 1, 0) == 1 || res.text(res.matches - 1, 0).substr(-1) != "\"");
 }
@@ -199,8 +198,7 @@ class ValueParamsVector {
     array<Value>&& values;
     Value retVal;
 
-    ValueParamsVector(uint argsCount = 0)
-    {
+    ValueParamsVector(uint argsCount = 0) {
         &&values = array<Value>(argsCount);
         if (argsCount > 0) {
             uint mem = 4 * argsCount;
@@ -215,37 +213,30 @@ class ValueParamsVector {
 class ILexem {
     protected lexem lex;
     protected IV8Lexer&& owner;
-    ILexem(const lexem& l, IV8Lexer&& o)
-    {
+    ILexem(const lexem& l, IV8Lexer&& o) {
         lex = l;
         &&owner = o;
     }
 
-    Lexems get_type()
-    {
+    Lexems get_type() {
         return Lexems(lex.type);
     }
-    uint get_start()
-    {
+    uint get_start() {
         return lex.start;
     }
-    uint get_length()
-    {
+    uint get_length() {
         return lex.length;
     }
-    uint get_line()
-    {
+    uint get_line() {
         return lex.line;
     }
-    string get_text()
-    {
+    string get_text() {
         return lex.text;
     }
 };
 
 class IV8Lexer {
-    IV8Lexer(const string& t, uint sl)
-    {
+    IV8Lexer(const string& t, uint sl) {
         //uint t1 = GetTickCount();
         _text = t;
         lex_provider lp(_text.cstr, sl);
@@ -292,41 +283,33 @@ class IV8Lexer {
     protected UintMap<uint> lexemPos;
     string _text;
     string _reStream;
-    uint get_lexemCount()
-    {
+    uint get_lexemCount() {
         return lexems.length;
     }
-    ILexem&& lexem(uint idx)
-    {
+    ILexem&& lexem(uint idx) {
         return idx < lexems.length ? lexems[idx] : null;
     }
-    uint get_namesCount()
-    {
+    uint get_namesCount() {
         return names.length;
     }
-    string name(uint idx)
-    {
+    string name(uint idx) {
         return idx < names.length ? names[idx] : string();
     }
-    int idxOfName(const string& name)
-    {
+    int idxOfName(const string& name) {
         auto fnd = findNames.find(name);
         return fnd.isEnd() ? -1 : fnd.value;
     }
-    int posToLexem(uint posInReStream)
-    {
+    int posToLexem(uint posInReStream) {
         auto find = lexemPos.find(posInReStream);
         return find.isEnd() ? -1 : find.value;
     }
-    string strNameIdx(const string& name)
-    {
+    string strNameIdx(const string& name) {
         auto fnd = findNames.find(name);
         return fnd.isEnd() ? string() : "Nm" + formatInt(fnd.value, "0", 6);
     }
 };
 
-Lexems lexType(uint t)
-{
+Lexems lexType(uint t) {
     switch (t) {
     case lexRemark:      // комментарий
         return ltRemark;
@@ -470,8 +453,7 @@ const string lexAbbr = "UnRmQtDtNuPrDrLbLpRpLrRrEqCmScPlMnMuDvMoQsPdLsLeGtGeNeNm
 // Метод получает текст текущего метода до текущей позиции каретки.
 // Началом метода считаются либо ключевые слова Процедура/Функция, либо текст после слов КонецПроцуры/КонецФункции, либо всё от начала модуля.
 // После нахождения начала метода к нему также ищется директива, а также определяется первая виртуальная лексема для парсера текста.
-LexemTypes getMethodText(TextManager& pTextManager, uint& line, uint col, bool bOnlyMeths, string&out methodText, execContextTypes&out directive)
-{
+LexemTypes getMethodText(TextManager& pTextManager, uint& line, uint col, bool bOnlyMeths, string&out methodText, execContextTypes&out directive) {
     directive = ecNone;
     uint startLine = line;
     array<string> lines;
