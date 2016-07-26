@@ -107,10 +107,8 @@ class IGridCtrl : IExtControl {
 	IGridCtrl(IGrid&& pGrid) {
 		&&grd = pGrid;
 		if (grd !is null) {
-			Print("Has grid");
 			IV8DataSource&& ds = grd.getDataSource();
 			if (ds !is null) {
-				Print("has ds");
 				&&_dataSource = IDataSource(ds, grd.getUISource());
 			}
 		}
