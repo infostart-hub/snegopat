@@ -270,18 +270,36 @@ var SearchAreas = {
 	'CurrentContainer'	: 3  // В текущем открытом контейнере (внешней обработке, конфигурации ИБ и т.п.)
 };
 
+//[+] СофтЛаб:Brad  (19.02.2015) 
+function getCurentTask() {
+	
+	var pflCurTask = 'Задачи/ТекущаяЗадача';
+	
+	var s = v8New("Структура","Задача,Описание","","");	
+	profileRoot.createValue(pflCurTask, s, pflSnegopat)    
+    s = profileRoot.getValue(pflCurTask);
+	
+	return s.Задача;
+}
+// СофтЛаб:Brad  (19.02.2015) 
+
 /* Осуществляет поиск с предварительным открытием диалогового окна. */
 function openSearchDialog(initSearchArea) {
 	
 	if (!initSearchArea)
 		initSearchArea = SearchAreas.ActiveWindow;
 	
-	var w = GetTextWindow();
+	var w = GetTextWindow();    
     if (!w) return false;
             
     var selText = w.GetSelectedText();
     if (selText == '')
         selText = w.GetWordUnderCursor();
+		
+	//[+] СофтЛаб:Brad  (19.02.2015) 
+	if (selText == '')	
+		selText = getCurentTask();		
+	// СофтЛаб:Brad  (19.02.2015) 
 		
     var sDlg = new ExtSearchDialog(selText, initSearchArea);
 		
