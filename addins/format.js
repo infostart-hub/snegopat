@@ -314,7 +314,7 @@ stdlib.createMacros(SelfScript.self, "УдалитьКонцевыеПробел
     "Убрать пробелы в конце строк", PictureLib.Char, 
     function() {
         var txtWnd = snegopat.activeTextWindow()
-        if (!txtWnd || txtWnd.isReadOnly)
+        if (!txtWnd || txtWnd.readOnly)
             return
         var replaces = 0, symbols = 0, crnl = 0
         var text = txtWnd.text.replace(/[ \t]+\r*\n/g, function (str) {
