@@ -4,6 +4,8 @@
 //addin: stdcommands
 //addin: global
 //author: Александр Орефков orefkov at gmail.com
+//help: inplace
+//www: https://snegopat.ru/scripts/wiki?name=stg_autoconnect.js
 
 global.connectGlobals(SelfScript)
 /*@
