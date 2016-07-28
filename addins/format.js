@@ -184,7 +184,7 @@ stdlib.createMacros(SelfScript.self, "ВыровнятьЗнакиРавно",
  */
 function MoveBlock(toLeft, spaceChar) {
     var txtWnd = snegopat.activeTextWindow()
-    if (!txtWnd || txtWnd.isReadOnly)
+    if (!txtWnd || txtWnd.readOnly)
         return
     var sel = txtWnd.getSelection()
     var endRow = sel.endRow
