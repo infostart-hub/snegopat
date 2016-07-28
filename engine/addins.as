@@ -16,12 +16,13 @@ AddinLoader&& loadersList;
 
 bool initAddins()
 {
+	if (oneDesigner !is null)
+		return true;
     // Создаем корень SnegAPI, а он создаст менеджер аддинов
     &&oneDesigner = Designer();
-    //oneAddinMgr.loadAddin("script:test.js", oneAddinMgr._root);
     if (oneAddinMgr.loadAddin("script:" + pathes._core + "scripts\\main.js", oneAddinMgr._root.childs[0]) is null)
         Message(oneAddinMgr._lastAddinError);
-    return true;
+	return true;
 }
 
 // Класс, представляющий загруженный аддин.

@@ -6,6 +6,8 @@ controls.as
 #pragma once
 #include "../../all.h"
 
+Packet piSetTrapOnDoModal("trapDoModaa", setTrapOnDoModal, piOnMainWindow);
+
 class IExtControl {};
 
 class IV8Control {
@@ -403,6 +405,8 @@ DoModalPatchedTables&& findPatchedTable(IFramedView& view) {
 */
 
 bool generateModalEvent(IFramedView&& pView, int& result, bool& bCreated) {
+	if (oneDesigner is null)
+		initAddins();
 	bCreated = false;
 	// ищем view в списке. Если он уже там, значит, beforeDoModal для него уже вызывали,
 	auto fnd = mapDialogsToInfo.find(pView.self);
@@ -427,8 +431,8 @@ bool generateModalEvent(IFramedView&& pView, int& result, bool& bCreated) {
 		hookInfo._reset();
 		return false;	// оригинал вызывать не надо
 	}
-	bCreated = true;			// сигнализирем, что добавили view в список
-	ModalDialogInfo info;		
+	bCreated = true;			// сигнализируем, что добавили view в список
+	ModalDialogInfo info;
 	&&info.object = hookInfo;	// запоминаем объект для события
 	&&info.originals = findPatchedTable(pView);	// Находим нужную для view патченную vtable, запоминаем оригинал
 	mapDialogsToInfo.insert(pView.self, info);	// запоминаем view
@@ -505,9 +509,10 @@ int doModal2_trap(IBkEndUI& pThis, IFramedView& pView, int i1, int i2, int i3, i
 	return result;
 }
 
-void setTrapOnDoModal() {
+bool setTrapOnDoModal() {
 	IBkEndUI&& ui = getBkEndUI();
 	trDoModal1.setTrap(&&ui, IBkEndUI_doModal1, doModal1_trap);
 	trDoModal2.setTrap(&&ui, IBkEndUI_doModal2, doModal2_trap);
 	//dumpVtable(&&ui);
+	return true;
 }

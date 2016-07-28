@@ -16,7 +16,6 @@ class IV8Windows {
         setTrapOnChangeTitle();
         setTrapOnMsgBox();
         setTrapOnMessage();
-		setTrapOnDoModal();
         idleHandlers.insertLast(clearViewMap);
     }
     // Основное окно

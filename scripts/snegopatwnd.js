@@ -1369,6 +1369,16 @@ function restoreWindowState() {
     // Восстановим состояние окна
     profileRoot.createValue(wndStateProfilePath, true, pflSnegopat);
     var isWndOpened = profileRoot.getValue(wndStateProfilePath);
-    if (isWndOpened)
-        openWnd();
+    if (isWndOpened) {
+        if (windows.modalMode != msNone) {
+            var nd = events.connect(Designer, "onIdle", function () {
+                if (windows.modalMode == msNone) {
+                    openWnd();
+                    events.disconnectNode(nd);
+                }
+            }, "-");
+        }
+        else
+            openWnd();
+    }
 }

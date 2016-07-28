@@ -224,7 +224,6 @@ class ITextWindow {
         if (wnd !is null && wnd.textDoc.mdInfo !is null)
             return getMDPropWrapper(mdService.mdProp(wnd.textDoc.mdInfo.mdPropUuid));
         return null;
-
     }
     //[propget, helpstring("Внешний объект")]
     Variant get_extObject()
