@@ -1,17 +1,20 @@
-﻿$engine JScript
-$uname NotifySend
-$dname Библиотека сообщений пользователю
-$addin stdcommands
-$addin global
-$addin stdlib
+﻿//engine: JScript
+//uname: NotifySend
+//dname: Библиотека сообщений пользователю
+//addin: stdcommands
+//addin: global
+//addin: stdlib
+//help: inplace
+//author: Сосна Евгений <shenja@sosna.zp.ua>
 
 // (c) Сосна Евгений <shenja@sosna.zp.ua>
-// Библиотека для посылки сообщиений пользовтелю.
+/*@
+Библиотека для посылки сообщений пользователю.
+@*/
 
 stdlib.require('SettingsManagement.js', SelfScript);
 global.connectGlobals(SelfScript)
 
-var mainFolder = profileRoot.getValue("Snegopat/MainFolder")
 var settings; // Хранит настройки скрипта (экземпляр SettingsManager'а).
 
 SelfScript.Self['macrosНастройка'] = function () {
@@ -113,7 +116,7 @@ _NotifySend.prototype.SendMessage = function(title, text, timeout, type) {
     
     title = title.replace(/\\/g, "\\\\").substr(0, 62);
     text = text.replace(/\n/g, "~n").replace(/\t/g, "~t").replace(/"/g, "~q");
-    var cmd = mainFolder+'scripts\\bin\\TrayTip.exe "'+title+'" "'+ text +'" ' +timeout+' '+type;
+    var cmd = '"' + env.pathes.tools +'TrayTip.exe" "'+title+'" "'+ text +'" ' +timeout+' '+type;
     ЗапуститьПриложение(cmd, "", false);
 }
 
@@ -193,7 +196,7 @@ function _TrayTipProvider() {
 _TrayTipProvider.prototype.SendMessage = function(title, text, timeout, type) {
     title = title.replace(/\\/g, "\\\\").substr(0, 62);
     text = text.replace(/\n/g, "~n").replace(/\t/g, "~t").replace(/"/g, "~q");
-    var cmd = mainFolder+'scripts\\bin\\TrayTip.exe "'+title+'" "'+ text +'" ' +timeout+' '+type;
+    var cmd = '"' + env.pathes.tools+'TrayTip.exe" "'+title+'" "'+ text +'" ' +timeout+' '+type;
     ЗапуститьПриложение(cmd, "", false);
 }
 
