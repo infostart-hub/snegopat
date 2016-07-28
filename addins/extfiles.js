@@ -33,7 +33,7 @@ function macrosОткрытьОкноВнешнихФайлов() {
         мФормаСкрипта.КлючСохраненияПоложенияОкна = SelfScript.uniqueName;
         мФормаСкрипта.Заголовок="Внешние файлы" //+мВерсияСкрипта        
         КэшКартинокТиповФайлов = ПолучитьКэшКартинокТиповФайлов(мФормаСкрипта);
-        loadDiffBackends()
+        loadDiffBackends();
         loadDvcsBackends();
         мФормаСкрипта.ЭлементыФормы.КпШапка.Кнопки.ПоискВыводитСписком.Пометка = мПоказыватьРезультатПоискаСписком;
     }
@@ -267,7 +267,7 @@ function КонтекстноеМенюКнDvcsПоказатьЖурнал(Кн
     if (ТекущаяСтрока) {
         caller = getDvcsBackendForPath(ТекущаяСтрока.ИмяФайла);
         if (caller!=null){
-            var pathToLog = mainFolder + "\\scripts\\dvcs\\logview.js";
+            var pathToLog = env.pathes.addins + "dvcs\\logview.js";
             var f = v8New("File", pathToLog);
             if (!f.Exist()) return
             
@@ -841,7 +841,7 @@ function loadDiffBackends() {
     //TODO: добавить на форму, таблицу значений с настройками. Что бы можно было выбрать какие diff и для каких файлов можно использовать, а какие нет. 
     DiffBackends = {}
         
-    var МассивФайлов = НайтиФайлы(mainFolder + "\\scripts\\dvcs\\", "diff*.js");
+    var МассивФайлов = НайтиФайлы(env.pathes.addins + "dvcs\\", "diff*.js");
     for (var i =0; i<МассивФайлов.Количество(); i++) {
         var лФайл = МассивФайлов.Get(i);
         function add(estr, caller) {
@@ -857,7 +857,7 @@ function loadDiffBackends() {
 function loadDvcsBackends() {
     DvcsBackends = {}
     if (!мИспользоватьВерсионирование) return 
-    var МассивФайлов = НайтиФайлы(mainFolder + "\\scripts\\dvcs\\", "dvcs*.js");
+    var МассивФайлов = НайтиФайлы(env.pathes.addins + "dvcs\\", "dvcs*.js");
     for (var i =0; i<МассивФайлов.Количество(); i++) {
         var лФайл = МассивФайлов.Get(i);
         try { 
