@@ -24,6 +24,8 @@ COMMENT:
 OnPressDeleteInComment предназначены для более удобного редактирования 
 многострочных комментариев. Вызываются неявно при нажатии соответствующих 
 клавиш.
+
+   4. Макрос Удалить строку. Удаляет целиком строку, где находится курсор. Горячие клавиши Ctrl + Y.
 @*/
 
 global.connectGlobals(SelfScript);
@@ -31,7 +33,7 @@ global.connectGlobals(SelfScript);
 stdlib.require('TextWindow.js', SelfScript);
 
 function getPredefinedHotkeys(predef){
-    predef.setVersion(9);
+    predef.setVersion(10);
     predef.add("НайтиВыделенныйТекстВниз", "Ctrl + Down");
     predef.add("НайтиВыделенныйТекстВверх", "Ctrl + Up");
     predef.add("КлонироватьТекст", "Ctrl + D");
@@ -47,7 +49,9 @@ function getPredefinedHotkeys(predef){
     predef.add("Установить кавычки 2", "Shift + '");
     predef.add("Установить скобки", "Shift + 9");
     predef.add("Установить скобки 2", "Shift + 0");
-
+	//<gigabyte-artur@mail.ru 04.08.2016
+    predef.add("Удалить строку", "Ctrl + Y");
+	//gigabyte-artur@mail.ru 04.08.2016>
 
 }
 
@@ -93,6 +97,28 @@ function macrosПоменятьОперандыПрисваиванияМест�
 
 SelfScript.Self['macrosПреобразовать регистр: ПРОПИСНЫЕ'] = function() {
     return processSelectedText(function(selText){ return selText.toUpperCase(); });
+}
+
+SelfScript.Self['macrosУдалить строку'] = function() 
+{
+    var w = GetTextWindow();
+    if (!w || w.IsReadOnly() || windows.modalMode != msNone) 
+		return false;
+	var sel = w.GetSelection();            
+    var selText = w.GetSelectedText();	
+    var pos = w.getCaretPos();
+	if (selText != '')
+	{            
+		w.setSelection(sel.beginRow, 1, pos.endRow+1, 1);			// Есть выделение - удалим все строки, в которые оно входит.
+		w.SetSelectedText('');
+		w.setCaretPos(sel.beginRow, sel.beginCol);
+    }
+	else
+	{	
+		w.setSelection(pos.beginRow, 1, pos.beginRow+1, 1);			// Нет выделения - удалим строку курсора.
+		w.SetSelectedText('');
+		w.setCaretPos(pos.beginRow, pos.beginCol);
+	}
 }
 
 SelfScript.Self['macrosУстановить кавычки'] = function() {
