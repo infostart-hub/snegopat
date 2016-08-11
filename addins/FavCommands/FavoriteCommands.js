@@ -92,7 +92,7 @@ FavoriteCommands.prototype.КПОткрытьНастройки = function (Кн
 
 function НаборКнопокИмяСкриптаНачалоВыбора(Элемент, СтандартнаяОбработка){
 	СтандартнаяОбработка.val = false;
-	macros = macroswnd.getMacrosWnd().selectMacros();
+	macros = macroswnd.MacrosWnd().selectMacros();
 	if(!macros)
 		return;
 	ТекСтрока = мФормаНастройки.ЭлементыФормы.НаборКнопок.ТекущаяСтрока;
