@@ -163,6 +163,7 @@ bool loadScriptForm(string path, IDispatch&& eventHandler, const string& eventPr
     ISettingsConsumer&& st = customForm.unk;
     IConfigMngrUI&& configMngrUI;
     getMDEditService().getTemplatesMainConfigMngrUI(configMngrUI);
+	//dumpVtable(&&configMngrUI);
     IMDContainer&& container = configMngrUI.getMDCont();
     st.setSettings(container, IID_IMDContainer);
     ILangSettings&& lang;

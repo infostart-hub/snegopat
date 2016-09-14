@@ -7,13 +7,11 @@
 
 class Snegopat {
     //[helpstring("Получить активное текстовое окно")]
-    ITextWindow&& activeTextWindow()
-    {
+    ITextWindow&& activeTextWindow() {
         return activeTextWnd is null ? null : activeTextWnd.getComWrapper();
     }
     //[helpstring("Обработать строку шаблонов")]
-    string parseTemplateString(const string& text, const string& name = "")
-    {
+    string parseTemplateString(const string& text, const string& name = "") {
         v8string wText = text;
         v8string wName = name.isEmpty() ? "Снегопат" : name;
         uint caret;
@@ -27,13 +25,11 @@ class Snegopat {
         return result;
     }
 	// [helpstring("Показать список методов модуля")]
-    bool showMethodsList()
-    {
+    bool showMethodsList() {
         return false;
     }
 	//[helpstring("Показать выпадающий список снегопата")]
-    bool showSmartBox()
-    {
+    bool showSmartBox() {
         // При принудительном вызове списка снегопата надо всё перепарсить
         for (uint i = 0, im = textDocStorage.openedDocs.length; i < im; i++) {
             ModuleTextProcessor&& tp = cast<ModuleTextProcessor>(textDocStorage.openedDocs[i].tp);
@@ -53,8 +49,7 @@ class Snegopat {
         }
         return true;
     }
-    IV8Lexer&& parseSources(const string& strSource, uint startLine = 1)
-    {
+    IV8Lexer&& parseSources(const string& strSource, uint startLine = 1) {
         return IV8Lexer(strSource, startLine);
     }
 	OptionsEntry&& _optionEntries = optionList;

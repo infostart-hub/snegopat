@@ -6,11 +6,9 @@
 #include "../../all.h"
 
 class V8Files {
-    V8Files()
-    {
+    V8Files() {
     }
-    IV8DataFile&& open(const string& path, FileOpenModes mode)
-    {
+    IV8DataFile&& open(const string& path, FileOpenModes mode) {
         IFile&& file;
         URL url(path);
         IFileSystem&& fs = getFSService();
@@ -26,14 +24,12 @@ class V8Files {
         IFileEx&& fex = file.unk;
         return fex is null ? null : IV8DataFile(fex);
     }
-    IV8DataFile&& createMemoryFile()
-    {
+    IV8DataFile&& createMemoryFile() {
         IFileEx&& fex;
         currentProcess().createByClsid(CLSID_MemoryFile, IID_IFileEx, fex);
         return IV8DataFile(fex);
     }
-    IV8DataFile&& createTempFile(uint memLimit = 0)
-    {
+    IV8DataFile&& createTempFile(uint memLimit = 0) {
         IFileEx&& fex;
         currentProcess().createByClsid(CLSID_TempFile, IID_IFileEx, fex);
         if (memLimit != 0) {
@@ -42,8 +38,7 @@ class V8Files {
         }
         return IV8DataFile(fex);
     }
-    IV8StorageFile&& attachStorage(IV8DataFile&& file, bool createNew = false)
-    {
+    IV8StorageFile&& attachStorage(IV8DataFile&& file, bool createNew = false) {
         IStorageRW&& stg;
         currentProcess().createByClsid(CLSID_StorageRW, IID_IStorageRW, stg);
         if (file.file !is null) {
@@ -62,8 +57,7 @@ class V8Files {
         }
         return null;
     }
-    MemoryBuffer&& newMemoryBuffer(uint size)
-    {
+    MemoryBuffer&& newMemoryBuffer(uint size) {
         return MemoryBuffer(size);
     }
 };
@@ -77,34 +71,28 @@ enum StringDataMode {
 class MemoryBuffer {
     uint bytes;
     uint _length;
-    MemoryBuffer(uint l)
-    {
+    MemoryBuffer(uint l) {
         _length = l;
         bytes = l != 0 ? malloc(l) : 0;
     }
-    ~MemoryBuffer()
-    {
+    ~MemoryBuffer() {
         if (bytes != 0)
             free(bytes);
     }
-    uint8 byte(uint pos)
-    {
+    uint8 byte(uint pos) {
         return mem::byte[bytes + pos];
     }
-    void set_byte(uint pos, uint8 val)
-    {
+    void set_byte(uint pos, uint8 val) {
         mem::byte[bytes + pos] = val;
     }
 };
 
 class IV8DataFile {
     IFileEx&& file;
-    IV8DataFile(IFileEx&& f)
-    {
+    IV8DataFile(IFileEx&& f) {
         &&file = f;
     }
-    MemoryBuffer&& read(uint length)
-    {
+    MemoryBuffer&& read(uint length) {
         if (file is null) {
             setComException("Файл закрыт");
             return null;
@@ -120,8 +108,7 @@ class IV8DataFile {
         }
         return buf;
     }
-    void write(MemoryBuffer&& bytes)
-    {
+    void write(MemoryBuffer&& bytes) {
         if (file is null) {
             setComException("Файл закрыт");
             return;
@@ -133,8 +120,7 @@ class IV8DataFile {
         if (catcher.hasException)
             setComException(catcher.errStr);
     }
-    uint32 seek(int64 pos, FileSeekMode fsMode)
-    {
+    uint32 seek(int64 pos, FileSeekMode fsMode) {
         if (file is null) {
             setComException("Файл закрыт");
             return 0;
@@ -146,8 +132,7 @@ class IV8DataFile {
             setComException(catcher.errStr);
         return res;
     }
-    string getString(StringDataMode mode, int length=-1)
-    {
+    string getString(StringDataMode mode, int length=-1) {
         string result;
         if (file is null) {
             setComException("Файл закрыт");
@@ -190,8 +175,7 @@ class IV8DataFile {
         }
         return result;
     }
-    void putString(StringDataMode mode, const string& str, int length = -1)
-    {
+    void putString(StringDataMode mode, const string& str, int length = -1) {
         if (length == -1)
             length = str.length;
         if (file is null) {
@@ -216,8 +200,7 @@ class IV8DataFile {
         if (catcher.hasException)
             setComException(catcher.errStr);
     }
-    void flush()
-    {
+    void flush() {
         if (file is null) {
             setComException("Файл закрыт");
             return;
@@ -229,8 +212,7 @@ class IV8DataFile {
         if (catcher.hasException)
             setComException(catcher.errStr);
     }
-    void setEOF()
-    {
+    void setEOF() {
         if (file is null) {
             setComException("Файл закрыт");
             return;
@@ -241,8 +223,7 @@ class IV8DataFile {
         if (catcher.hasException)
             setComException(catcher.errStr);
     }
-    string get_url()
-    {
+    string get_url() {
         if (file is null) {
             setComException("Файл закрыт");
             return string();
@@ -256,20 +237,17 @@ class IV8DataFile {
             setComException(catcher.errStr);
         return u.url;
     }
-    void close()
-    {
+    void close() {
         &&file = null;
     }
 };
 
 class IV8StorageFile {
-    IV8StorageFile(IStorageRW&& s)
-    {
+    IV8StorageFile(IStorageRW&& s) {
         &&stg = s;
     }
     IStorageRW&& stg;
-    array<string>&& files()
-    {
+    array<string>&& files() {
         array<string> result;
         Vector flist;
         stg.find(flist, "*".cstr);
@@ -281,8 +259,7 @@ class IV8StorageFile {
         }
         return result;
     }
-    IV8DataFile&& open(const string& name, FileOpenModes mode)
-    {
+    IV8DataFile&& open(const string& name, FileOpenModes mode) {
         IFileEx&& file;
         ExceptionCatcher catcher;
         CppCatch c("class core::Exception", ExceptionHandler(catcher.handle));
@@ -293,16 +270,14 @@ class IV8StorageFile {
         }
         return file is null ? null : IV8DataFile(file);
     }
-    void rename(const string& oldName, const string& newName)
-    {
+    void rename(const string& oldName, const string& newName) {
         ExceptionCatcher catcher;
         CppCatch c("class core::Exception", ExceptionHandler(catcher.handle));
         stg.rename(oldName, newName);
         if (catcher.hasException)
             setComException(catcher.errStr);
     }
-    void remove(const string& name)
-    {
+    void remove(const string& name) {
         ExceptionCatcher catcher;
         CppCatch c("class core::Exception", ExceptionHandler(catcher.handle));
         stg.remove(name.cstr);
@@ -320,8 +295,7 @@ class ExceptionCatcher {
     bool hasException = false;
     bool bypass = false;
     string errStr;
-    bool handle(Exception& exc)
-    {
+    bool handle(Exception& exc) {
         if (bypass)
             return false;       // Исключение не обработано, передать дальше
         hasException = true;

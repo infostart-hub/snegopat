@@ -7,33 +7,28 @@
 
 class V8Value {
     Value value;
-    V8Value(Variant& v)
-    {
+    V8Value(Variant& v) {
         var2val(v, value);
     }
     //[helpstring("Название типа")]
-    string typeName(long language = 0)
-    {
+    string typeName(long language = 0) {
         if (value.pValue !is null)
             return string(value.pValue.getType().getTypeString(language));
         return string();
     }
     //[helpstring("Строковое представление")]
-    string presentation()
-    {
+    string presentation() {
         v8string res;
         value.getString(res);
         return res;
     }
     //[propget, helpstring("Это объект?")]
-    bool get_isObject()
-    {
+    bool get_isObject() {
         IContext&& ctx = cast<IUnknown>(value.pValue);
         return ctx !is null;
     }
     //[helpstring("Список методов/свойств")]
-    string contextInfo()
-    {
+    string contextInfo() {
         if (value.pValue is null)
             return string();
         // Получим имя типа
@@ -64,15 +59,13 @@ class V8Value {
         return join(result, "\n");
     }
     //[helpstring("ЗначениеВСтрокуВнутр")]
-    string toStringInternal()
-    {
+    string toStringInternal() {
         v8string res;
         value.toString(res);
         return res;
     }
     //[propget, helpstring("UUID типа")]
-    string typeUUID()
-    {
+    string typeUUID() {
         if (value.pValue !is null)
             return value.pValue.getType().getClsid();
         return string();

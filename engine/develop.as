@@ -9,13 +9,11 @@
 class Develop {
     bool cmdTrace = false;
 
-    void dumpV8typesToDts()
-    {
+    void dumpV8typesToDts() {
         V8Dumper d;
         d.dump();
     }
-	void dumpSnegApiToDts()
-	{
+	void dumpSnegApiToDts() {
 		dumpSnegApi();
 	}
 };
@@ -26,8 +24,7 @@ class V8Dumper {
 	NoCaseSet allNames;
     array<string> newNames;
 
-    void dump()
-    {
+    void dump() {
         // Откроем файл для дампа
         IFile&& file;
         URL url("file://" + myFolder + "v8.d.ts");
@@ -61,8 +58,7 @@ class V8Dumper {
         file.write(str.ptr, str.length);
         dumpSnegApi();
     }
-    void dumpContextDef(IContextDef&& ctx, const string& name0, const string& name1)
-    {
+    void dumpContextDef(IContextDef&& ctx, const string& name0, const string& name1) {
 		if (!name1.isEmpty() && !allNames.insert(name0))
 			return;
 		if (!name1.isEmpty() && name1 != name0 && !allNames.insert(name1))
@@ -130,14 +126,12 @@ class V8Dumper {
         content += join(lines, "\n") + "\n";
     }
     
-    void dumpV8New()
-    {
+    void dumpV8New() {
         for (uint i = 0; i < newNames.length; i++)
             newNames[i] = "declare function v8New(name:\"" + newNames[i] + "\",... params): " + newNames[i] + ";";
         content += join(newNames, "\n") + "\n";
     }
-    void getTypeName(TypeDomainPattern& types, string& typeName)
-    {
+    void getTypeName(TypeDomainPattern& types, string& typeName) {
         typeName = "";
         Vector tt;
         types.types(tt);
@@ -159,8 +153,7 @@ class V8Dumper {
             }
         }
     }
-    string getGuidTypeName(const Guid& guid)
-    {
+    string getGuidTypeName(const Guid& guid) {
         string strGuid = guid;
         auto fnd = typeGuidToNames.find(strGuid);
         if (!fnd.isEnd())

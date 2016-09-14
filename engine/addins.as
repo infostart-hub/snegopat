@@ -14,8 +14,7 @@ BuiltinAddin&& builtinAddinsList;
 // Ссылка на начало списка загрузчиков аддинов. Для авто-подключения загрузчик должен добавить себя в этот список
 AddinLoader&& loadersList;
 
-bool initAddins()
-{
+bool initAddins() {
 	if (oneDesigner !is null)
 		return true;
     // Создаем корень SnegAPI, а он создаст менеджер аддинов
@@ -49,8 +48,7 @@ class Addin {
 // Интерфейс загрузчика аддинов. Остальные загрузчики должны наследоваться от него
 class AddinLoader {
     AddinLoader&& next;
-    AddinLoader()
-    {
+    AddinLoader() {
         &&next = loadersList;
         &&loadersList = this;
     }
@@ -71,12 +69,10 @@ class AddinGroup {
     array<AddinGroup&&> childs;
     array<Addin&&> addins;
 
-    AddinGroup()
-    {
+    AddinGroup() {
         &&parent = null;
     }
-    AddinGroup(AddinGroup&& p, const string& n)
-    {
+    AddinGroup(AddinGroup&& p, const string& n) {
         name = n;
         &&parent = p;
         if (p.child is null)
@@ -85,8 +81,7 @@ class AddinGroup {
             &&p.childs[p.childs.length - 1].next = this;
         p.childs.insertLast(this);
     }
-    AddinGroup&& addGroup(const string& nameOfChild)
-    {
+    AddinGroup&& addGroup(const string& nameOfChild) {
         for (uint i = 0, im = childs.length; i < im; i++) {
             AddinGroup&& c = childs[i];
             if (c.name.compareNoCase(nameOfChild) == 0)
@@ -94,17 +89,14 @@ class AddinGroup {
         }
         return AddinGroup(this, nameOfChild);
     }
-    void addAddin(Addin&& addin)
-    {
+    void addAddin(Addin&& addin) {
         &&addin.group = this;
         addins.insertLast(addin);
     }
-    uint get_addinsCount()
-    {
+    uint get_addinsCount() {
         return addins.length;
     }
-    Addin&& addin(uint idx)
-    {
+    Addin&& addin(uint idx) {
         return idx < addins.length ? addins[idx] : null;
     }
 };
@@ -122,8 +114,7 @@ class AddinMgr {
 	// При ошибке работы с аддинами описание ошибки писать сюда
     string _lastAddinError;
 
-    AddinMgr()
-    {
+    AddinMgr() {
         &&oneAddinMgr = this;
         // Зарегим все лоадеры
         while (loadersList !is null) {
@@ -163,8 +154,7 @@ class AddinMgr {
     {
         return addins[idx];
     }
-    Addin&& loadAddin(const string& uri, AddinGroup&& group)
-    {
+    Addin&& loadAddin(const string& uri, AddinGroup&& group) {
         int protoPos = uri.find(':');
         if (protoPos <= 0) {
             _lastAddinError = "Не задан тип загрузчика";
@@ -211,15 +201,13 @@ class AddinMgr {
         oneDesigner._fireAddinChanges(addin, true);
         return addin;
     }
-    private void remove(Addin&& addin, const string& uniqueName)
-    {
+    private void remove(Addin&& addin, const string& uniqueName) {
         mapUniqueName.remove(uniqueName);
         mapFullPath.remove(addin.fullPath);
         removeAddinFromArray(addins, addin);
         removeAddinFromArray(addin.group.addins, addin);
     }
-    bool unloadAddin(Addin&& addin)
-    {
+    bool unloadAddin(Addin&& addin) {
         if (addin is null)
             return true;
         string uniqueName = addin.get_uniqueName();
@@ -238,8 +226,7 @@ class AddinMgr {
         return true;
     }
     //[helpstring("Получить команды для загрузки всех поддерживаемых видов аддинов.")]
-    array<string>&& getLoaderCommands()
-    {
+    array<string>&& getLoaderCommands() {
         array<string> result;
         for (auto it = loaders.begin(); it++;) {
             string cmd = it.value.nameOfLoadCommand();
@@ -249,8 +236,7 @@ class AddinMgr {
         return result;
     }
     //[helpstring("Выбрать и загрузить аддин. Передавать часть команды загрузчика после '|'")]
-    Addin&& selectAndLoad(const string& loaderCommand, AddinGroup&& group)
-    {
+    Addin&& selectAndLoad(const string& loaderCommand, AddinGroup&& group) {
         auto find = loaders.find(loaderCommand);
         if (!find.isEnd()) {
             string uri = find.value.selectLoadURI();
@@ -261,8 +247,7 @@ class AddinMgr {
         return null;
     }
     //[helpstring("Можно ли выгружать аддин")]
-    bool isAddinUnloadable(Addin&& addin)
-    {
+    bool isAddinUnloadable(Addin&& addin) {
         if (addin.uniqueName.isEmpty()) {
             _lastAddinError = "Аддин уже выгружен";
             return false;
@@ -274,8 +259,7 @@ class AddinMgr {
 class BuiltinAddin : Addin {
     BuiltinAddin&& next;
     uint order;
-    BuiltinAddin(const string& un, const string& dn, uint ord = 0)
-    {
+    BuiltinAddin(const string& un, const string& dn, uint ord = 0) {
         uName = fPath = un;
         dName = dn;
         order = ord;
@@ -291,8 +275,7 @@ class BuiltinAddin : Addin {
     }
 };
 
-void removeAddinFromArray(array<Addin&&>&& arr, Addin&& a)
-{
+void removeAddinFromArray(array<Addin&&>&& arr, Addin&& a) {
     for (uint i = 0, im = arr.length; i < im; i++) {
         if (arr[i] is a) {
             arr.removeAt(i);

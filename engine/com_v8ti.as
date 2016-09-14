@@ -13,8 +13,7 @@ TrapVirtualStdCall trGetTypeInfo;
 
 // Создадим объект 1С, преобразуем его в IDispatch, и перехватим у него два метода:
 // GetTypeInfo и GetTypeInfoCount
-bool initV8TypeInfo()
-{
+bool initV8TypeInfo() {
     Variant var;
     Value val;
     currentProcess().createByClsid(CLSID_TxtEdtDoc, IID_IValue, val.pValue);
@@ -26,8 +25,7 @@ bool initV8TypeInfo()
 }
 
 funcdef int FTrap_GetTypeInfoCount(IDispatch&, uint&);
-int Trap_GetTypeInfoCount(IDispatch& pDisp, uint& res)
-{
+int Trap_GetTypeInfoCount(IDispatch& pDisp, uint& res) {
     return 1;
     /*
     FTrap_GetTypeInfoCount&& original;
@@ -38,8 +36,7 @@ int Trap_GetTypeInfoCount(IDispatch& pDisp, uint& res)
 }
 
 funcdef int FTrap_GetTypeInfo(IDispatch&, uint, uint, IUnknown&&&);
-int Trap_GetTypeInfo(IDispatch& pDisp, uint iTInfo, uint lcid, IUnknown&&& ppTInfo)
-{
+int Trap_GetTypeInfo(IDispatch& pDisp, uint iTInfo, uint lcid, IUnknown&&& ppTInfo) {
     /*FTrap_GetTypeInfo&& original;
     trGetTypeInfo.getOriginal(&&original);
     if (0 == original(pDisp, iTInfo, lcid, ppTInfo) && ppTInfo !is null) // У объекта свой ITypeInfo
@@ -60,13 +57,11 @@ enum ComConst {
 
 // Порядок функций НЕ МЕНЯТЬ!!! Реализация интерфейса
 class IV8TypeInfo {
-    IV8TypeInfo(IContext&& c)
-    {
+    IV8TypeInfo(IContext&& c) {
         &&ctx = c;
     }
     IContext&& ctx;
-    int GetTypeAttr(uint ppTypeAttr)
-    {
+    int GetTypeAttr(uint ppTypeAttr) {
         IContextDef&& def = ctx;
         TYPEATTRRef&& ta = toTYPEATTR(malloc(TYPEATTR_size));
         mem::memset(ta.self, 0, TYPEATTR_size);
@@ -80,8 +75,7 @@ class IV8TypeInfo {
         return 0;
     }
     int GetTypeComp(uint) { return E_NOTIMPL; }
-    int GetFuncDesc(uint idx, uint pRet)
-    {
+    int GetFuncDesc(uint idx, uint pRet) {
         IContextDef&& def = ctx;
         uint metCount = uint(def.methsCount());
         bool isFunc = idx < metCount;
@@ -94,8 +88,7 @@ class IV8TypeInfo {
         return 0;
     }
     int GetVarDesc(uint, uint) { return E_NOTIMPL; }
-    int GetNames(int memid, uint rgBstrNames, uint cMaxNames, uint pcNames)
-    {
+    int GetNames(int memid, uint rgBstrNames, uint cMaxNames, uint pcNames) {
         if (cMaxNames > 0) {
             uint res = 0;
             IContextDef&& def = ctx;
@@ -129,16 +122,13 @@ class IV8TypeInfo {
     int CreateInstance(uint, uint, uint)                   { return E_NOTIMPL; }
     int GetMops(uint, uint)                                { return E_NOTIMPL; }
     int GetContainingTypeLib(uint, uint)                   { return E_NOTIMPL; }
-    void ReleaseTypeAttr(uint pTypeAttr)
-    {
+    void ReleaseTypeAttr(uint pTypeAttr) {
         free(pTypeAttr);
     }
-    void ReleaseFuncDesc(uint pFuncDesc)
-    {
+    void ReleaseFuncDesc(uint pFuncDesc) {
         free(pFuncDesc);
     }
-    void ReleaseVarDesc(uint pVarDesc)
-    {
+    void ReleaseVarDesc(uint pVarDesc) {
         free(pVarDesc);
     }
 };

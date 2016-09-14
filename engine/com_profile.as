@@ -15,8 +15,7 @@ enum ProfileStoreType {
     pflSnegopat = 6
 };
 
-const Guid& guidOfStore(ProfileStoreType pfs)
-{
+const Guid& guidOfStore(ProfileStoreType pfs) {
     switch (pfs) {
     case pflComputer:
         return gpflComputer;
@@ -36,18 +35,15 @@ const Guid& guidOfStore(ProfileStoreType pfs)
 
 class ProfileStore {
     protected IProfileFolder&& folder;
-    ProfileStore(IProfileFolder&& f)
-    {
+    ProfileStore(IProfileFolder&& f) {
         &&folder = f;
     }
     //[propget, helpstring("Название раздела")]
-    string get_name()
-    {
+    string get_name() {
         return folder.getName();
     }
     //[helpstring("Создать значение")]
-    void createValue(const string& path2value, const Variant& defaultValue, ProfileStoreType storeType)
-    {
+    void createValue(const string& path2value, const Variant& defaultValue, ProfileStoreType storeType) {
         v8string strPath = path2value;
         Value val, existVal;
         if (folder.getValue(strPath, existVal)) {
@@ -58,8 +54,7 @@ class ProfileStore {
         folder.createAndSetValue(strPath, guidOfStore(storeType), val);
     }
     //[helpstring("Получить значение")]
-    Variant getValue(const string& path2value)
-    {
+    Variant getValue(const string& path2value) {
         Variant res;
         Value val;
         if (folder.getValue(path2value, val))
@@ -67,28 +62,24 @@ class ProfileStore {
         return res;
     }
     //[helpstring("Установить значение")]
-    void setValue(const string& path2value, Variant value)
-    {
+    void setValue(const string& path2value, Variant value) {
         Value val;
         var2val(value, val);
         folder.setValue(path2value, val);
     }
     //[propget, helpstring("Количество значений")]
-    uint get_valuesCount()
-    {
+    uint get_valuesCount() {
         return folder.valuesCount();
     }
     //[helpstring("Название значения по номеру")]
-    string valueName(uint idx)
-    {
+    string valueName(uint idx) {
         v8string res;
         if (idx < folder.valuesCount())
             folder.getValueKeyAt(idx, res);
         return res;
     }
     //[helpstring("Получить значение по номеру")]
-    Variant getValueAt(uint idx)
-    {
+    Variant getValueAt(uint idx) {
         Variant res;
         if (idx < folder.valuesCount()) {
             Value val;
@@ -98,8 +89,7 @@ class ProfileStore {
         return res;
     }
     //[helpstring("Установить значение по номеру")]
-    void setValueAt(uint idx, Variant value)
-    {
+    void setValueAt(uint idx, Variant value) {
         if (idx < folder.valuesCount()) {
             Value val;
             var2val(value, val);
@@ -107,29 +97,24 @@ class ProfileStore {
         }
     }
     //[helpstring("Удалить значение по имени")]
-    void deleteValue(const string&  name)
-    {
+    void deleteValue(const string&  name) {
         folder.deleteValue(name);
     }
     //[helpstring("Удалить значение по номеру")]
-    void deleteValueAt(uint idx)
-    {
+    void deleteValueAt(uint idx) {
         if (idx < folder.valuesCount())
             folder.deleteValueAt(idx);
     }
     //[helpstring("Создать раздел")]
-    void createFolder(const string&  folderName, ProfileStoreType storeType)
-    {
+    void createFolder(const string&  folderName, ProfileStoreType storeType) {
         folder.createFolder(folderName, guidOfStore(storeType));
     }
     //[propget, helpstring("Количество разделов")]
-    uint get_foldersCount()
-    {
+    uint get_foldersCount() {
         return folder.foldersCount();
     }
     //[helpstring("Получить раздел по имени")]
-    ProfileStore&& getFolder(const string&  path2folder)
-    {
+    ProfileStore&& getFolder(const string&  path2folder) {
         IProfileFolder&& ptr;
         folder.getFolder(ptr, path2folder);
         if (ptr is null)
@@ -137,8 +122,7 @@ class ProfileStore {
         return ProfileStore(ptr);
     }
     //[helpstring("Получить раздел по номеру")]
-    ProfileStore&& getFolderAt(uint idx)
-    {
+    ProfileStore&& getFolderAt(uint idx) {
         if (idx < folder.foldersCount()) {
             IProfileFolder&& ptr;
             folder.getFolderAt(ptr, idx);
@@ -147,13 +131,11 @@ class ProfileStore {
         return null;
     }
     //[helpstring("Удалить раздел по имени")]
-    void deleteFolder(const string&  name)
-    {
+    void deleteFolder(const string&  name) {
         folder.deleteFolder(name);
     }
     //[helpstring("Удалить раздел по номеру")]
-    void deleteFolderAt(uint idx)
-    {
+    void deleteFolderAt(uint idx) {
         if (idx < folder.foldersCount())
             folder.deleteFolderAt(idx);
     }

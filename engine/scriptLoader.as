@@ -5,8 +5,7 @@
 #include "../../all.h"
 Packet ScriptInit("ScriptInit", initScripts, piOnMainWindow);
 
-bool initScripts()
-{
+bool initScripts() {
     //debugger();
 	IWindow&& w = cast<IUnknown>(mainFrame);
 	string nameOfInstance = getDefaultInfoBase().connectString();
@@ -21,15 +20,13 @@ class AddinScript : Addin, ScriptSite {
     protected ActiveScript script;
     protected SelfScript selfScript;
 	private uint errorsCount = 0;
-    AddinScript(const string& u, const string& d, const string& f)
-    {
+    AddinScript(const string& u, const string& d, const string& f) {
         uName = u;
         dName = d;
         fPath = "script:" + f;
         selfScript._fullPath = f;
     }
-    void _connectSelf()
-    {
+    void _connectSelf() {
         &&selfScript.__addin = this;
         // Подключим объект, возвращающий все объявленные в AngelScript значения перечислений
         script.addNamedItem("Enums", getEnumsDispatch(), true);
@@ -40,24 +37,20 @@ class AddinScript : Addin, ScriptSite {
     }
     ActiveScript&& _script() { return script;  }
     // получить массив имен макросов
-    array<string>&& macroses()
-    {
+    array<string>&& macroses() {
         return script.extractMacroses();
     }
     // выполнить макрос
-    Variant invokeMacros(const string& macros)
-    {
+    Variant invokeMacros(const string& macros) {
         Variant result;
         script.invokeMacros(macros, result);
         return result;
     }
     // получить Dispatch объект
-    IUnknown&& object()
-    {
+    IUnknown&& object() {
         return script.getObject();
     }
-    bool onScriptError(const ScriptError& err)
-    {
+    bool onScriptError(const ScriptError& err) {
 		errorsCount++;
 		if (errorsCount > 5) {
 			Message("Скрипт " + uName + " совершил пять ошибок и будет прерван", mInfo);
@@ -79,8 +72,7 @@ class AddinScript : Addin, ScriptSite {
         }
         return MsgBox(msg, type) == mbaYes;
     }
-    void _unload()
-    {
+    void _unload() {
         &&selfScript.__addin = null;
         script.stop();
         uName.empty();
@@ -93,8 +85,7 @@ class SelfScript {
     string get_displayName()    { return __addin is null ? string() : __addin.displayName; }
     string _fullPath;
     IUnknown&& get_self()       { return __addin is null ? null : __addin.object(); }
-    void addNamedItem(const string& name, IDispatch&& unk, bool global = false)
-    {
+    void addNamedItem(const string& name, IDispatch&& unk, bool global = false) {
         if (__addin !is null)
             __addin._script().addNamedItem(name, unk, global);
     }
@@ -103,16 +94,14 @@ class SelfScript {
 // Загрузчик скриптов
 class ScriptLoader : AddinLoader {
     NoCaseMap<string> mapEngineNames;
-    ScriptLoader()
-    {
+    ScriptLoader() {
         super();
         mapEngineNames.insert("js", "JScript");
         mapEngineNames.insert("vbs", "VBScript");
     }
     string proto()                  { return "script"; }
     bool canUnload(Addin&& addin)   { return true; }
-    Addin&& load(const string& uri)
-    {
+    Addin&& load(const string& uri) {
         string fullPath = findFullPath(uri);
 
         if (fullPath.isEmpty()) {
@@ -209,8 +198,7 @@ class ScriptLoader : AddinLoader {
         }
         return ads;
     }
-    bool run(Addin&& addin)
-    {
+    bool run(Addin&& addin) {
         uint res = cast<AddinScript>(addin)._script().run();
         if (res > 0) {
             Message("не удалось запустить скрипт " + addin.uniqueName);
@@ -219,8 +207,7 @@ class ScriptLoader : AddinLoader {
         }
         return true;
     }
-    bool unload(Addin&& addin)
-    {
+    bool unload(Addin&& addin) {
         cast<AddinScript>(addin)._unload();
         if (!unloadIdleHandlerSet) {
             idleHandlers.insertLast(unloadDelayedScripts);
@@ -229,8 +216,7 @@ class ScriptLoader : AddinLoader {
         return true;
     }
     string nameOfLoadCommand() { return "Загрузить скрипт|script"; }
-    string selectLoadURI()
-    {
+    string selectLoadURI() {
         // Сделаем всё штатным 1Сным диалогом выбора файла
         IContext&& selModes = oneDesigner._createValue("ПеречислениеРежимДиалогаВыбораФайла");
         ValueParamsVector args(1);
@@ -255,8 +241,7 @@ class ScriptLoader : AddinLoader {
 ScriptLoader oneScriptLoader;
 bool unloadIdleHandlerSet = false;
 
-void extractTags(array<array<string>&&>& tags, string& sources, uint& firstLineIdx)
-{
+void extractTags(array<array<string>&&>& tags, string& sources, uint& firstLineIdx) {
     uint startPos = 0;
     for (;;) {
         auto match = scriptTagsRex.match(sources, 1, startPos);

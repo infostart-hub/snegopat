@@ -11,7 +11,9 @@
 	void openView(IFramedView& view, const ViewPosition& pos=ViewPosition(), int openIn=0, bool activate=true, const Guid& g=IID_NULL, const Rect& r=kEmptyRect)
 ////////////////////////////////////////////////////////
 // Открыть диалог и Предупреждение
-#if ver >= 8.3.7
+#if ver >= 8.3.9
+    21
+#elif ver >= 8.3.7
 	20
 #elif ver >= 8.3.6
     19
@@ -64,6 +66,9 @@
     #endif
     save int doMsgLine(const v8string& text, MessageMarker marker=mNone, const Guid&in g=IID_NULL, int i1=0, IUnknown@ pUnkObject=null, const V8Picture&in customMarker=V8Picture())
 		+21
+	#if ver >= 8.3.9
+	    +1
+	#endif
 	save bool GetFileName(SelectFileName& data, int timeout, HWND parent)
 
 

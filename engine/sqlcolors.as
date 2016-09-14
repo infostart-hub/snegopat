@@ -78,8 +78,7 @@ const uint bgMagic = 0xDEADBEEF;
 int bgColorTrapType = 0;
 
 // Инициализация перехвата
-bool initGroupingAndColoring()
-{
+bool initGroupingAndColoring() {
 	getEventService().notify(eTxtEdtOptionChanged);
 	if (!usersGrouping && !colorizedMultyLines) {
 		// Не нужны ни группировки, ни раскраска запросов
@@ -154,8 +153,7 @@ bool initGroupingAndColoring()
     return true;
 }
 
-void printSyntaxInfos(const string& text, Vector& infos)
-{
+void printSyntaxInfos(const string& text, Vector& infos) {
     SyntaxItemInfoRef&& s = toSyntaxItemInfo(infos.start);
     Print("------");
     while (s < infos.end) {
@@ -166,8 +164,7 @@ void printSyntaxInfos(const string& text, Vector& infos)
 
 // Обработчик перехваченной функции синтакс-разбора строки
 funcdef void TE_gc(ITextExtColors&, const v8string&, Vector&);
-void ITextExtColors_getColorsTrap(ITextExtColors& pThis, const v8string& sourceLine, Vector& infos)
-{
+void ITextExtColors_getColorsTrap(ITextExtColors& pThis, const v8string& sourceLine, Vector& infos) {
 	// Вызовем штатную процедуру
 	TE_gc&& orig;
 	trITextExtColors_getColors.getOriginal(&&orig);
@@ -206,8 +203,7 @@ void ITextExtColors_getColorsTrap(ITextExtColors& pThis, const v8string& sourceL
 
 RegExp reGroupComment("(//\\{)|(//\\})");
 // Проверка на группирующий комментарий
-bool checkForGroupingRemark(const string& srcLine, Vector& infos)
-{
+bool checkForGroupingRemark(const string& srcLine, Vector& infos) {
     if (infos.start > 0) {
         SyntaxItemInfoRef&& sInfo = toSyntaxItemInfo(infos.start);
         while (sInfo < infos.end) {
@@ -233,8 +229,7 @@ bool checkForGroupingRemark(const string& srcLine, Vector& infos)
 // Процедура перебирает все токены в массиве, дополнительно обрабатывая
 // строковые константы языком запросов. Обрабатываются те, которые либо начинаются с |,
 // либо без закрывающей кавычки
-array<SQLBlockInfo&&>&& parseQuoteLexemAsSQL(const string& srcLine, Vector& tokens, uint&out newCount)
-{
+array<SQLBlockInfo&&>&& parseQuoteLexemAsSQL(const string& srcLine, Vector& tokens, uint&out newCount) {
     SyntaxItemInfoRef&& sInfo = toSyntaxItemInfo(tokens.start);
     uint tokensCount = tokens.count(SyntaxItemInfo_size);
     array<SQLBlockInfo&&> sqlBlocks;
@@ -333,8 +328,7 @@ array<SQLBlockInfo&&>&& parseQuoteLexemAsSQL(const string& srcLine, Vector& toke
 class SQLBlockInfo {
     Vector tokens;
     // Создает вектор для одного элемента и копирует в него элемент
-    SyntaxItemInfoRef&& addSyntaxBlock(SyntaxItemInfo& si)
-    {
+    SyntaxItemInfoRef&& addSyntaxBlock(SyntaxItemInfo& si) {
         tokens.allock(1, SyntaxItemInfo_size);
         SyntaxItemInfoRef&& p = toSyntaxItemInfo(tokens.start);
         p.ref.copy(si);
@@ -344,8 +338,7 @@ class SQLBlockInfo {
     // также правится длина токенов, если в них встречаются кавычки, так как в
     // оригинальном тексте это сдвоенные кавычки.
     // возвращает количество токенов
-    uint fixupStartPositions(uint shift, const string& srcLine)
-    {
+    uint fixupStartPositions(uint shift, const string& srcLine) {
         uint tokensCount = Vector__count(tokens, SyntaxItemInfo_size);
         SyntaxItemInfoRef&& pS = toSyntaxItemInfo(tokens.start);
         for (uint idx = 0; idx < tokensCount; idx++) {
@@ -369,8 +362,7 @@ class SQLBlockInfo {
     }
 };
 
-bool processHasCustomBackground(Vector& items)
-{
+bool processHasCustomBackground(Vector& items) {
     if (items.start != 0) {
         SyntaxItemInfoRef&& p = toSyntaxItemInfo(items.start);
         while (p < items.end) {
@@ -382,8 +374,7 @@ bool processHasCustomBackground(Vector& items)
     return false;
 }
 
-void processGetColorInfo(Vector& items, Vector& res)
-{
+void processGetColorInfo(Vector& items, Vector& res) {
     if (items.start != 0) {
         uint newCount = 0;
         SyntaxItemInfoRef&& p = toSyntaxItemInfo(items.start);
@@ -417,16 +408,14 @@ void processGetColorInfo(Vector& items, Vector& res)
 }
 
 
-bool TxtExt_hasCustomBackground(ITextExtBackColors& pThis, int nLineNo, SyntaxItemInfos& items)
-{
+bool TxtExt_hasCustomBackground(ITextExtBackColors& pThis, int nLineNo, SyntaxItemInfos& items) {
     trTxtExt_hasBG.swap();
     bool res = pThis.hasCustomBackground(nLineNo, items);
     trTxtExt_hasBG.swap();
     return res || processHasCustomBackground(items.infos);
 }
 
-void TxtExt_getColorInfo(ITextExtBackColors& pThis, COLORREF currentBGColor, SyntaxItemInfos& items, Vector& res)
-{
+void TxtExt_getColorInfo(ITextExtBackColors& pThis, COLORREF currentBGColor, SyntaxItemInfos& items, Vector& res) {
     trTxtExt_getBG.swap();
     pThis.getColorInfo(currentBGColor, items, res);
     trTxtExt_getBG.swap();
@@ -437,23 +426,18 @@ void TxtExt_getColorInfo(ITextExtBackColors& pThis, COLORREF currentBGColor, Syn
 class MyTextExtBackColors
 {
     // Определить, нужно ли будет менять фон слов в строке
-    bool hasCustomBackground(int nLineNo, SyntaxItemInfos& items)
-    {
+    bool hasCustomBackground(int nLineNo, SyntaxItemInfos& items) {
         return processHasCustomBackground(items.infos);
     }
     // Получить инфу о цветах фона
-    void getColorInfo(COLORREF currentBGColor, SyntaxItemInfos& items, Vector& res)
-    {
+    void getColorInfo(COLORREF currentBGColor, SyntaxItemInfos& items, Vector& res) {
         processGetColorInfo(items.infos, res);
     }
 };
 
 
 funcdef uint IUnk_QI(IUnknown&, const Guid&, IUnknown&&&);
-uint TextExtModule_QI(IUnknown& pThis, const Guid& g, IUnknown&&& res)
-//funcdef uint IUnk_QI(uint, uint, uint);
-//uint TextExtModule_QI(uint p1, uint p2, uint p3)
-{
+uint TextExtModule_QI(IUnknown& pThis, const Guid& g, IUnknown&&& res) {
     //Print("" + g);
     
     if (g == IID_ITextExtBackColors) {

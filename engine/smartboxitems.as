@@ -100,16 +100,14 @@ enum imagesIdx {
 class SmartBoxItem : SmartBoxItemBaseIface
 {
     SmartBoxItemData d;
-    SmartBoxItemData& data()
-    {
+    SmartBoxItemData& data() {
         return d;
     }
     void textForTooltip(string& text)  // Получить тултип элемента
     {
         text = d.descr;
     }
-    SmartBoxItem(const string& descr, imagesIdx img)
-    {
+    SmartBoxItem(const string& descr, imagesIdx img) {
         d.descr = descr;
         d.key = descr.dup().makeLower();
         d.exclude = false;

@@ -5,8 +5,7 @@
 #include "../../all.h"
 
 // Обработка одного запроса
-bool processOneQuery(uint pStmt, Value& result, QueryResultProcessor& qp)
-{
+bool processOneQuery(uint pStmt, Value& result, QueryResultProcessor& qp) {
     uint cols = sqlite3_column_count(pStmt);
     if (cols > 0) {
         if (qp.needColumns()) {
@@ -51,8 +50,7 @@ bool processOneQuery(uint pStmt, Value& result, QueryResultProcessor& qp)
     return true;
 }
 
-bool processOneQueryAndReset(uint pStmt, Value& result, QueryResultProcessor& qp)
-{
+bool processOneQueryAndReset(uint pStmt, Value& result, QueryResultProcessor& qp) {
     bool res = processOneQuery(pStmt, result, qp);
     sqlite3_reset(pStmt);
     return res;
@@ -89,8 +87,7 @@ class ValueTableQueryResultProcessor : QueryResultProcessor {
     bool answerIsID;
     ValueTableQueryResultProcessor(bool aid) { answerIsID = aid; }
     bool needColumns() { return true; }
-    void setColumns(array<string>& colNames)
-    {
+    void setColumns(array<string>& colNames) {
         currentProcess().createByClsid(CLSID_ValueTable, IID_IValueTableColumns, pIValueTable);
         VTColumnInfo info;
         IUnknown&& unk;
@@ -108,19 +105,16 @@ class ValueTableQueryResultProcessor : QueryResultProcessor {
             &&unk = null;
         }
     }
-    AddResultRowAnswers addResultRow()
-    {
+    AddResultRowAnswers addResultRow() {
         IVTRowRO&& row;
         pIValueTable.addRow(row);
         &&addedRow = cast<IUnknown>(row);
         return addRowSuccess;
     }
-    void setResultValue(uint col, const Value& val)
-    {
+    void setResultValue(uint col, const Value& val) {
         addedRow.setValueAt(col, val);
     }
-    void setAnswer(Value& val, uint db)
-    {
+    void setAnswer(Value& val, uint db) {
         if (pIValueTable is null)
             val = answerIsID ? sqlite3_last_insert_rowid(db) : sqlite3_changes(db);
         else
@@ -135,8 +129,7 @@ class OneRowQueryResultProcessor : QueryResultProcessor {
     IValueStructure&& valueStruct;
     array<v8string> keys;
     bool needColumns() { return true; }
-    void setColumns(array<string>& colNames)
-    {
+    void setColumns(array<string>& colNames) {
         for (uint i = 0, cols = colNames.length; i < cols; i++) {
             // Добавим колонки в источник данных
             string title = colNames[i];
@@ -147,17 +140,14 @@ class OneRowQueryResultProcessor : QueryResultProcessor {
             keys.insertLast(title);
         }
     }
-    AddResultRowAnswers addResultRow()
-    {
+    AddResultRowAnswers addResultRow() {
         currentProcess().createByClsid(CLSID_ValueStruct, IID_IValueStructure, valueStruct);
         return addRowBreak;
     }
-    void setResultValue(uint col, const Value& val)
-    {
+    void setResultValue(uint col, const Value& val) {
         valueStruct.set(keys[col], val);
     }
-    void setAnswer(Value& val, uint db)
-    {
+    void setAnswer(Value& val, uint db) {
         val = valueStruct is null ? null: cast<IValue>(cast<IUnknown>(valueStruct));
     }
 };
@@ -168,13 +158,11 @@ class OneValueQueryResultProcessor : QueryResultProcessor {
     bool needColumns() { return false; }
     void setColumns(array<string>& colNames) {}
     AddResultRowAnswers addResultRow() { return addRowBreak; }
-    void setResultValue(uint col, const Value& val)
-    {
+    void setResultValue(uint col, const Value& val) {
         if (0 == col)
             answer = val;
     }
-    void setAnswer(Value& val, uint db)
-    {
+    void setAnswer(Value& val, uint db) {
         val = answer;
     }
 };
@@ -182,8 +170,7 @@ class OneValueQueryResultProcessor : QueryResultProcessor {
 // Класс обёртка для работы с базой данных sqlite
 class SqliteBase {
     uint _db;
-    SqliteBase(uint db)
-    {
+    SqliteBase(uint db) {
         _db = db;
     }
     // Выполнить один запрос или несколько запросов, разделённых ';'
@@ -195,8 +182,7 @@ class SqliteBase {
     //  Колонки ТЗ соответствуют полям запроса. В идентификаторах колонок все недопустимые символы
     //  заменяются на '_', а заголовки колонок совпадают с названиями полей запроса
     // - для остальных запросов: если answerIsID false, то количество обработанных строк, иначе lastInsertRowID
-    Variant exec(const string& strQuery, bool answerIsID = false, Variant resArray = 0)
-    {
+    Variant exec(const string& strQuery, bool answerIsID = false, Variant resArray = 0) {
         Value val;
         var2val(resArray, val);
         IValueArray&& resultArray = cast<IUnknown>(val.pValue);
@@ -226,19 +212,16 @@ class SqliteBase {
         return result;
     }
     // Получить описание ошибки
-    string get_lastError()
-    {
+    string get_lastError() {
         return stringFromAddress(sqlite3_errmsg16(_db));
     }
     // Закрыть базу данных
-    void close()
-    {
+    void close() {
         sqlite3_close_v2(_db);
         _db = 0;
     }
     // Подготовить один запрос
-    SqliteQuery&& prepare(const string& strQuery)
-    {
+    SqliteQuery&& prepare(const string& strQuery) {
         uint pSqlText = strQuery.cstr;
         uint pStmt;
         if (SQLITE_OK != sqlite3_prepare16_v2(_db, pSqlText, -1, pStmt, pSqlText)) {
@@ -248,18 +231,15 @@ class SqliteBase {
         return SqliteQuery(pStmt);
     }
     // Возвращает количество строк, обработанных непосредственно последним запросом
-    uint changes()
-    {
+    uint changes() {
         return sqlite3_changes(_db);
     }
     // Возвращает общее количество строк, обработанных при выполнении последнего запроса, учитывая различные триггеры
-    uint totalChanges()
-    {
+    uint totalChanges() {
         return sqlite3_total_changes(_db);
     }
     // Возвращает rowid последней добавленной строки
-    uint lastInsertedID()
-    {
+    uint lastInsertedID() {
         return sqlite3_last_insert_rowid(_db);
     }
 };
@@ -267,13 +247,11 @@ class SqliteBase {
 // Класс для выполнения подготовленного запроса
 class SqliteQuery {
     uint _stmt;
-    SqliteQuery(uint s)
-    {
+    SqliteQuery(uint s) {
         _stmt = s;
     }
     // Установить параметр по имени или номеру
-    SqliteQuery&& bind(Variant idx, Variant val)
-    {
+    SqliteQuery&& bind(Variant idx, Variant val) {
         Value vidx, vval;
         var2val(idx, vidx);
         var2val(val, vval);
@@ -330,8 +308,7 @@ class SqliteQuery {
         return this;
     }
     // Выполнить запрос. Возвращаемое значение, как в SqliteBase::exec
-    Variant exec(bool isAnswerID = false)
-    {
+    Variant exec(bool isAnswerID = false) {
         Variant var;
         Value val;
         if (processOneQueryAndReset(_stmt, val, ValueTableQueryResultProcessor(isAnswerID)))
@@ -341,8 +318,7 @@ class SqliteQuery {
         return var;
     }
     // Выполняет запрос и возвращает первую строку результата в виде объекта Структура
-    Variant queryRow()
-    {
+    Variant queryRow() {
         Variant var;
         Value val;
         if (processOneQueryAndReset(_stmt, val, OneRowQueryResultProcessor()))
@@ -352,8 +328,7 @@ class SqliteQuery {
         return var;
     }
     // Выполняет запрос и возвращает первое поле первой строки результата запроса
-    Variant queryValue()
-    {
+    Variant queryValue() {
         Variant var;
         Value val;
         if (processOneQueryAndReset(_stmt, val, OneValueQueryResultProcessor()))
@@ -362,8 +337,7 @@ class SqliteQuery {
             setComException(stringFromAddress(sqlite3_errmsg16(sqlite3_db_handle(_stmt))));
         return var;
     }
-	void close()
-	{
+	void close() {
 		sqlite3_finalize(_stmt);
 		_stmt = 0;
 	}

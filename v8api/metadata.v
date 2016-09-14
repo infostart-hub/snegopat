@@ -46,8 +46,10 @@
 		27
 	  #elif ver < 8.3.6
 		28
-	  #else
+	  #elif ver < 8.3.9
 		26
+	  #else
+	    27
 	  #endif
 		IMDContainer@+ getMDCont()
 		+1
@@ -151,8 +153,10 @@
 	:virt
 	  #if ver <8.3.3.641
 		35
-	  #else 
+	  #elif ver < 8.3.9
 		38
+	  #else
+		82
 	  #endif
 		IMDContainer@+ getMDCont(int i = 0)
 
@@ -177,8 +181,10 @@
 		61
 	  #elif ver < 8.3.7
 		59
-	  #else
+	  #elif ver < 8.3.9
 	    53
+	  #else
+	    54
 	  #endif
 		IConfigMngr@+ getConfigMgr()
 

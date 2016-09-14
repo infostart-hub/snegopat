@@ -11,8 +11,7 @@ class OptionsEntry {
 	OptionsEntry&& _next;
 	string _name;
 	string _profile;
-	bool doApply(Variant& newVal)
-	{
+	bool doApply(Variant& newVal) {
 		Value val;
 		var2val(newVal, val);
 		getProfileRoot().setValue(_profile, val);

@@ -42,8 +42,8 @@ class Designer {
     EnvironmentData _env;
 	CommandService	_cmdService;
     
-    Designer()
-    {
+    Designer() {
+		//dumpVtable(&&getBkEndUI());
         // Инициализирем всякую всячину
         setTrapOnComExportCount();
         fillTypeNames();
@@ -63,8 +63,7 @@ class Designer {
         es.subscribe(eventSaveModules, AStoIUnknown(SaveModulesNotifier(), IID_IEventRecipient));
     }
     // Создать объект 1С
-    Variant v8New(const string& name, array<Variant>& params)
-    {
+    Variant v8New(const string& name, array<Variant>& params) {
         Variant result;
         IType&& type;
         currentProcess().createByName(name, IID_IType, type);
@@ -94,8 +93,7 @@ class Designer {
         return result;
     }
     // Сообщить
-    void Message(const string& text, Variant markerOrPict = mNone, IDispatch&& clickHandler = null, Variant handlerArg=0)
-    {
+    void Message(const string& text, Variant markerOrPict = mNone, IDispatch&& clickHandler = null, Variant handlerArg=0) {
         Guid g = IID_NULL;
         IUnknown&& h = null;
         V8Picture pict;
@@ -118,13 +116,11 @@ class Designer {
         getBkEndUI().doMsgLine(v8string(text), marker, g, 0, h, pict);
     }
     // Предупреждение
-    MsgBoxAnswers MessageBox(const string& text, MsgBoxStyles style = mbOK, const string& caption = "", uint timeout = 0)
-    {
+    MsgBoxAnswers MessageBox(const string& text, MsgBoxStyles style = mbOK, const string& caption = "", uint timeout = 0) {
         return MsgBoxAnswers(MsgBox(text, style, caption, timeout));
     }
     // Получить указанный глобальный контекст
-    Variant globalContext(const string& uuidStr)
-    {
+    Variant globalContext(const string& uuidStr) {
         auto fnd = __globalContextes.find(uuidStr);
         if (!fnd.isEnd())
             return fnd.value;
@@ -145,55 +141,51 @@ class Designer {
         }
         return res;
     }
-    void designInternalForm(const string path = "")
-    {
+    void designInternalForm(const string path = "") {
         ::designInternalForm(path);
     }
-    void designScriptForm(const string& path = "")
-    {
+    void designScriptForm(const string& path = "") {
         ::designScriptForm(path);
     }
-    Variant loadScriptForm(string path, IDispatch&& eventHandler, const string& eventPrefix="")
-    {
+    Variant loadScriptForm(string path, IDispatch&& eventHandler, const string& eventPrefix="") {
         Value form;
         ::loadScriptForm(path, eventHandler, eventPrefix, form);
         Variant res;
         val2var(form, res);
         return res;
     }
-    V8Value&& toV8Value(Variant varValue)
-    {
+    V8Value&& toV8Value(Variant varValue) {
         return V8Value(varValue);
     }
     //[helpstring("Получить состояние команды")]
-    ICmdUpdateResult&& getCmdState(string cmdGroupUUID, uint cmdNumber, int subCommandIdx = -1)
-    {
+    ICmdUpdateResult&& getCmdState(string cmdGroupUUID, uint cmdNumber, int subCommandIdx = -1) {
         return getCommandState(CommandID(Guid(cmdGroupUUID), cmdNumber), subCommandIdx);
     }
     //[helpstring("Выполнить команду")]
-    bool sendCommand(string cmdGroupUUID, uint cmdNumber, int subCommandIdx = 0)
-    {
+    bool sendCommand(string cmdGroupUUID, uint cmdNumber, int subCommandIdx = 0) {
         return sendCommandToMainFrame(CommandID(Guid(cmdGroupUUID), cmdNumber), subCommandIdx);
     }
-    uint createTimer(uint msec, IDispatch&& pDisp, const string& member = "")
-    {
+    uint createTimer(uint msec, IDispatch&& pDisp, const string& member = "") {
         TimerHandler th;
         &&th.pDisp = pDisp;
         th.name = member;
         return setTimer(msec, TimerProc(th.handler));
     }
-    void killTimer(uint timerID)
-    {
+    void killTimer(uint timerID) {
         removeTimer(timerID);
     }
-    void saveProfile()
-    {
+    void saveProfile() {
         getProfileService().flush();
     }
+	void snPrint(const string& msg) {
+		Print(msg);
+	}
+	void snLog(const string& msg) {
+		doLog(msg);
+	}
 
     // Это из скриптов не вызвать
-    IUnknown&& _createValue(const string& name, ValueParamsVector&& params = ValueParamsVector())
-    {
+    IUnknown&& _createValue(const string& name, ValueParamsVector&& params = ValueParamsVector()) {
         IType&& type;
         currentProcess().createByName(name, IID_IType, type);
         if (type is null) {
@@ -212,15 +204,13 @@ class Designer {
         }
         return null;
     }
-    string loadResourceString(const string& moduleName, const string& stringID)
-    {
+    string loadResourceString(const string& moduleName, const string& stringID) {
         utf8string strModuleName = moduleName.toUtf8(), strStringID = stringID.toUtf8();
         v8string res = load_module_wstring(strModuleName.ptr, strStringID.ptr);
         return res;
     }
 
-	Variant builtin_require(string addinFile)
-	{
+	Variant builtin_require(string addinFile) {
 		Variant res;
 		// Так как вызов этого require вставляется автоматически TypeScript'ом, то название аддина является
 		// файлом, и он может быть относительным и содержать различные папки и прочее. Также в конечном
@@ -242,8 +232,7 @@ class Designer {
     NoCaseMap<Guid> __mapTypeNames;
     NoCaseMap<Variant> __globalContextes;
     private array<IGlobalContextInit&&> reinitGlobalContextes;
-    private void fillTypeNames()
-    {
+    private void fillTypeNames() {
         Vector vec;
         SCOM_Process&& proc = currentProcess();
         proc.getCategoryClasses(vec, IID_IType);
@@ -269,15 +258,13 @@ class Designer {
             }
         }
     }
-    IDispatch&& _me()
-    {
+    IDispatch&& _me() {
         // Диспатч для объекта создается только в первый раз и привязывается к объекту.
         // Последующие вызовы только возвращают созданный диспатч
         return createDispatchFromAS(&&this);
     }
     // Открыть базу данных sqlite
-    SqliteBase&& sqliteOpen(const string& baseName = ":memory:", int flags = -1)
-    {
+    SqliteBase&& sqliteOpen(const string& baseName = ":memory:", int flags = -1) {
         uint db = 0;
         if (flags == -1)
             flags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE;
@@ -290,34 +277,28 @@ class Designer {
         return null;
     }
 
-    void _beforeExitApp(ExitAppCancel&& cancel)
-    {
+    void _beforeExitApp(ExitAppCancel&& cancel) {
         array<Variant> args(1);
         args[0].setDispatch(createDispatchFromAS(&&cancel));
         _events.fireEvent(_me(), "beforeExitApp", args);
     }
-    void _onExitApp()
-    {
+    void _onExitApp() {
         _events.fireEvent(_me(), "onExitApp", array<Variant>());
     }
-    void _fireAddinChanges(Addin&& a, bool load)
-    {
+    void _fireAddinChanges(Addin&& a, bool load) {
         array<Variant> args(1);
         args[0].setDispatch(createDispatchFromAS(&&a));
         _events.fireEvent(_me(), load ? "onLoadAddin" : "onUnLoadAddin", args);
     }
-    void _onIdle()
-    {
+    void _onIdle() {
         _events.fireEvent(_me(), "onIdle", array<Variant>());
     }
-    void _fireCreateTextWindow(TextWnd&& wnd)
-    {
+    void _fireCreateTextWindow(TextWnd&& wnd) {
         array<Variant> args(1);
         args[0].setDispatch(createDispatchFromAS(&&wnd.getComWrapper()));
         _events.fireEvent(_me(), "createTextWindow", args);
     }
-    void _reinitGlobalContextes()
-    {
+    void _reinitGlobalContextes() {
         IInfoBase&& ib = getDefaultInfoBase();
         for (uint i = 0, im = reinitGlobalContextes.length; i < im; i++)
             reinitGlobalContextes[i].init(ib);
@@ -334,8 +315,7 @@ Designer&& oneDesigner;
 // функцию com_export_count и возвращая из нее 0.
 TrapSwap trComExportCount;
 uint com_export_count() { return 0; }
-void setTrapOnComExportCount()
-{
+void setTrapOnComExportCount() {
     trComExportCount.setTrapByName(
 #if ver < 8.3
         "core82.dll"
@@ -356,8 +336,7 @@ void setTrapOnComExportCount()
 TrapVirtualStdCall trValQueryIface;
 IContext&& contextForConvertToVariant;
 
-void initConvertContextToVariant()
-{
+void initConvertContextToVariant() {
     Value val;
     &&val.pValue = null;
     currentProcess().createByClsid(CLSID_TxtEdtDoc, IID_IValue, val.pValue);
@@ -371,8 +350,7 @@ void initConvertContextToVariant()
     trValQueryIface.swap();
 }
 
-uint IGlobcalContext_QI(IUnknown& pThis, const Guid& g, IUnknown&&& res)
-{
+uint IGlobcalContext_QI(IUnknown& pThis, const Guid& g, IUnknown&&& res) {
     if (g == IID_IContext) {
         // Отдадим вместо родного - свой контекст
         &&res = contextForConvertToVariant;
@@ -384,8 +362,7 @@ uint IGlobcalContext_QI(IUnknown& pThis, const Guid& g, IUnknown&&& res)
     return orig(pThis, g, res);
 }
 
-void convertContextToVariant(IContext&& ctx, Variant& var)
-{
+void convertContextToVariant(IContext&& ctx, Variant& var) {
     &&contextForConvertToVariant = ctx;
     Value val;
     &&val.pValue = null;
@@ -403,8 +380,7 @@ void convertContextToVariant(IContext&& ctx, Variant& var)
 class TimerHandler {
     IDispatch&& pDisp;
     string name;
-    void handler(uint timerID)
-    {
+    void handler(uint timerID) {
         int id;
         if (name.isEmpty())
             id = 0;
@@ -419,16 +395,14 @@ class TimerHandler {
 class MessageClickHandler {
     IDispatch&& handler;
     Variant arg;
-    void process()
-    {
+    void process() {
         array<Variant> args = { arg };
         handler.call(0, args);
     }
 };
 
 class MessageClickNotifier {
-    void onEvent(const Guid&in eventID, long val, IUnknown& obj)
-    {
+    void onEvent(const Guid&in eventID, long val, IUnknown& obj) {
         MyMessageHandler&& h = obj;
         if (h !is null)
             h.process();
@@ -436,8 +410,7 @@ class MessageClickNotifier {
 };
 
 class SaveModulesNotifier {
-    void onEvent(const Guid&in eventID, long val, IUnknown& obj)
-    {
+    void onEvent(const Guid&in eventID, long val, IUnknown& obj) {
         // Надо по-новой инициализировать открытые глобальные контексты, которым это надо
         oneDesigner._reinitGlobalContextes();
     }
@@ -451,8 +424,7 @@ enum SelectFileResult {
 
 class ISelectFileData {
     protected SelectFileNameRef&& data;
-    ISelectFileData(SelectFileNameRef&& d)
-    {
+    ISelectFileData(SelectFileNameRef&& d) {
         &&data = d;
         result = sfrNormal;
     }
@@ -471,15 +443,13 @@ class ISelectFileData {
     void set_title(string ttl)      { data.ref.title = ttl; }
     uint get_filesCount()           { return data.ref.selectedFiles.count(v8string_size); }
     string selectedFile(uint idx)   { return tov8string(data.ref.selectedFiles.start + idx * v8string_size).ref.str; }
-    void addSelectedFile(string fileName)
-    {
+    void addSelectedFile(string fileName) {
         VectorV8StringPushBack(data.ref.selectedFiles, fileName);
     }
     SelectFileResult result;
 };
 
-void VectorV8StringPushBack(Vector& v, const v8string&in str)
-{
+void VectorV8StringPushBack(Vector& v, const v8string&in str) {
     if (v.end == v.allocked) {
         // места больше нет, надо перевыделить память и переместить строки
         // строки в V8 перемещать можно простым копированием памяти
@@ -508,8 +478,7 @@ class EnvironmentData {
 };
 
 TrapVirtualStdCall trSelectFileName;
-bool GetFileNameTrap(IBkEndUI& pBkEndUI, SelectFileName& data, int timeout, HWND parent)
-{
+bool GetFileNameTrap(IBkEndUI& pBkEndUI, SelectFileName& data, int timeout, HWND parent) {
     // В момент обработки событий снимем перехват, чтобы можно было воспользоваться штатным диалогом открытия файлов
     trSelectFileName.swap();
     // Оповестим о событии

@@ -11,8 +11,7 @@ funcdef void PCancelExitApp(ExitAppCancel&&);
 array<PVV&&> exitAppHandlers;
 array<PCancelExitApp&&> beforeExitAppHandlers;
 
-bool initExitApp()
-{
+bool initExitApp() {
     IEventService&& es = getEventService();
     es.subscribe(eventExitApp, AStoIUnknown(ExitAppNotifier(), IID_IEventRecipient));
     es.subscribe(eventBeforeExitApp, AStoIUnknown(BeforeExitAppNotifier(), IID_IEventRecipient));
@@ -20,16 +19,14 @@ bool initExitApp()
 }
 
 class ExitAppNotifier {
-    void onEvent(const Guid&in eventID, long val, IUnknown& obj)
-    {
+    void onEvent(const Guid&in eventID, long val, IUnknown& obj) {
         for (uint i = 0, im = exitAppHandlers.length; i < im; i++)
             exitAppHandlers[i]();
     }
 };
 
 class BeforeExitAppNotifier {
-    void onEvent(const Guid&in eventID, long val, IUnknown& obj)
-    {
+    void onEvent(const Guid&in eventID, long val, IUnknown& obj) {
         ExitAppCancel cancel;
         for (uint i = 0, im = beforeExitAppHandlers.length; i < im; i++)
             beforeExitAppHandlers[i](cancel);

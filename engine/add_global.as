@@ -37,12 +37,10 @@
 @*/
 
 class AddinGlobal : BuiltinAddin {
-    AddinGlobal()
-    {
+    AddinGlobal() {
         super("global", "Подключение глобальных контекстов", 0);
     }
-    IUnknown&& object()
-    {
+    IUnknown&& object() {
         if (obj is null)
             &&obj = createDispatchFromAS(&&GlobalAddinObject());
         return obj;
@@ -53,8 +51,7 @@ AddinGlobal addGlobal;
 
 
 class GlobalAddinObject {
-    GlobalAddinObject()
-    {
+    GlobalAddinObject() {
         fillArrayOfContextes();
 		//oneDesigner._develop.dumpV8typesToDts();
     }
@@ -63,20 +60,17 @@ class GlobalAddinObject {
     // надо сделать параметр IDispatch'ем, а возможность вытащить из него объект AngelScript
     // вынести на уровень самого скрипта. Тогда выполнение будет идти по двум вариантам -
     // если из параметра удалось вытащить SelfScript, и если нет.
-    void connectGlobals(SelfScript&& ss)
-    {
+    void connectGlobals(SelfScript&& ss) {
         if (ss is null)
             return;
         for (uint i = 0, im = globalContextes.length; i < im; i++)
             ss.addNamedItem("gc" + i, globalContextes[i], true);
     }
     private array<IDispatch&&> globalContextes;
-    private void addGC(const string& g)
-    {
+    private void addGC(const string& g) {
         globalContextes.insertLast(oneDesigner.globalContext(g).getDispatch());
     }
-    private void fillArrayOfContextes()
-    {
+    private void fillArrayOfContextes() {
         //allgc.push(globalContext("{F10C9E4B-49CA-48A8-8363-BE52C25F46BE}"))
         // {F10C9E4B-49CA-48A8-8363-BE52C25F46BE} - 0x25575200 c:\Program Files\1cv82\8.2.11.236\bin\scheme.dll
         // Методы

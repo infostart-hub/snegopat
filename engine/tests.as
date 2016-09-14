@@ -7,23 +7,20 @@
 
 Packet TestTestTest("TestTestTest", initTestTestTest, piOnMainEnter);
 
-void testReadTextFile()
-{
+void testReadTextFile() {
     v8string textOfFile;
     Message("" + readTextFile(textOfFile, myFolder + "snegopat.pfl"));
     Message(textOfFile.str);
 }
 
-void testValueToString()
-{
+void testValueToString() {
     Value val = 0.234;
     v8string tt;
     val.toString(tt);
     Message("res=" + tt);
 }
 
-void testScriptObject()
-{
+void testScriptObject() {
     Message(join(oneAddinMgr.byIdx(0).macroses(), "\n"));
     Variant res = oneAddinMgr.byIdx(0).invokeMacros("DesignScriptForm");
     Value val;
@@ -33,16 +30,14 @@ void testScriptObject()
     Message(str.str);
 }
 
-bool runTest()
-{
+bool runTest() {
     //testReadTextFile();
     //testValueToString();
     testScriptObject();
     return true;
 }
 
-bool initTestTestTest()
-{
+bool initTestTestTest() {
     addHotKey('T' | hkCtrl | hkAlt, runTest);
     return true;
 }

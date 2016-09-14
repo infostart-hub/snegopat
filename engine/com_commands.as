@@ -6,59 +6,49 @@
 #include "../../all.h"
 
 class ICmdUpdateResult {
-    ICmdUpdateResult(CommandState&& s)
-    {
+    ICmdUpdateResult(CommandState&& s) {
         &&state = s;
     }
     private CommandState&& state;
     //[propget, helpstring("Доступна")]
-    bool get_enabled()
-    {
+    bool get_enabled() {
         return state.cmdState.bEnable;
     }
     //[propget, helpstring("Помечена")]
-    bool get_checked()
-    {
+    bool get_checked() {
         return state.cmdState.bChecked;
     }
     //[propget, helpstring("Текст")]
-    string get_text()
-    {
+    string get_text() {
         return state.cmdState.text;
     }
     //[propget, helpstring("Описание")]
-    string get_description()
-    {
+    string get_description() {
         return state.cmdState.descr;
     }
     //[propget, helpstring("Тултип")]
-    string get_tooltip()
-    {
+    string get_tooltip() {
         return state.cmdState.tooltip;
     }
     //[propget, helpstring("Состав подкоманд")]
-    uint get_subCommands()
-    {
+    uint get_subCommands() {
         return state.lstState.count;
     }
 };
 
-ICmdUpdateResult&& getCommandState(const CommandID& cmd, int subCommand)
-{
+ICmdUpdateResult&& getCommandState(const CommandID& cmd, int subCommand) {
     CommandState&& st = getMainFrameCommandState(cmd, subCommand);
     return st !is null ? ICmdUpdateResult(st) : null;
 }
 
-ICmdUpdateResult&& getCommandStateRecv(const CommandID& cmd, int subCommand, ICommandReceiver&& recv)
-{
+ICmdUpdateResult&& getCommandStateRecv(const CommandID& cmd, int subCommand, ICommandReceiver&& recv) {
     CommandState&& st = getCommandState(cmd, subCommand, recv);
     return st !is null ? ICmdUpdateResult(st) : null;
 }
 
 class CommandService {
 	
-	CommandDescription&& getCommandDescription(string groupUuid, uint number)
-	{
+	CommandDescription&& getCommandDescription(string groupUuid, uint number) {
 		ICommandService&& pCmdServ = currentProcess().getService(IID_ICommandService);
 		CommandID id(Guid(groupUuid), number);
 		ICmdDescription&& descr;
@@ -71,8 +61,7 @@ class CommandService {
 		return null;
 	}
 	/*
-	string groupPresentation(string groupID)
-	{
+	string groupPresentation(string groupID) {
 		ICommandService&& pCmdServ = currentProcess().getService(IID_ICommandService);
 		//dumpVtable(&&pCmdServ);
 		return pCmdServ.groupPresentation(Guid(groupID));

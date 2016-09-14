@@ -26,8 +26,7 @@ class Packet {
     PacketsInitLevel _level;
     InitPacket&& _init;
 
-    Packet(const string& name, InitPacket&& init, PacketsInitLevel level = piOnMainEnter, array<string>&& depends = null)
-    {
+    Packet(const string& name, InitPacket&& init, PacketsInitLevel level = piOnMainEnter, array<string>&& depends = null) {
         &&next = firstPacket;
         &&firstPacket = this;
         _name = name;
@@ -39,8 +38,7 @@ class Packet {
 
 NoCaseSet loadedPackets;
 
-void initPackets(PacketsInitLevel level)
-{
+void initPackets(PacketsInitLevel level) {
     bool hasLoaded, hasNotLoaded;
     for (;;) {
         hasLoaded = false;

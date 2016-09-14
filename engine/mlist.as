@@ -6,8 +6,7 @@
 
 // Оформляем в виде встроенного аддина, со своим макросом
 class AddinMethodsList {
-    bool showMethodList()
-    {
+    bool showMethodList() {
         // Проверим наличие активного текстового окна
         if (activeTextWnd is null)
             return false;

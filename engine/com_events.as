@@ -6,13 +6,11 @@
 #include "../../all.h"
 
 class IEventConnector {
-    IEventConnector()
-    {
+    IEventConnector() {
         setCmdTrap();
     }
     //[helpstring("Подключить обработчик события")]
-    HandlerNode&& connect(IDispatch&& pSource, const string& eventName, IDispatch&& handler, string handlerName = "")
-    {
+    HandlerNode&& connect(IDispatch&& pSource, const string& eventName, IDispatch&& handler, string handlerName = "") {
         if (pSource is null || handler is null || eventName.isEmpty())
             return null;
         if (handlerName.isEmpty())
@@ -22,16 +20,14 @@ class IEventConnector {
         return hn;
     }
     //[helpstring("Отключить обработчик события")]
-    void disconnect(IDispatch&& pSource, const string& eventName, IDispatch&& handler, string handlerName = "")
-    {
+    void disconnect(IDispatch&& pSource, const string& eventName, IDispatch&& handler, string handlerName = "") {
         if (pSource is null || handler is null || eventName.isEmpty())
             return;
         if (handlerName.isEmpty())
             handlerName = eventName;
         disconnectImpl(pSource, eventName, handler, handlerName);
     }
-    void disconnectNode(HandlerNode&& node)
-    {
+    void disconnectNode(HandlerNode&& node) {
         node._removed = true;
         if (fireEventEnters == 0)
             deleteRemoved();
@@ -39,8 +35,7 @@ class IEventConnector {
             hasRemovedNodes = true;
     }
     //[vararg, helpstring("Вызвать событие")]
-    void fireEvent(IDispatch&& pSource, const string& eventName, array<Variant>&& args)
-    {
+    void fireEvent(IDispatch&& pSource, const string& eventName, array<Variant>&& args) {
         EventNode&& pNode = getEventNode(pSource, eventName);
         if (pNode !is null) {
             fireEventEnters++;
@@ -63,8 +58,7 @@ class IEventConnector {
         }
     }
     //[helpstring("Подключить обработчик команд 1С")]
-    HandlerNode&& addCommandHandler(const string& cmdGroupUUID, uint cmdNumber, IDispatch&& handler, string handlerName)
-    {
+    HandlerNode&& addCommandHandler(const string& cmdGroupUUID, uint cmdNumber, IDispatch&& handler, string handlerName) {
         if (handler is null || handlerName.isEmpty())
             return null;
         HandlerNode hn(handler, handlerName);
@@ -72,23 +66,19 @@ class IEventConnector {
         return hn;
     }
     //[helpstring("Отключить обработчик команд 1С")]
-    void delCommandHandler(const string& cmdGroupUUID, uint cmdNumber, IDispatch&& handler, string handlerName)
-    {
+    void delCommandHandler(const string& cmdGroupUUID, uint cmdNumber, IDispatch&& handler, string handlerName) {
         if (handler is null || handlerName.isEmpty())
             return;
         disconnectImpl(null, _getCmdEventName(cmdGroupUUID, cmdNumber), handler, handlerName);
     }
-    string _getCmdEventName(const string&in uuid, int num)
-    {
+    string _getCmdEventName(const string&in uuid, int num) {
         return uuid + "-" + num;
     }
-    bool _hasHandlers(IDispatch&& source, const string& eventName)
-    {
+    bool _hasHandlers(IDispatch&& source, const string& eventName) {
         EventNode&& pNode = getEventNode(source, eventName);
         return pNode !is null && pNode.handlers.length > 0;
     }
-    void removeMyListeners(IDispatch&& pSource)
-    {
+    void removeMyListeners(IDispatch&& pSource) {
         bool removed = false;
         for (auto it = events.begin(); it++;) {
             array<EventNode&&>&& en = it.value;
@@ -109,8 +99,7 @@ class IEventConnector {
         }
     }
     private NoCaseMap<array<EventNode&&>&&> events;
-    private EventNode&& getEventNode(IDispatch&& pSrc, const string& eventName, bool create = false)
-    {
+    private EventNode&& getEventNode(IDispatch&& pSrc, const string& eventName, bool create = false) {
         array<EventNode&&>&& en;
         auto fnd = events.find(eventName);
         if (fnd.isEnd()) {
@@ -130,8 +119,7 @@ class IEventConnector {
         en.insertLast(pNewNode);
         return pNewNode;
     }
-    private void disconnectImpl(IDispatch&& pSource, const string& eventName, IDispatch&& handler, string handlerName = "")
-    {
+    private void disconnectImpl(IDispatch&& pSource, const string& eventName, IDispatch&& handler, string handlerName = "") {
         EventNode&& pNode = getEventNode(pSource, eventName);
         if (pNode !is null) {
             for (uint k = 0, km = pNode.handlers.length; k < km; k++) {
@@ -151,8 +139,7 @@ class IEventConnector {
             }
         }
     }
-    private void deleteRemoved()
-    {
+    private void deleteRemoved() {
         array<string> removedKeys;
         for (auto it = events.begin(); it++; ) {
             array<EventNode&&>&& en = it.value;
@@ -183,8 +170,7 @@ class IEventConnector {
 };
 
 class HandlerNode {
-    HandlerNode(IDispatch&& pHndl, const string& name)
-    {
+    HandlerNode(IDispatch&& pHndl, const string& name) {
         &&handler = pHndl;
         nameOfHandler = name;
     }
@@ -194,8 +180,7 @@ class HandlerNode {
 };
 
 class EventNode {
-    EventNode(IDispatch&& pSrc)
-    {
+    EventNode(IDispatch&& pSrc) {
         &&pSource = pSrc;
     }
     IDispatch&& pSource;
@@ -204,9 +189,8 @@ class EventNode {
 
 TrapVirtualStdCall trSendCommand;
 funcdef void FTransmitCommand(ICommandReceiver&, const Command&, bool);
-void transmitCommandTrap(ICommandReceiver& cmdRecv, const CommandRef&& command, bool deactivate)
-{
-    if (oneDesigner._develop.cmdTrace)
+void transmitCommandTrap(ICommandReceiver& cmdRecv, const CommandRef&& command, bool deactivate) {
+	if (oneDesigner._develop.cmdTrace)
         Message("Команда: группа " + command.ref.id.group + " номер " + command.ref.id.num + " Параметр: " + command.ref.param + " obj=" + command.ref.object);
     FTransmitCommand&& original;
     trSendCommand.getOriginal(&&original);
@@ -228,8 +212,7 @@ void transmitCommandTrap(ICommandReceiver& cmdRecv, const CommandRef&& command, 
     }
 }
 
-void setCmdTrap()
-{
+void setCmdTrap() {
     if (coreMainFrame !is null) {
         ICommandReceiver&& cmdReceiver = coreMainFrame.unk;
         if (cmdReceiver !is null) {
@@ -246,8 +229,7 @@ class CmdHandlerParam {
     int _cmdParam;
     bool _isBefore = true;
     bool cancel = false;
-    CmdHandlerParam(const Command& cmd)
-    {
+    CmdHandlerParam(const Command& cmd) {
         _groupID = cmd.id.group;
         _cmdNumber = cmd.id.num;
         _cmdParam = cmd.param;

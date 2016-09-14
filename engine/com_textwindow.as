@@ -10,8 +10,7 @@ class Selection {
     int beginCol;
     int endRow;
     int endCol;
-    Selection(const TextPosition& begin, const TextPosition& end)
-    {
+    Selection(const TextPosition& begin, const TextPosition& end) {
         beginRow = begin.line;
         beginCol = begin.col;
         endRow = end.line;
@@ -22,12 +21,10 @@ class Selection {
 // Класс для скриптов
 class ITextWindow {
     private TextWnd&& wnd;
-    ITextWindow(TextWnd&& w)
-    {
+    ITextWindow(TextWnd&& w) {
         &&wnd = w;
     }
-    void _disconnect()
-    {
+    void _disconnect() {
         &&wnd = null;
         array<Variant> args(1);
         IDispatch&& me = createDispatchFromAS(&&this);
@@ -35,13 +32,11 @@ class ITextWindow {
         oneDesigner._events.fireEvent(me, "TextWindowClosed", args);
         oneDesigner._events.removeMyListeners(me);
     }
-    bool get_isAlive()
-    {
+    bool get_isAlive() {
         return wnd !is null;
     }
     //[propget, helpstring("Возвращает текст этого окна")]
-    string get_text()
-    {
+    string get_text() {
         if (wnd !is null) {
             v8string text;
             wnd.textDoc.tm.save(text);
@@ -50,8 +45,7 @@ class ITextWindow {
         return string();
     }
     //[helpstring("Получить границы выделенного текста")]
-    Selection&& getSelection()
-    {
+    Selection&& getSelection() {
         if (wnd !is null) {
             TextPosition begin, end;
             wnd.ted.getSelection(begin, end, false);
@@ -60,8 +54,7 @@ class ITextWindow {
         return null;
     }
     //[helpstring("Установить границы выделенного текста")]
-    void setSelection(int beginRow, int beginCol, int endRow, int endCol)
-    {
+    void setSelection(int beginRow, int beginCol, int endRow, int endCol) {
         if (wnd !is null) {
             TextPosition begin, end;
             bool caretInStart;
@@ -90,8 +83,7 @@ class ITextWindow {
         }
     }
     //[propget, helpstring("Получить/установить выделенный текст")]
-    string get_selectedText()
-    {
+    string get_selectedText() {
         if (wnd !is null) {
             v8string res;
             wnd.ted.getSelectionText(res);
@@ -100,8 +92,7 @@ class ITextWindow {
         return string();
     }
     //[propput, helpstring("Получить/установить выделенный текст")]
-    void set_selectedText(const string& text)
-    {
+    void set_selectedText(const string& text) {
         if (wnd !is null) {
             wnd.ted.setSelectionText(text);
             ITextParserCache&& cache = cast<IUnknown>(wnd.textDoc.itm);
@@ -110,8 +101,7 @@ class ITextWindow {
         }
     }
     //[helpstring("Получить положение курсора")]
-    Selection&& getCaretPos()
-    {
+    Selection&& getCaretPos() {
         if (wnd !is null) {
             TextPosition tp;
             wnd.ted.getCaretPosition(tp, false);
@@ -120,23 +110,20 @@ class ITextWindow {
         return null;
     }
     //[helpstring("Установить положение курсора")]
-    void setCaretPos(int row, int col)
-    {
+    void setCaretPos(int row, int col) {
         if (wnd !is null) {
             wnd.ted.setCaretPosition(TextPosition(row, col), false);
             wnd.ted.scrollToCaretPos();
         }
     }
     //[propget, helpstring("Количество строк")]
-    uint get_linesCount()
-    {
+    uint get_linesCount() {
         if (wnd !is null)
             return wnd.textDoc.tm.getLinesCount();
         return 0;
     }
     //[helpstring("Текст строки по номеру (нумерация с 1)")]
-    string line(int lineNumber)
-    {
+    string line(int lineNumber) {
         if (wnd !is null) {
             v8string l;
             wnd.textDoc.tm.getLine(lineNumber, l);
@@ -145,8 +132,7 @@ class ITextWindow {
         return string();
     }
     //[propget, helpstring("Текст только для чтения")]
-    bool get_readOnly()
-    {
+    bool get_readOnly() {
         if (wnd !is null) {
             if (wnd.isControl) {
                 IContext&& ctx = cast<IUnknown>(wnd.textDoc.itm);
@@ -166,18 +152,15 @@ class ITextWindow {
         return true;
     }
     //[propget, helpstring("HWND окна")]
-    uint get_hwnd()
-    {
+    uint get_hwnd() {
         return wnd is null ? 0 : wnd.hWnd;
     }
     //[propget, helpstring("Адрес внутреннего менеджера текста")]
-    uint get_textMgr()
-    {
+    uint get_textMgr() {
         return wnd is null ? 0 : wnd.textDoc.tm.self;
     }
     //[propget, helpstring("Выбранное расширение редактора")]
-    string extName()
-    {
+    string extName() {
         if (wnd !is null) {
             ITextManager_Operations&& to = cast<IUnknown>(wnd.textDoc.itm);
             if (to !is null) {
@@ -191,8 +174,7 @@ class ITextWindow {
         return string();
     }
     // Это на пробу, что выйдет. Возвращает одинэсный объект ТекстовыйДокумент
-    Variant get_textDocument()
-    {
+    Variant get_textDocument() {
         Variant res;
         if (wnd !is null) {
             Value val;
@@ -205,29 +187,25 @@ class ITextWindow {
     bool _multyEdit; // todo Пока не делаю, присутствует для совместимости
     // Это пока не делаем, это метаданные. Присутствуют для совместимости
     //[propget, helpstring("Контейнер метаданных, если есть")]
-    IV8MDContainer&& get_mdCont()
-    {
+    IV8MDContainer&& get_mdCont() {
         if (wnd !is null && wnd.textDoc.mdInfo !is null)
             return getContainerWrapper(wnd.textDoc.mdInfo.container);
         return null;
     }
     //[propget, helpstring("Объект метаданных, если есть")]
-    IV8MDObject&& get_mdObj()
-    {
+    IV8MDObject&& get_mdObj() {
         if (wnd !is null && wnd.textDoc.mdInfo !is null)
             return getMDObjectWrapper(wnd.textDoc.mdInfo.object);
         return null;
     }
     //[propget, helpstring("Свойство объекта метаданных, если есть")]
-    IV8MDProperty&& get_mdProp()
-    {
+    IV8MDProperty&& get_mdProp() {
         if (wnd !is null && wnd.textDoc.mdInfo !is null)
             return getMDPropWrapper(mdService.mdProp(wnd.textDoc.mdInfo.mdPropUuid));
         return null;
     }
     //[propget, helpstring("Внешний объект")]
-    Variant get_extObject()
-    {
+    Variant get_extObject() {
         Variant res;
         if (wnd !is null && wnd.textDoc.mdInfo !is null) {
             Value val;

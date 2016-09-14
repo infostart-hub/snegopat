@@ -16,8 +16,7 @@ class AddinDll : Addin {
 	protected GetMacroses&& getMacroses;
 	protected InvokeMacros&& invMacros;
 	protected GetObject&& getObject;
-    AddinDll(uint m, const string& u, const string& d, const string& f, AddinLoader&& l)
-    {
+    AddinDll(uint m, const string& u, const string& d, const string& f, AddinLoader&& l) {
 		&&__loader = l;
 		module = m;
         uName = u;
@@ -33,8 +32,7 @@ class AddinDll : Addin {
 		if (ptr != 0)
 			initFuncDefFromAddress(ptr, 0, &&getObject);
 	}
-	bool init()
-	{
+	bool init() {
 		uint ptr = GetProcAddress(module, "initAddin".toUtf8().ptr);
 		if (ptr != 0) {
 			InitAddin&& ia;
@@ -44,8 +42,7 @@ class AddinDll : Addin {
 		return true;
 	}
     // получить массив имен макросов
-    array<string>&& macroses()
-    {
+    array<string>&& macroses() {
 		if (getMacroses !is null) {
 			uint res = getMacroses();
 			if (res > 0) {
@@ -57,16 +54,14 @@ class AddinDll : Addin {
 		return null;
     }
     // выполнить макрос
-    Variant invokeMacros(const string& macros)
-    {
+    Variant invokeMacros(const string& macros) {
         Variant result;
 		if (invMacros !is null)
 			invMacros(macros.cstr, result);
         return result;
     }
     // получить Dispatch объект
-    IUnknown&& object()
-    {
+    IUnknown&& object() {
 		IUnknown&& unk;
 		if (getObject !is null)
 			getObject(unk);
@@ -76,14 +71,12 @@ class AddinDll : Addin {
 
 // Загрузчик скриптов
 class DllLoader : AddinLoader {
-    DllLoader()
-    {
+    DllLoader() {
 		super();
     }
     string proto()                  { return "dll"; }
     bool canUnload(Addin&& addin)   { return false; }
-    Addin&& load(const string& uri)
-    {
+    Addin&& load(const string& uri) {
         string fullPath = findFullPath(uri);
         if (fullPath.isEmpty()) {
             oneAddinMgr._lastAddinError = "Не удалось найти файл " + uri;
@@ -116,18 +109,15 @@ class DllLoader : AddinLoader {
 			dn = un;
         return AddinDll(module, un, dn, fullPath, this);
     }
-    bool run(Addin&& addin)
-    {
+    bool run(Addin&& addin) {
 		AddinDll&& ad = cast<AddinDll>(addin);
 		return ad !is null && ad.init();
     }
-    bool unload(Addin&& addin)
-    {
+    bool unload(Addin&& addin) {
         return false;
     }
     string nameOfLoadCommand() { return "Загрузить dll|dll"; }
-    string selectLoadURI()
-    {
+    string selectLoadURI() {
         // Сделаем всё штатным 1Сным диалогом выбора файла
         IContext&& selModes = oneDesigner._createValue("ПеречислениеРежимДиалогаВыбораФайла");
         ValueParamsVector args(1);
