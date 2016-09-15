@@ -252,7 +252,8 @@ class IntelliSite : SmartBoxSite {
 
     // Реализация интерфейса взаимодействия со списком
     void onDoSelect(SmartBoxItemBaseIface&& pSelected) {
-		if (templateToolTip.hwnd != 0 && (GetKeyState(VK_SHIFT) & 0x8000) > 0) {
+		bool shiftPressed = (GetKeyState(VK_SHIFT) & 0x8000) > 0;
+		if (templateToolTip.hwnd != 0 && shiftPressed) {
 			ICommandTarget&& cmd = textWnd.ted.unk;
 			hide();
 			if (cmd !is null)
@@ -275,6 +276,13 @@ class IntelliSite : SmartBoxSite {
 					tpStart.col--;
 				text.remove(0);
 			}
+			if ((GetKeyState(VK_CONTROL) & 0x8000) > 0) {
+				if (text[text.length - 1] != ';')
+					text += ";";
+				text += "\n";
+				notIndent = false;
+			}
+
             editor.setSelection(tpStart, tpEnd, false, false);
             insertInSelection(editor, textWnd.textDoc.tm, textWnd.textDoc.itm, text, true, !notIndent);
             updateHotOrder(ins);
@@ -492,7 +500,7 @@ class IntelliSite : SmartBoxSite {
 					pt.x = boxCornerPosition.x - width - 4;
 			}
 			SetWindowPos(templateToolTip.hwnd, uint(HWND_TOPMOST), pt.x, pt.y, width, height, SWP_NOACTIVATE | SWP_SHOWWINDOW);
-		} else if (templateToolTip.hwnd == 0)
+		} else if (templateToolTip.hwnd != 0)
 			templateToolTip.destroy();
 	}
 };
