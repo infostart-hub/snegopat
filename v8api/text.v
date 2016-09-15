@@ -130,6 +130,8 @@
 
 :iface ITemplateProcessor {BE7E8365-EC19-4804-A04B-2CA31436BF21}
 :virt
+	11
+	bool needSubstitute(const v8string& strSrc, TextManager& tm, v8string&out res)
 	15
 	void processTemplate(const v8string&in templName, const v8string&in templStr, v8string&out result, uint&out nCaretStartOffset, const v8string&in indent)
 

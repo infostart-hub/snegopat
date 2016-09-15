@@ -41,6 +41,7 @@ class Designer {
     Develop         _develop;
     EnvironmentData _env;
 	CommandService	_cmdService;
+    //IV8Debugger     _v8debug;
     
     Designer() {
 		//dumpVtable(&&getBkEndUI());
