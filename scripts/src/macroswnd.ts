@@ -78,7 +78,7 @@ export var MacrosWnd = (function(){
         hotkeys: Object = {};
         MacrosTreeCtrl;
         tc: stdlib.TextChangesWatcher;
-    
+
         constructor() {
             this.form = loadScriptForm(env.pathes.core + "forms\\macroses.ssf", this);
             this.form.MacrosTree.Columns.Add("rowInfo");
@@ -96,7 +96,7 @@ export var MacrosWnd = (function(){
         onChangeAddin(): void {
             this.filled = false;
         }
-    
+
         processAddinsGroup(rows: ValueTreeRowCollection, group: AddinGroup) {
             for (var child = group.child; child; child = child.next) {
                 if (!this.pattern) {
@@ -115,7 +115,7 @@ export var MacrosWnd = (function(){
             }
             if (this.mode == TypeofObjects.Group)
                 return;
-    
+
             for (var i = 0, count = group.addinsCount; i < count; i++) {
                 var addin = group.addin(i);
                 if (this.mode == TypeofObjects.Addin) {
@@ -128,7 +128,7 @@ export var MacrosWnd = (function(){
                     // Надо вставлять макросы. Если макрос один, надо вставить сразу, иначе - создать узел для аддина
                     var macroses = stdlib.toArray(addin.macroses());
                     var prefix = addin.displayName + "::";
-                    // Надо убрать из списка скрытые макросы и макросы, не попадающие в поиск. 
+                    // Надо убрать из списка скрытые макросы и макросы, не попадающие в поиск.
                     for (var kk = macroses.length; kk--;) {
                         if (macroses[kk].substr(0, 1) == "_" || !testPattern(this.pattern, prefix + macroses[kk]))
                             macroses.splice(kk, 1)
@@ -157,8 +157,10 @@ export var MacrosWnd = (function(){
                         macrosRow.Addin = ins.name;
                         macrosRow.Картинка = 1;
                         var rowInfo = new RowInfo(TypeofObjects.Macros, { addin: addin.uniqueName, macros: mname });
-                        if (addin.object && addin.object["getMacrosInfo"])
-                            addin.object["getMacrosInfo"](mname, rowInfo.info);
+                        try {
+                            if (addin.object && addin.object["getMacrosInfo"])
+                                addin.object["getMacrosInfo"](mname, rowInfo.info);
+                        } catch(e){}
                         var key = rowInfo.key();
                         macrosRow.rowInfo = rowInfo;
                         if (this.hotkeys.hasOwnProperty(key))
@@ -168,7 +170,7 @@ export var MacrosWnd = (function(){
                         if (key == this.lastMacros)
                             this.lastMacrosRow = macrosRow;
                     }
-    
+
                     function insertSubGroups(parentRows: ValueTreeRowCollection, macrosName: string): { rows: ValueTreeRowCollection, name: string } {
                         for (; ;) {
                             var k = macrosName.indexOf("\\");
@@ -198,10 +200,10 @@ export var MacrosWnd = (function(){
             var currentRow = <MacrosTreeRow>this.MacrosTreeCtrl.ТекущаяСтрока;
             this.lastMacros = currentRow ? currentRow.rowInfo.key() : "";
             this.lastMacrosRow = null;
-    
+
             this.form.MacrosTree.Строки.Очистить();
             this.processAddinsGroup(this.form.MacrosTree.Строки, addins.root);
-    
+
             if (this.lastMacrosRow)
                 this.MacrosTreeCtrl.ТекущаяСтрока = this.lastMacrosRow;
             else if (this.form.MacrosTree.Строки.Количество() > 0)
@@ -209,7 +211,7 @@ export var MacrosWnd = (function(){
             if (!pattern.length)
                 this.form.ТекущийЭлемент = this.MacrosTreeCtrl;
         }
-    
+
         PatternРегулирование(Элемент, Направление, СтандартнаяОбработка): void {
             var tp = this.MacrosTreeCtrl, cr = tp.ТекущаяСтрока;
             if (cr) {
@@ -219,7 +221,7 @@ export var MacrosWnd = (function(){
             }
             СтандартнаяОбработка.val = false;
         }
-    
+
         CmdsСделатьВыбор(): void {
             var tp = this.MacrosTreeCtrl;
             if (!tp.ТекущаяСтрока)
@@ -239,19 +241,19 @@ export var MacrosWnd = (function(){
             }
             this.form.Закрыть(selected);
         }
-    
+
         MacrosTreeВыбор() {
             this.CmdsСделатьВыбор();
         }
-    
+
         ПриОткрытии() {
             this.tc.start()
         }
-    
+
         ПриЗакрытии() {
             this.tc.stop()
         }
-    
+
         MacrosTreeOnRowOutput(Control, RowAppearance, RowData) {
             var rowInfo:RowInfo = RowData.val.rowInfo;
             if (rowInfo.info.picture)
@@ -261,7 +263,7 @@ export var MacrosWnd = (function(){
             if (ctrl.val.CurrentRow && (<MacrosTreeRow>ctrl.val.CurrentRow).rowInfo)
                 this.form.Controls.Description.Caption = (<MacrosTreeRow>ctrl.val.CurrentRow).rowInfo.info.descr.replace("&", "&&");
         }
-    
+
         fillMacrosesTree(mode: TypeofObjects) {
             this.mode = mode;
             var caption;
@@ -296,20 +298,20 @@ export var MacrosWnd = (function(){
                 this.fillMacrosesTree(mode)
             return this.form.ОткрытьМодально();
         }
-    
+
         selectMacros(): Macros {
             return this.doSelect(TypeofObjects.Macros);
         }
-    
+
         selectAddins() {
             return this.doSelect(TypeofObjects.Addin);
         }
-    
+
         selectGroups() {
             return this.doSelect(TypeofObjects.Group);
         }
     }
-    
+
     function testPattern(p: string[], s: string): boolean {
         s = s.toLowerCase();
         for (var k in p)
@@ -317,7 +319,7 @@ export var MacrosWnd = (function(){
                 return false
         return true
     }
-    
+
     function findNextRowInTree(row, tree) {
         if (tree.Развернут(row))
             return row.Строки.Получить(0)
@@ -332,7 +334,7 @@ export var MacrosWnd = (function(){
         }
         return null
     }
-    
+
     function findPrevRowInTree(row, tree) {
         var parentRows = row.Parent ? row.Parent.Строки : row.Owner().Строки
         var rowIdx = parentRows.Индекс(row)

@@ -165,27 +165,31 @@ function changeScriptForm() {
         designScriptForm(selDlg.ПолноеИмяФайла);
 }
 
-/*
-
-function macrosПерейтиКОпределению() {
-    if (snegopat.activeTextWindow() && windows.modalMode == msNone) {
-        var st = stdcommands.Frntend.GoToDefinition.getState();
-        if (st && st.enabled) {
-            // Будем также подавлять появление дополнительного диалога
-            var handler = events.connect(windows, "onDoModal", function (dlgInfo) {
-                if (dlgInfo.stage == beforeDoModal) {
-                    dlgInfo.cancel = true
-                    dlgInfo.result = 1
-                }
-            }, "-");
-            var res = stdcommands.Frntend.GoToDefinition.send();
-            events.disconnectNode(handler);
-            return res;
+stdlib.createMacros(SelfScript.self, "Перейти к определению",
+    "Перейти к определению символа под курсором (аналог F12)",
+    stdcommands.Frntend.GoToDefinition.info.picture,
+    function () {
+        if (snegopat.activeTextWindow() && windows.modalMode == msNone) {
+            var st = stdcommands.Frntend.GoToDefinition.getState();
+            if (st && st.enabled) {
+                // Будем также подавлять появление дополнительного диалога
+                var handler = events.connect(windows, "onDoModal", function (dlgInfo) {
+                    if (dlgInfo.stage == beforeDoModal) {
+                        dlgInfo.cancel = true
+                        dlgInfo.result = 1
+                    }
+                }, "-");
+                var res = stdcommands.Frntend.GoToDefinition.send();
+                events.disconnectNode(handler);
+                return res;
+            }
         }
-    }
-    return false;
-}
+        return false;
+    },
+    "Ctrl + Enter"
+);
 
+/*
 
 function macrosПоказатьПараметры() {
     //return snegopat.showParams()
@@ -202,7 +206,7 @@ function macrosЛистатьПараметрыНазад() {
 
 // Метод вызывается при регистрации хоткеев аддина
 function getPredefinedHotkeys(predef) {
-    predef.setVersion(6);
+    predef.setVersion(7);
     stdlib.getAllPredefHotKeys(SelfScript.self, predef);
     //predef.add("Показать список методов модуля", "Ctrl + 1|Ctrl + Alt + P");
     //predef.add("ПоказатьВыпадающийСписокСнегопата", "Ctrl + Alt + Space")
