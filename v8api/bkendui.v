@@ -47,7 +47,9 @@
 
 ////////////////////////////////////////////////////////
 // Сообщить
-	#if ver >= 8.3.7
+	#if ver >= 8.3.9
+	    50
+	#elif ver >= 8.3.7
 		49
     #elif ver >= 8.3.6
         48
@@ -66,9 +68,6 @@
     #endif
     save int doMsgLine(const v8string& text, MessageMarker marker=mNone, const Guid&in g=IID_NULL, int i1=0, IUnknown@ pUnkObject=null, const V8Picture&in customMarker=V8Picture())
 		+21
-	#if ver >= 8.3.9
-	    +1
-	#endif
 	save bool GetFileName(SelectFileName& data, int timeout, HWND parent)
 
 
