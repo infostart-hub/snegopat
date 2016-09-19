@@ -65,6 +65,7 @@
 	bool save(v8string&)|?save@TextManager@core@@QAE_NAAV?$basic_string@_WV?$char_traits@_W@stlp_std@@V?$allocator@_W@2@@stlp_std@@@Z
 	uint getCashObject(IUnknown@&)|?getCashObject@TextManager@core@@QAE?AV?$InterfacePtr@VITextManagerCash@core@@@2@XZ
 	bool getLineFast(int, v8string&, IUnknown& cash)|?getLineFast@TextManager@core@@QAE_NHPAV?$basic_string@_WV?$char_traits@_W@stlp_std@@V?$allocator@_W@2@@stlp_std@@PAVITextManagerCash@2@@Z
+	int getLineLength(int, bool)|?getLineLength@TextManager@core@@QAEHH_N@Z
 #if ver<1
 	void addAction(const v8string&in, const TextPosition&in, const TextPosition&in)|?addAction@TextManager@core@@QAEXABV?$basic_string@_WV?$char_traits@_W@stlp_std@@V?$allocator@_W@2@@stlp_std@@ABVTextPosition@2@1@Z
 	void addAction(bool, MarkType, char const*, int, int, bool)|?addAction@TextManager@core@@QAEX_NW4MarkType@2@PBDHH0@Z
@@ -93,7 +94,6 @@
 	void getLabelsPosition(vector<MarkType, allocator<MarkType> > const&, multimap<TextPosition, LabelData, struct stlp_std::less<TextPosition>, allocator<struct stlp_std::pair<TextPosition const , LabelData> > >&)|?getLabelsPosition@TextManager@core@@QAEXABV?$vector@W4MarkType@core@@V?$allocator@W4MarkType@core@@@stlp_std@@@stlp_std@@AAV?$multimap@VTextPosition@core@@VLabelData@2@U?$less@VTextPosition@core@@@stlp_std@@V?$allocator@U?$pair@$$CBVTextPosition@core@@VLabelData@2@@stlp_std@@@5@@4@@Z
 	unsigned int getLastActionItemCount()|?getLastActionItemCount@TextManager@core@@QAEIXZ
 	bool getLineFast(int, v8string*, deque<LabelData, allocator<LabelData> >*, ITextManagerCash*)|?getLineFast@TextManager@core@@QAE_NHPAV?$basic_string@_WV?$char_traits@_W@stlp_std@@V?$allocator@_W@2@@stlp_std@@PAV?$deque@VLabelData@core@@V?$allocator@VLabelData@core@@@stlp_std@@@4@PAVITextManagerCash@2@@Z
-	int getLineLength(int, bool)|?getLineLength@TextManager@core@@QAEHH_N@Z
 	int getLinesCountSelection()|?getLinesCountSelection@TextManager@core@@QAEHXZ
 	int getMaxLineLength(int*)|?getMaxLineLength@TextManager@core@@QAEHPAH@Z
 	int getMpodifyActionCounter()|?getMpodifyActionCounter@TextManager@core@@QAEHXZ

@@ -1,30 +1,44 @@
 ﻿// Работа с WinAPI
-:tdef HWND uint32
-:tdef HDC uint32
-:tdef COLORREF uint32
-:tdef HICON uint32
-:tdef HMENU uint32
-:tdef UINT uint32
-:tdef BOOL uint32
-:tdef BYTE uint8
-:tdef PTR uint32
-:tdef DWORD uint32
-:tdef HFONT uint32
-:tdef HGDIOBJ uint32
-:tdef HMONITOR uint32
-:tdef WPARAM uint32
-:tdef LPARAM uint32
+:tdef HWND		int_ptr
+:tdef HDC		int_ptr
+:tdef COLORREF	uint32
+:tdef HICON		int_ptr
+:tdef HMENU		int_ptr
+:tdef UINT		uint32
+:tdef BOOL		int32
+:tdef BYTE		uint8
+:tdef PTR		int_ptr
+:tdef DWORD		uint32
+:tdef HFONT		int_ptr
+:tdef HGDIOBJ	int_ptr
+:tdef HMONITOR	int_ptr
+:tdef WPARAM	int_ptr
+:tdef LPARAM	int_ptr
+:tdef LRESULT	int_ptr
+:tdef LONG		int32
 
 :enum WndMessages
+	0x3		WM_MOVE
+	0x5		WM_SIZE
 	0xF		WM_PAINT
+	0x10	WM_CLOSE
+	0x24	WM_GETMINMAXINFO
+	0x30	WM_SETFONT
 	0x100	WM_KEYDOWN
 	0x104	WM_SYSKEYDOWN
 	0x101	WM_KEYUP
 	0x102	WM_CHAR
+	0x110	WM_INITDIALOG
+	0x111	WM_COMMAND
 	0x2		WM_DESTROY
 	0x7		WM_SETFOCUS
 	0x8		WM_KILLFOCUS
 	0x201	WM_LBUTTONDOWN
+	0x214	WM_SIZING
+	0x300	EN_CHANGE
+
+:enum WinConstants
+	17		DEFAULT_GUI_FONT
 
 :enum VirtualKeyCodes
 	0x01 	VK_LBUTTON
@@ -186,15 +200,15 @@
 
 :global
 :dlls user32.dll
-	stdcall int SetWindowText(HWND, uint)|SetWindowTextW
+	stdcall BOOL SetWindowText(HWND, int_ptr)|SetWindowTextW
 	stdcall int GetWindowTextLength(HWND hWnd)|GetWindowTextLengthW
-	stdcall int GetWindowText(HWND hWnd, uint lpString, int nMaxCount)|GetWindowTextW
+	stdcall int GetWindowText(HWND hWnd, int_ptr lpString, int nMaxCount)|GetWindowTextW
 	stdcall void keybd_event(BYTE bVk, BYTE bScan, DWORD dwFlags, PTR dwExtraInfo)|keybd_event
 	stdcall UINT MapVirtualKey(UINT uCode, UINT uMapType)|MapVirtualKeyW
 	stdcall HWND SetFocus(HWND hWnd)|SetFocus
 	stdcall HWND GetFocus()|GetFocus
-	stdcall UINT SendMessage(HWND,UINT,UINT,UINT)|SendMessageW
-	stdcall UINT PostMessage(HWND,UINT,UINT,UINT)|PostMessageW
+	stdcall LRESULT SendMessage(HWND,UINT,UINT,UINT)|SendMessageW
+	stdcall BOOL PostMessage(HWND,UINT,WPARAM,LPARAM)|PostMessageW
 	stdcall BOOL DestroyWindow(HWND hWnd)|DestroyWindow
 	stdcall BOOL ShowWindow(HWND hWnd,int nCmdShow)|ShowWindow
 	stdcall BOOL UpdateWindow(HWND hWnd)|UpdateWindow
@@ -207,14 +221,22 @@
 	stdcall int GetSystemMetrics(int nIndex)|GetSystemMetrics
 	stdcall BOOL ClientToScreen(HWND hWnd, Point& lpPoint)|ClientToScreen
 	stdcall BOOL ScreenToClient(HWND hWnd, Point& lpPoint)|ScreenToClient
-	stdcall BOOL CreateCaret(HWND hWnd, uint hBitmap, int nWidth, int nHeight)|CreateCaret
+	stdcall BOOL CreateCaret(HWND hWnd, int_ptr hBitmap, int nWidth, int nHeight)|CreateCaret
 	stdcall BOOL SetCaretPos(int X, int Y)|SetCaretPos
 	stdcall BOOL ShowCaret(HWND hWnd)|ShowCaret
 	stdcall BOOL DestroyCaret()|DestroyCaret
-	stdcall int GetClassName(HWND hWnd, uint lpClassName, int nMaxCount)|GetClassNameW
-	stdcall HWND FindWindow(uint lpClassName, uint lpWindowName)|FindWindowW
+	stdcall int GetClassName(HWND hWnd, int_ptr lpClassName, int nMaxCount)|GetClassNameW
+	stdcall HWND FindWindow(int_ptr lpClassName, int_ptr lpWindowName)|FindWindowW
 	stdcall BOOL IsWindowVisible(HWND hWnd)|IsWindowVisible
 	stdcall BOOL PeekMessage(MSG& lpMsg, HWND hWnd,UINT wMsgFilterMin,UINT wMsgFilterMax,UINT wRemoveMsg)|PeekMessageW
+	stdcall int_ptr DialogBoxIndirectParam(int_ptr hInstance, int_ptr hDialogTemplate, HWND hWndParent, int_ptr lpDialogFunc, LPARAM dwInitParam)|DialogBoxIndirectParamW
+	stdcall BOOL EndDialog(HWND hDlg, int_ptr nResult)|EndDialog
+	stdcall BOOL GetWindowRect(HWND hWnd, Rect& lpRect)|GetWindowRect
+	stdcall HWND CreateWindowEx(DWORD dwExStyle, int_ptr lpClassName, int_ptr lpWindowName, DWORD dwStyle, int X, int Y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, int_ptr hInstance, int_ptr lpParam)|CreateWindowExW
+	stdcall BOOL MoveWindow(HWND hWnd, int X, int Y, int nWidth, int nHeight, BOOL bRepaint)|MoveWindow
+	stdcall BOOL GetClientRect(HWND hWnd, Rect& lpRect)|GetClientRect
+	stdcall BOOL AdjustWindowRectEx(Rect& lpRect, DWORD dwStyle, BOOL bMenu, DWORD dwExStyle)|AdjustWindowRectEx
+	stdcall LONG GetWindowLong(HWND hWnd, int nIndex)|GetWindowLongW
 
 :global
 :dlls gdi32.dll
@@ -223,21 +245,25 @@
 	stdcall BOOL GetTextExtentPoint32(HDC hdc, uint32 lpString, int c, Size&)|GetTextExtentPoint32W
     stdcall BOOL DeleteObject(HGDIOBJ ho)|DeleteObject
 	stdcall int GetDeviceCaps(HDC hdc,int index)|GetDeviceCaps
+	stdcall int_ptr GetStockObject(int i)|GetStockObject
+	stdcall int GetObjectW(int_ptr h, uint c, int_ptr pv)|GetObjectW
 
 :global
 :dlls kernel32.dll
 	stdcall void Sleep(uint)|Sleep
 	stdcall DWORD GetTickCount()|GetTickCount
-	stdcall BOOL VirtualProtect(uint address, uint size, uint newProtect, uint&out oldProtect=void)|VirtualProtect
-	stdcall int MultiByteToWideChar(UINT CodePage, DWORD dwFlags, uint lpMultiByteStr, int cbMultiByte, uint lpWideCharStr, int cchWideChar)|MultiByteToWideChar
-	stdcall int WideCharToMultiByte(UINT CodePage, DWORD dwFlags, uint lpWideCharStr, int cchWideChar, uint lpMultiByteStr, int cbMultiByte, uint lpDefaultChar, bool& lpUsedDefaultChar)|WideCharToMultiByte
-	stdcall uint GetCommandLine()|GetCommandLineW
-	stdcall uint ExpandEnvironmentStrings(uint lpSrc, uint buffer, uint nSize)|ExpandEnvironmentStringsW
-	stdcall uint GetTempPath(uint nBufferLength, uint lpBuffer)|GetTempPathW
-	stdcall int CreateDirectory(uint lpPathName, uint)|CreateDirectoryW
-	stdcall uint LoadLibraryEx(uint lpLibFileName, uint=0,uint dwFlags=0)|LoadLibraryExW
-	stdcall uint GetProcAddress(uint hModule,uint lpProcName)|GetProcAddress
+	stdcall BOOL VirtualProtect(int_ptr address, uint size, uint newProtect, uint&out oldProtect=void)|VirtualProtect
+	stdcall int MultiByteToWideChar(UINT CodePage, DWORD dwFlags, int_ptr lpMultiByteStr, int cbMultiByte, int_ptr lpWideCharStr, int cchWideChar)|MultiByteToWideChar
+	stdcall int WideCharToMultiByte(UINT CodePage, DWORD dwFlags, int_ptr lpWideCharStr, int cchWideChar, int_ptr lpMultiByteStr, int cbMultiByte, uint lpDefaultChar, bool& lpUsedDefaultChar)|WideCharToMultiByte
+	stdcall int_ptr GetCommandLine()|GetCommandLineW
+	stdcall DWORD ExpandEnvironmentStrings(int_ptr lpSrc, int_ptr buffer, DWORD nSize)|ExpandEnvironmentStringsW
+	stdcall DWORD GetTempPath(DWORD nBufferLength, int_ptr lpBuffer)|GetTempPathW
+	stdcall BOOL CreateDirectory(int_ptr lpPathName, int_ptr=0)|CreateDirectoryW
+	stdcall int_ptr LoadLibraryEx(int_ptr lpLibFileName, int_ptr=0, uint dwFlags=0)|LoadLibraryExW
+	stdcall int_ptr GetProcAddress(int_ptr hModule, int_ptr lpProcName)|GetProcAddress
 	stdcall void DebugBreak()|DebugBreak
+	stdcall int_ptr GetModuleHandle(int_ptr lpModuleName)|GetModuleHandleW
+	stdcall DWORD GetLastError()|GetLastError
 
 
 :struct LOGFONT
@@ -275,3 +301,11 @@
 	uint time
 	uint ptx
 	uint pty
+
+:struct MINMAXINFO
+:props
+    Point ptReserved
+    Point ptMaxSize
+    Point ptMaxPosition
+    Point ptMinTrackSize
+    Point ptMaxTrackSize

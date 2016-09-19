@@ -26,7 +26,34 @@ class Snegopat {
     }
 	// [helpstring("Показать список методов модуля")]
     bool showMethodsList() {
-        return false;
+		if (activeTextWnd !is null && oneDesigner._windows.get_modalMode() == msNone) {
+			ModuleTextProcessor&& mtp = cast<ModuleTextProcessor>(activeTextWnd.textDoc.tp);
+			if (mtp !is null) {
+				if (methodsDialog is null)
+					&&methodsDialog = MethodsDialog();
+				IntelliSite&& ist = getIntelliSite();
+				if (ist.isActive())
+					ist.hide();
+				TextPosition curPos;
+				ITextEditor&& editor = activeTextWnd.ted;
+				editor.getCaretPosition(curPos);
+				int line = methodsDialog.show(mtp.moduleElements, curPos.line);
+				if (line > 0) {
+					int len = activeTextWnd.textDoc.tm.getLineLength(line, false);
+					// сначала надо установить каретку на следующую строку, чтобы метод развернулся, если он был свёрнут
+					curPos.line = line + 1;
+					curPos.col = 1;
+					editor.setCaretPosition(curPos);
+					curPos.line = line;
+					editor.setCaretPosition(curPos);
+					editor.scrollToCaretPos();
+					editor.setSelection(curPos, TextPosition(line, len + 1), false);
+					editor.updateView();
+				}
+				return true;
+			}
+		}
+		return false;
     }
 	//[helpstring("Показать выпадающий список снегопата")]
     bool showSmartBox() {
