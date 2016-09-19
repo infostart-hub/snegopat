@@ -87,6 +87,10 @@ function getSignature() {
     return fmt.replace(ptn, function (match, p1, p2, offset, s) {
         // p1 - имя управляющей конструкции.
         // p2 - параметр управляющей конструкции (для ДатаВремя).
+		if (!MarkerFormatStringParameters[p1]) {
+			Message('В настройках подписи для авторского комментария встретилась неизвестная конструкция "' + p1 + '"');
+			return p1;
+		}
         return MarkerFormatStringParameters[p1].call(null, p2);
     });
 }
