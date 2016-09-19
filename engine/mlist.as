@@ -68,7 +68,7 @@ class MethodsDialog: SmartBoxSite {
 
 			for (uint i = 0; i < items.length; i++) {
 				SmartBoxItem&& item = items[i];
-				if (l == 0 || cmp.match(item.d.key) || compareUcaseLetters(item.d.descr, patternUpper))
+				if (cmp.match(item.d.key) || compareUcaseLetters(item.d.descr, patternUpper))
 					fItems.insertLast(item);
 			}
 		}
@@ -90,7 +90,7 @@ class MethodsDialog: SmartBoxSite {
 			initDialog();
 			return 1;
 		case WM_CLOSE:
-			endDialog(-1);
+			endDialog(0);
 			return 1;
 		case WM_SIZE:
 			onSize();
