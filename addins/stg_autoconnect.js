@@ -22,10 +22,14 @@ var pflData = pflPath + "data"                      // Данные
 var pflShowMessage = pflPath + "ShowMessage"        // Показывать сообщение при подстановке
 var pflCurrentBasePath = pflPath + "CurrentBasePath"; // Храним путь к базе данных, если поменялась, тогда будем спрашивать точно надо подключится.
 var pflAutoRecursiveCheckOut = pflPath + "AutoRecursiveCheckOut"; // Опция автоматической установки флажка "захватывать рекурсивно"
+var pflAutoOpenCfgStore = pflPath + "AutoOpenCfgStore";
+var pflCfgViewList = pflPath + "CfgViewList";
 var prevConnectSuccessed = true
 
 // Настройку отображения сообщений будем хранить едино для всех баз, в профиле Снегопата
-profileRoot.createValue(pflShowMessage, true, pflSnegopat)
+profileRoot.createValue(pflShowMessage, true, pflSnegopat);
+profileRoot.createValue(pflAutoOpenCfgStore, false, pflSnegopat);
+profileRoot.createValue(pflCfgViewList, false, pflSnegopat);
 // Подцепляемся к событию показа модальных окон. Если со временем появится событие подключения к хранилищу,
 // то надо будет делать это в том событии, и после отключаться от перехвата модальных окон.
 events.connect(windows, "onDoModal", SelfScript.self)
@@ -53,7 +57,7 @@ function onDoModal(dlgInfo)
                 events.connect(Designer, "onIdle", SelfScript.self);
                 count = 0;
         }
-                      
+
         if(dlgInfo.stage == beforeDoModal)
         {
             var data = profileRoot.getValue(pflData)
@@ -69,7 +73,7 @@ function onDoModal(dlgInfo)
                     var currentBasePath = profileRoot.getValue(pflCurrentBasePath);
                     if (!currentBasePath)
                         currentBasePath = cnnString();
-                    
+
                     if (currentBasePath.toLowerCase() != cnnString().toLowerCase()){
                         var questionStirng = " Для базы сохранена другая строка подключения. \n";
                         questionStirng += "Текущий путь:"+cnnString()+"\n";
@@ -110,7 +114,7 @@ function onDoModal(dlgInfo)
                 profileRoot.setValue(pflCurrentBasePath, currentBasePath)
             }
         }
-        
+
     }
     else if(dlgInfo.stage == openModalWnd && (dlgInfo.caption == "Захват объектов в хранилище конфигурации" ||
         dlgInfo.caption == "Помещение объектов в хранилище конфигурации"))
@@ -164,7 +168,7 @@ SelfScript.self["macrosНастроить автоматический реку�
     var valueSet = null;
 
     var answer = MessageBox("Включить автоматическую установку флага \"Захватывать рекурсивно\"", 4, "Настройка флажка \"Рекурсивно\"");
-    
+
     if(answer == mbYes)
         valueSet = true;
     else if(answer == mbNo)
@@ -177,3 +181,37 @@ SelfScript.self["macrosНастроить автоматический реку�
         saveProfile();
     }
 }
+
+function macrosНастройка() {
+    var form = loadScriptForm(SelfScript.fullPath.replace(/js$/i, 'ssf'), {
+        ПриОткрытии: function() {
+            form.showMessage = profileRoot.getValue(pflShowMessage);
+            form.fRecursive = profileRoot.getValue(pflAutoRecursiveCheckOut);
+            form.autoOpenCfgStore = profileRoot.getValue(pflAutoOpenCfgStore);
+            form.CfgStoreViewInList = profileRoot.getValue(pflCfgViewList);
+        },
+        CmdBarЗаписать: function() {
+            profileRoot.setValue(pflShowMessage, form.showMessage);
+            profileRoot.setValue(pflAutoRecursiveCheckOut, form.fRecursive);
+            profileRoot.setValue(pflAutoOpenCfgStore, form.autoOpenCfgStore);
+            profileRoot.setValue(pflCfgViewList, form.CfgStoreViewInList);
+            form.Close();
+        }
+    });
+    form.ОткрытьМодально();
+}
+
+(function() {
+    var no = profileRoot.getValue(pflAutoOpenCfgStore);
+    if (profileRoot.getValue(pflAutoOpenCfgStore))
+        stdcommands.CfgStore.OpenCfgStore.send();
+    if (profileRoot.getValue(pflCfgViewList)) {
+        var n = events.connect(Designer, "onIdle", function() {
+            var v = windows.getActiveView();
+            if (v && v.title == "Хранилище конфигурации") {
+                v.getInternalForm().sendCommand(stdcommands.CfgStore.groupID, 203, 1);
+                events.disconnectNode(n);
+            }
+        }, '-');
+    }
+})();
