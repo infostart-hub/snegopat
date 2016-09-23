@@ -61,9 +61,11 @@ function onDoModal(dlgInfo) {
     {       
         if (SelfScript.Self['StopOnErrorOpenedByMacros']) 
         {
-            dlgInfo.form.getControl("CheckBox_StopOnError").Value = !dlgInfo.form.getControl("CheckBox_StopOnError").Value;
+			var soe = !dlgInfo.form.getControl("CheckBox_StopOnError").Value;
+            dlgInfo.form.getControl("CheckBox_StopOnError").Value = soe;
             dlgInfo.result = 1; // Нажимаем "Ок".
             dlgInfo.cancel = true; // Окно показывать не надо.
+			Message("Остановка по ошибке " + (soe ? "включена" : "выключена"), mInfo);
         
             SelfScript.Self['StopOnErrorOpenedByMacros'] = undefined;
         }
