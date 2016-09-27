@@ -425,6 +425,8 @@ interface SelectionChangedReceiver {
 	void onScrollToCaretPos(ITextEditor&& editor);
 	// Список штатной подсказки 1С запрашивает оконные координаты, где его показать
 	bool getCaretPosForIS(ITEIntelliSence& teis, Point& caretPos, uint& lineHeight);
+	// Проверить границы выделения в режиме ожидания
+	void checkSelectionInIdle(ITextEditor&& editor);
 };
 
 // Описание альтернативного редактора
@@ -455,6 +457,16 @@ class EditorsManager {
 	private UintMap<array<SelectionChangedReceiver&&>&&> selChangeSubscribers;
 	private UintMap<array<TextModifiedReceiver&&>&&> textChangeSubscribers;
 
+	private void checkSelectionInIdle() {
+		for (auto it = selChangeSubscribers.begin(); !it.isEnd(); it++) {
+			ITextEditor&& ted = toITextEditor(it.key);
+			ted.AddRef();
+			auto arr = it.value;
+			for (uint i = 0; i < arr.length; i++)
+				arr[i].checkSelectionInIdle(ted);
+		}
+	}
+
 	// Создание редактора для указанного расширения текстового редактора
 	TextEditorDocument&& _createEditor(const Guid& extGuid) {
 		auto fnd = editorForExtGuids.find(string(extGuid));
@@ -468,6 +480,8 @@ class EditorsManager {
 	}
 	// Подписка на изменения в окне редактора
 	void _subscribeToSelChange(ITextEditor& editor, SelectionChangedReceiver& receiver) {
+		if (trSS.state == trapNotActive)
+			idleHandlers.insertLast(PVV(this.checkSelectionInIdle));
 		initSelChangeTrap(editor);
 		array<SelectionChangedReceiver&&>&& subscribers;
 		auto fnd = selChangeSubscribers.find(editor.self);

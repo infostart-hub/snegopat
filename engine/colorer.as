@@ -82,8 +82,7 @@ class ScintillaDocument : TextEditorDocument, TextModifiedReceiver {
 			editor.scicall(SCI_SETCURRENTPOS, posEnd);
 			editor.scicall(SCI_REPLACESEL, 0, ustr.ptr);
 		}
-		tm.setSelectRange(tpStart, tpEnd);
-		editor.inReflection = false;
+		//editor.inReflection = false;
 		inTextModified = false;
 	}
 	ScintillaEditor&& firstEditor() {
@@ -138,7 +137,7 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 		}
 		owner.connect(this);
 		initWindowSettings();
-		&&wnd = attachWndToFunction(hEditor, WndFunc(this.ScnWndProc), array<uint> = {WM_SETFOCUS, WM_KILLFOCUS, WM_CHAR, WM_KEYDOWN, WM_SYSKEYDOWN});
+		&&wnd = attachWndToFunction(hEditor, WndFunc(this.ScnWndProc), array<uint> = {WM_SETFOCUS, WM_KILLFOCUS, WM_CHAR, WM_KEYDOWN, WM_SYSKEYDOWN, WM_RBUTTONDOWN});
 		editorsManager._subscribeToSelChange(tw.ted, this);
 	}
 	
@@ -209,6 +208,26 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 		lineHeight = scicall(SCI_TEXTHEIGHT, 0);
 		return true;
 	}
+	void checkSelectionInIdle(ITextEditor&& editor) override {
+		if (inReflection)
+			inReflection = false;
+		TextPosition tpStart, tpEnd;
+		editor.getSelection(tpStart, tpEnd);
+		int posStart = getPosition(tpStart);
+		int posEnd = tpStart == tpEnd ? posStart : getPosition(tpEnd);
+		int posAnchor = scicall(SCI_GETANCHOR);
+		int posCurrent = scicall(SCI_GETCURRENTPOS);
+		if (posStart != posAnchor || posEnd != posCurrent) {
+			inReflection = true;
+			if (posStart == posEnd) {
+				scicall(SCI_GOTOPOS, posStart);
+			} else {
+				// Иначе установим выделение
+				scicall(SCI_SETSEL, posStart, posEnd);
+			}
+			inReflection = false;
+		}
+	}
 
 	LRESULT ScnWndProc(uint msg, WPARAM w, LPARAM l) {
 		switch (msg) {
@@ -229,6 +248,8 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 			if (txtWnd.onKeyDown(w, l))
 				return 0;
 			break;
+		case WM_RBUTTONDOWN:
+			return SendMessage(txtWnd.hWnd, msg, w, l);
 		}
 		return wnd.doDefault();
 	}
@@ -316,14 +337,21 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 			inReflection = false;
 		}
 	}
+	int_ptr getLineText(int line) {
+		int lineLen = scicall(SCI_LINELENGTH, line);
+		int_ptr ptr = malloc(lineLen + 1);
+		scicall(SCI_GETLINE, line, ptr);
+		return ptr;
+	}
 	// Пересчёт из координат штатного редактора в позицию документа сцинтиллы
 	int getPosition(const TextPosition& tp) {
 		int col = tp.col - 1;
 		int pos = scicall(SCI_POSITIONFROMLINE, tp.line - 1);
 		if (col > 0) {
 			v8string line;
-			txtWnd.textDoc.tm.getLine(tp.line, line);
-			//pos += line.str.substr(0, col).toUtf8().length;
+			IUnknown&& cashObject;
+			txtWnd.textDoc.tm.getCashObject(cashObject);
+			txtWnd.textDoc.tm.getLineFast(tp.line, line, cashObject);
 			int_ptr ptr = line.cstr;
 			for (int idx = 0; idx < col; idx++)
 				pos += utf16ToUt8Length(ptr);
@@ -338,7 +366,9 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 		tp.col = 1;
 		if (pos > lineStart) {
 			v8string l;
-			txtWnd.textDoc.tm.getLine(tp.line, l);
+			IUnknown&& cashObject;
+			txtWnd.textDoc.tm.getCashObject(cashObject);
+			txtWnd.textDoc.tm.getLineFast(tp.line, l, cashObject);
 			int_ptr ptr = l.cstr;
 			while (lineStart < pos) {
 				tp.col++;

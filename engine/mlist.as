@@ -45,6 +45,7 @@ class MethodsDialog: SmartBoxSite {
 		if (elements !is null) {
 			currentLine = _currentLine;
 			&&currentModule = elements;
+			elements.parsed = false;
 			elements.parse();
 			IWindow&& w = mainFrame.unk;
 			return DialogBoxIndirectParam(GetModuleHandle(0), dlgTemplate, w.hwnd(), dlgFunc, 0);
