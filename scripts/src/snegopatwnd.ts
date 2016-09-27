@@ -728,6 +728,9 @@ class SettingsPage implements Page {
     handlerCheckChanges() {
         this.enableButtons(this.isParamChanged());
     }
+    handlerAltEditorsНажатие() {
+        (<any>addins.byUniqueName('alteditors').object()).setup();
+    }
 }
 
 type HotkeysControls = FormItems & { HKTable: TableBox, CommandDescription: Label };

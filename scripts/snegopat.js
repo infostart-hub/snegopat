@@ -129,12 +129,4 @@ function macrosЛистатьПараметрыНазад() {
 function getPredefinedHotkeys(predef) {
     predef.setVersion(7);
     stdlib.getAllPredefHotKeys(SelfScript.self, predef);
-    //predef.add("Показать список методов модуля", "Ctrl + 1|Ctrl + Alt + P");
-    //predef.add("ПоказатьВыпадающийСписокСнегопата", "Ctrl + Alt + Space")
-    //predef.add("ПерейтиКОпределению", "Ctrl + Enter")
-    //predef.add("ВернутьсяНазад", "Alt + Left");
-    //predef.add("ПерейтиВперед", "Alt + Right");
-    //predef.add("ПоказатьПараметры", "Ctrl + Shift + Space")
-    //predef.add("ЛистатьПараметрыВперед", "Alt + Down")
-    //predef.add("ЛистатьПараметрыНазад", "Alt + Up")
 }

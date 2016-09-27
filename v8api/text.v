@@ -60,15 +60,15 @@
 	int getFirstVisible()
 	int setFirstVisible(int nLine, bool bInScreenCoords = false)
 	bool isSelectionEmpty()
-	void setSelectionNull()
+	save void setSelectionNull()
 	uint getCaretPosition(TextPosition& out, bool bInScreenCoords = false)
-	void setCaretPosition(const TextPosition&in tp, bool bInScreenCoords = false)
-	void scrollToCaretPos()
+	save void setCaretPosition(const TextPosition&in tp, bool bInScreenCoords = false)
+	save void scrollToCaretPos()
 	void getSelection(TextPosition&out tpStart, TextPosition&out tpStop,bool bInScreenCoords = false)
 	void getSelectionText(v8string&out str)
 	void setSelectionText(const v8string&in str)
 	void getTextUnderCaretPos(v8string&in str)
-	void setSelection(const TextPosition&in tpStart, const TextPosition&in tpStop, bool bCaretToStart, bool bInScreenCoords = false)
+	save void setSelection(const TextPosition&in tpStart, const TextPosition&in tpStop, bool bCaretToStart, bool bInScreenCoords = false)
 	+1
 	void setSepcialSel(int nLine, bool bInScreenCoords = true)
 	int getSepcialSel(bool bInScreenCoords = true)
@@ -123,9 +123,13 @@
 :virt
 	+4
 	void setTxtDocExtender(ITextManager@+ itm, ITxtEdtExtender@+ tee)
-	+4
+	+3
+	bool getExtenderCLSID(const uint& index, Guid& clsid)
 	thiscall uint getExtender(ITxtEdtExtender@&, ITextManager@+ pITextManager, const Guid& clsid) 
-	+4
+	+1
+	uint extendersCount()
+	uint extenderName(int idx)
+	+1
 	uint getTemplateProcessor(ITemplateProcessor@&)
 
 :iface ITemplateProcessor {BE7E8365-EC19-4804-A04B-2CA31436BF21}
@@ -160,6 +164,22 @@
 :virt
     uint getControlId()
     uint getControl(IUnknown@& res, const Guid& iid)
+
+:iface IOutlineCoords {668F52B6-8504-44CB-91EE-81BCEC8124F4}
+:virt
+	+4
+	#if ver >= 8.3
+		+1
+	#endif
+    bool convertTextPosition(TextPosition& tp, bool bFromScreen)
+
+:iface ITEIntelliSence {8291C836-E286-401C-AEEC-E374A8F34879}
+:virt
+	+4
+	int_ptr getMousePos(Point&)
+	int_ptr getCaretPosForTooltip(Point&)
+	int_ptr getMousePosForTooltip(Point&)
+	save void getContextListPos(Point& caretPos, uint& lineHeight)
 
 :global
 :dlls

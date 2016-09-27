@@ -721,6 +721,9 @@ var SettingsPage = (function () {
     SettingsPage.prototype.handlerCheckChanges = function () {
         this.enableButtons(this.isParamChanged());
     };
+    SettingsPage.prototype.handlerAltEditorsНажатие = function () {
+        addins.byUniqueName('alteditors').object().setup();
+    };
     return SettingsPage;
 })();
 var HotkeysPage = (function () {

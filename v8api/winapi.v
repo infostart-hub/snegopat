@@ -18,21 +18,23 @@
 :tdef LONG		int32
 
 :enum WndMessages
+	0x2		WM_DESTROY
 	0x3		WM_MOVE
 	0x5		WM_SIZE
+	0x7		WM_SETFOCUS
+	0x8		WM_KILLFOCUS
 	0xF		WM_PAINT
 	0x10	WM_CLOSE
 	0x24	WM_GETMINMAXINFO
 	0x30	WM_SETFONT
+	0x4E	WM_NOTIFY
+	0x83	WM_NCCALCSIZE
 	0x100	WM_KEYDOWN
-	0x104	WM_SYSKEYDOWN
 	0x101	WM_KEYUP
 	0x102	WM_CHAR
+	0x104	WM_SYSKEYDOWN
 	0x110	WM_INITDIALOG
 	0x111	WM_COMMAND
-	0x2		WM_DESTROY
-	0x7		WM_SETFOCUS
-	0x8		WM_KILLFOCUS
 	0x201	WM_LBUTTONDOWN
 	0x214	WM_SIZING
 	0x300	EN_CHANGE
@@ -207,8 +209,8 @@
 	stdcall UINT MapVirtualKey(UINT uCode, UINT uMapType)|MapVirtualKeyW
 	stdcall HWND SetFocus(HWND hWnd)|SetFocus
 	stdcall HWND GetFocus()|GetFocus
-	stdcall LRESULT SendMessage(HWND,UINT,UINT,UINT)|SendMessageW
-	stdcall BOOL PostMessage(HWND,UINT,WPARAM,LPARAM)|PostMessageW
+	stdcall LRESULT SendMessage(HWND,UINT,WPARAM=0,LPARAM=0)|SendMessageW
+	stdcall BOOL PostMessage(HWND,UINT,WPARAM=0,LPARAM=0)|PostMessageW
 	stdcall BOOL DestroyWindow(HWND hWnd)|DestroyWindow
 	stdcall BOOL ShowWindow(HWND hWnd,int nCmdShow)|ShowWindow
 	stdcall BOOL UpdateWindow(HWND hWnd)|UpdateWindow

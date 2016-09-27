@@ -39,6 +39,7 @@
             loadAddin(prefix + "help.js", group) &&
             loadAddin(prefix + "repo.js", group) &&
             loadAddin(prefix + "snegopat.js", group) &&
+            loadAddin(prefix + "editors.js", group) &&
             loadAddin(prefix + "snegopatwnd.js", group);
     }
     function loadUserAddins() {
