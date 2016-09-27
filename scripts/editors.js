@@ -49,6 +49,7 @@ var FormObject = (function () {
                 s.Insert(item.ExtName, item.EditorName);
         }
         profileRoot.setValue(profileKeyName(), s);
+        this.form.Close();
     };
     FormObject.prototype.CmdbarSetup = function () {
         try {
