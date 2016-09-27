@@ -60,15 +60,12 @@ class MethodsDialog: SmartBoxSite {
 			string pattern;
 			GetWindowText(edit, pattern.setLength(l), l + 1);
 			StringComparator cmp;
-			if (pattern.find(' ') >= 0)
-				cmp.setPattern(pattern, cmContain);
-			else
-				cmp.setPattern(pattern, cmBeginWithOtherLangs);
-			string patternUpper = pattern.makeUpper();
+			cmp.setPattern(pattern, cmContain);
+			pattern.makeUpper();
 
 			for (uint i = 0; i < items.length; i++) {
 				SmartBoxItem&& item = items[i];
-				if (cmp.match(item.d.key) || compareUcaseLetters(item.d.descr, patternUpper))
+				if (cmp.match(item.d.key) || compareUcaseLetters(item.d.descr, pattern))
 					fItems.insertLast(item);
 			}
 		}

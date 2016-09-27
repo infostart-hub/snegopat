@@ -184,6 +184,10 @@ class Designer {
 	void snLog(const string& msg) {
 		doLog(msg);
 	}
+	
+	EditorsManager&& get_editorsManager() {
+		return editorsManager;
+	}
 
     // Это из скриптов не вызвать
     IUnknown&& _createValue(const string& name, ValueParamsVector&& params = ValueParamsVector()) {

@@ -91,12 +91,7 @@ class IntelliSite : SmartBoxSite {
 	ToolTipWindow templateToolTip;
 
     IntelliSite() {
-        fontSize.cx = 0;
         clearAllItems();
-        // Подпишемся на событие изменения настроек текстового редактора,
-        // для пересчета размера шрифта
-        IEventService&& es = getEventService();
-        es.subscribe(eTxtEdtOptionChanged, AStoIUnknown(TextEditorSettingChangeNotifier(), IID_IEventRecipient));
         prepareV8StockItems();
         loadHotOrder();
         exitAppHandlers.insertLast(PVV(this.saveHotOrder));
@@ -187,10 +182,10 @@ class IntelliSite : SmartBoxSite {
         }
         if (!currentItemSelected)
             smartBox.navigate(boxIsUnderLine ? navFirst : navLast);
-        CreateCaret(textWnd.hWnd, 0, 2, fontSize.cy);
+		textWnd.editor.createCaret(fontSize.cy);
         bCaretCreated = true;
         SetCaretPos(xCaret, yCaret);
-        ShowCaret(textWnd.hWnd);
+        textWnd.editor.showCaret();
         return true;
     }
     void setBoxPosition(uint itemsCount) {
@@ -201,16 +196,7 @@ class IntelliSite : SmartBoxSite {
     private void readSettings() {
         boxWidth = getBoxWidth();
         bAllowMultyFilter = isAllowMultyFilter();
-        if (fontSize.cx == 0)
-            getFontSize();
-    }
-    private void getFontSize() {
-        ITxtEdtOptions&& params = editor.unk;
-        Font font;
-        params.getFont(font);
-        //Message("Font kind=" + font.kind + " Height=" + font.lf.lfHeight);
-        getLogFontSizes(font.lf, fontSize);
-        //Message("font.cx=" + fontSize.cx + " font.cy=" + fontSize.cy);
+		textWnd.editor.getFontSize(fontSize);
     }
 
     // Метод фильтрует существующие элементы, создавая массив с удовлетворяющему фильтру элементами
@@ -236,12 +222,12 @@ class IntelliSite : SmartBoxSite {
                 cmp.setPattern(pattern.replace(spaceSymbol, ' '), cmContain);
             else
                 cmp.setPattern(pattern, cmBeginWithOtherLangs);
-            string patternUpper = pattern.makeUpper();
+            pattern.makeUpper();
             for (uint g = 0, gm = itemsGroup.length(); g < gm; g++) {
                 array<SmartBoxItem&&>&& group = itemsGroup[g];
                 for (uint i = 0, im = group.length(); i < im; i++) {
                     SmartBoxItem&& item = group[i];
-                    if (!item.d.exclude && (cmp.match(item.d.key) || compareUcaseLetters(item.d.descr, patternUpper)))
+                    if (!item.d.exclude && (cmp.match(item.d.key) || compareUcaseLetters(item.d.descr, pattern)))
                         result.insertLast(item);
                 }
             }
@@ -307,21 +293,20 @@ class IntelliSite : SmartBoxSite {
                 tpStart.col -= c;
                 editor.setSelection(tpStart, caretPos, false, false);
                 editor.setSelectionText("");
-                buffer.remove(posInBuffer - c, c);
-                moveCaret(-c);
+                moveCaret(-c, c);
             }
             return true;
         case VK_LEFT:
             if (posInBuffer == 0)
                 hideAndSend(WM_KEYDOWN, wParam, lParam);
             else
-                moveCaret(-1);
+                moveCaret(-1, 0);
             return true;
         case VK_RIGHT:
             if (posInBuffer == buffer.length)
                 hideAndSend(WM_KEYDOWN, wParam, lParam);
             else
-                moveCaret(1);
+                moveCaret(1, 0);
             return true;
         case VK_DELETE:
             if (posInBuffer == 0)
@@ -331,8 +316,7 @@ class IntelliSite : SmartBoxSite {
                 tpEnd.col++;
                 editor.setSelection(caretPos, tpEnd, false, false);
                 editor.setSelectionText("");
-                buffer.remove(posInBuffer);
-                moveCaret(0);
+                moveCaret(0, 1);
             }
             return true;
         case VK_TAB:
@@ -358,7 +342,7 @@ class IntelliSite : SmartBoxSite {
         editor.setSelection(caretPos, caretPos, false, false);
         editor.setSelectionText(text);
         buffer.insert(posInBuffer, symbol);
-        moveCaret(1);
+        moveCaret(1, 0);
     }
     bool onKillFocus(HWND hNewWnd) {
         if (!bInHide) {
@@ -408,11 +392,20 @@ class IntelliSite : SmartBoxSite {
         hide();
         SendMessage(hWnd, msg, wParam, lParam);
     }
-	private void moveCaret(int step) {
+	private void moveCaret(int step, int removeSymbols) {
         caretPos.col += step;
-        posInBuffer += step;
-        xCaret += fontSize.cx * step;
-        SetCaretPos(xCaret, yCaret);
+		if (step != 0) {
+			string sm;
+			if (step < 0)
+				sm = buffer.substr(posInBuffer + step, -step);
+			else
+				sm = buffer.substr(posInBuffer, step);
+			posInBuffer += step;
+			xCaret += (step < 0 ? -1 : 1) * textWnd.editor.getTextWidth(sm, fontSize);
+			SetCaretPos(xCaret, yCaret);
+		}
+		if (removeSymbols != 0)
+			buffer.remove(posInBuffer, removeSymbols);
         array<SmartBoxItem&&>&& items = filter();
         int itemsCount = items.length;
         if (itemsCount == 0) {
@@ -503,12 +496,6 @@ class IntelliSite : SmartBoxSite {
 		} else if (templateToolTip.hwnd != 0)
 			templateToolTip.destroy();
 	}
-};
-
-class TextEditorSettingChangeNotifier {
-    void onEvent(const Guid&in eventID, long val, IUnknown& obj) {
-        oneIntelliSite.fontSize.cx = oneIntelliSite.fontSize.cy = 0;
-    }
 };
 
 // Реализация вставляемого элемента метода

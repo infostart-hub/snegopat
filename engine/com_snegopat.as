@@ -26,14 +26,14 @@ class Snegopat {
     }
 	// [helpstring("Показать список методов модуля")]
     bool showMethodsList() {
+		IntelliSite&& ist = getIntelliSite();
+		if (ist.isActive())
+			ist.hide();
 		if (activeTextWnd !is null && oneDesigner._windows.get_modalMode() == msNone) {
 			ModuleTextProcessor&& mtp = cast<ModuleTextProcessor>(activeTextWnd.textDoc.tp);
 			if (mtp !is null) {
 				if (methodsDialog is null)
 					&&methodsDialog = MethodsDialog();
-				IntelliSite&& ist = getIntelliSite();
-				if (ist.isActive())
-					ist.hide();
 				TextPosition curPos;
 				ITextEditor&& editor = activeTextWnd.ted;
 				editor.getCaretPosition(curPos);

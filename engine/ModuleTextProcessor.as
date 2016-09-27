@@ -150,7 +150,7 @@ class ModuleTextProcessor : TextProcessor, ModuleTextSource {
             ParamShow::get().activate();
         */
     }
-    bool onKeyDown(TextWnd&& editor, uint wParam, uint lParam) {
+    bool onKeyDown(TextWnd&& editor, WPARAM wParam, LPARAM lParam) {
         switch (wParam) {
         case VK_LEFT:       case VK_RIGHT:      case VK_UP:
         case VK_DOWN:       case VK_PRIOR:      case VK_NEXT:

@@ -158,6 +158,7 @@ RegExp extractFileExtRex("(?<\\.)[^\\.]*$");
 RegExp whiteSpaceRex("\\s+");
 RegExp ucaseLetterRex("\\p{Upper}");
 RegExp scriptTagsRex("""^(?://(\w+)\:|\$(\w+))[ \t]*(.*?)\s*?\n""");
+RegExp newlines("\\n");
 
 // Проверка, завершается ли строка текста открытым литералом
 bool isLineEndWithOpenQuote(const string& line) {

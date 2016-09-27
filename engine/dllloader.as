@@ -24,19 +24,19 @@ class AddinDll : Addin {
         fPath = "dll:" + f;
 		uint ptr = GetProcAddress(module, "getMacroses".toUtf8().ptr);
 		if (ptr != 0)
-			initFuncDefFromAddress(ptr, 0, &&getMacroses);
+			initFuncDefFromAddress(ptr, &&getMacroses);
 		ptr = GetProcAddress(module, "invokeMacros".toUtf8().ptr);
 		if (ptr != 0)
-			initFuncDefFromAddress(ptr, 0, &&invMacros);
+			initFuncDefFromAddress(ptr, &&invMacros);
 		ptr = GetProcAddress(module, "getObject".toUtf8().ptr);
 		if (ptr != 0)
-			initFuncDefFromAddress(ptr, 0, &&getObject);
+			initFuncDefFromAddress(ptr, &&getObject);
 	}
 	bool init() {
 		uint ptr = GetProcAddress(module, "initAddin".toUtf8().ptr);
 		if (ptr != 0) {
 			InitAddin&& ia;
-			initFuncDefFromAddress(ptr, 0, &&ia);
+			initFuncDefFromAddress(ptr, &&ia);
 			ia(oneDesigner._me());
 		}
 		return true;
@@ -91,7 +91,7 @@ class DllLoader : AddinLoader {
 		uint ptr = GetProcAddress(module, "addinInfo".toUtf8().ptr);
 		if (ptr != 0) {
 			GetAddinInfo&& getAddinInfo;
-			initFuncDefFromAddress(ptr, 0, &&getAddinInfo);
+			initFuncDefFromAddress(ptr, &&getAddinInfo);
 			uint bun = 0, bdn = 0;
 			getAddinInfo(bun, bdn);
 			if (bun != 0) {
