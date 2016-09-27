@@ -75,13 +75,17 @@ class ScintillaDocument : TextEditorDocument, TextModifiedReceiver {
 		utf8string ustr = newText.toUtf8();
 		if (tpStart == tpEnd) {
 			editor.scicall(SCI_INSERTTEXT, posStart, ustr.ptr);
-			editor.scicall(SCI_GOTOPOS, posStart + ustr.length);
 		} else {
 			int posEnd = editor.getPosition(tpEnd);
 			editor.scicall(SCI_SETANCHOR, posStart);
 			editor.scicall(SCI_SETCURRENTPOS, posEnd);
 			editor.scicall(SCI_REPLACESEL, 0, ustr.ptr);
 		}
+		posStart += ustr.length;
+		editor.scicall(SCI_GOTOPOS, posStart);
+		int x = editor.scicall(SCI_POINTXFROMPOSITION, 0, posStart);
+		int y = editor.scicall(SCI_POINTYFROMPOSITION, 0, posStart);
+		SetCaretPos(x, y);
 		//editor.inReflection = false;
 		inTextModified = false;
 	}
