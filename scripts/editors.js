@@ -45,7 +45,7 @@ var FormObject = (function () {
         for (var e = new Enumerator(this.form.AltEditors); !e.atEnd(); e.moveNext()) {
             var item = e.item();
             editorsManager.setActiveEditor(item.ExtName, item.EditorName);
-            if (item.EditorName.length)
+            if (item.EditorName && item.EditorName.length > 0)
                 s.Insert(item.ExtName, item.EditorName);
         }
         profileRoot.setValue(profileKeyName(), s);
