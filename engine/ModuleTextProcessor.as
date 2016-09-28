@@ -599,6 +599,6 @@ void addTypeStores(IntelliSite&& isite, uint allowedAccesses) {
 
 void showV8Assist() {
     CommandID assist(cmdFrameGroup, cmdFrameShowAssist);
-    if (commandState(assist) & cmdStateEnabled != 0)
+    if ((commandState(assist) & cmdStateEnabled) != 0)
         sendCommandToMainFrame(assist);
 }

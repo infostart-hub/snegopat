@@ -235,6 +235,7 @@
 	11 cmdTxtInsertPageBreak
 	12 cmdTxtParams
 	15 cmdTxtGotoLine
+	61 cmdProcessTemplate
 
 :enum TxtOffsets
   #if ver < 8.3

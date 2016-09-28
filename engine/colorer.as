@@ -243,19 +243,42 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 			break;
 		case WM_CHAR:
 		{
+			if ((w == VK_RETURN && inReflection) || (w == VK_SPACE && checkForSubst()))
+				return 0;
 			LRESULT res = wnd.doDefault();
 			txtWnd.onChar(w);
 			return res;
 		}
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:
-			if (txtWnd.onKeyDown(w, l))
+			if ((w == VK_RETURN && checkForSubst()) || txtWnd.onKeyDown(w, l))
 				return 0;
 			break;
 		case WM_RBUTTONDOWN:
 			return SendMessage(txtWnd.hWnd, msg, w, l);
 		}
 		return wnd.doDefault();
+	}
+	bool checkForSubst() {
+		int posSelStart = scicall(SCI_GETANCHOR);
+		int posSelEnd = scicall(SCI_GETCURRENTPOS);
+		if (posSelStart == posSelEnd) {
+			TextPosition caretPos;
+			calcPosition(posSelStart, caretPos);
+			ITemplateProcessor&& tp;
+			getTxtEdtService().getTemplateProcessor(tp);
+			v8string line;
+			txtWnd.textDoc.tm.getLine(caretPos.line, line);
+			string cline = line.str.substr(0, caretPos.col - 1);
+			if (tp.needSubstitute(v8string(cline), txtWnd.textDoc.tm, line)) {
+				CommandID subst(cmdGroupTxtEdt, cmdProcessTemplate);
+				if ((commandState(subst) & cmdStateEnabled) != 0)
+					sendCommandToMainFrame(subst);
+				inReflection = true;
+				return true;
+			}
+		}
+		return false;
 	}
 
 	void initWindowSettings() {
