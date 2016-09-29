@@ -3,6 +3,7 @@
 //dname: Авто-подключение к хранилищу
 //addin: stdcommands
 //addin: global
+//addin: stdlib
 //author: Александр Орефков orefkov at gmail.com
 //help: inplace
 //www: https://snegopat.ru/scripts/wiki?name=stg_autoconnect.js
@@ -202,16 +203,25 @@ function macrosНастройка() {
 }
 
 (function() {
-    var no = profileRoot.getValue(pflAutoOpenCfgStore);
-    if (profileRoot.getValue(pflAutoOpenCfgStore))
-        stdcommands.CfgStore.OpenCfgStore.send();
-    if (profileRoot.getValue(pflCfgViewList)) {
-        var n = events.connect(Designer, "onIdle", function() {
-            var v = windows.getActiveView();
-            if (v && v.title == "Хранилище конфигурации") {
-                v.getInternalForm().sendCommand(stdcommands.CfgStore.groupID, 203, 1);
-                events.disconnectNode(n);
-            }
-        }, '-');
-    }
+	if (stdlib.isConfigOpen()) {
+		var no = profileRoot.getValue(pflAutoOpenCfgStore);
+		if (profileRoot.getValue(pflAutoOpenCfgStore)) {
+			var s = stdcommands.CfgStore.OpenCfgStore.getState();
+			if (!s)
+				Message("Команда открытия хранилища не найдена");
+			else if (!s.enabled)
+				Message("Команда открытия хранилища не доступна");
+			else
+				stdcommands.CfgStore.OpenCfgStore.send();
+		}
+		if (profileRoot.getValue(pflCfgViewList)) {
+			var n = events.connect(Designer, "onIdle", function() {
+				var v = windows.getActiveView();
+				if (v && v.title == "Хранилище конфигурации") {
+					v.getInternalForm().sendCommand(stdcommands.CfgStore.groupID, 203, 1);
+					events.disconnectNode(n);
+				}
+			}, '-');
+		}
+	}
 })();
