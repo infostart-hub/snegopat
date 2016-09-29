@@ -654,8 +654,7 @@ function getAbsolutePath(path) {
     if (path.match(/^\.{1,2}[\/\\]/))
     {
         // Относительные пути должны задаваться относительно главного каталога Снегопата.
-        var mainFolder = profileRoot.getValue("Snegopat/MainFolder");
-        return mainFolder + path;
+        return env.pathes.main + path;
     }
     
     return path;
