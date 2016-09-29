@@ -28,6 +28,12 @@ type EditorsForm = {AltEditors: EditorsTable, Controls: {AltEditors: TableBox} &
 class FormObject {
     form: EditorsForm;
     extentions: {[ext:string]: string[]};
+    static one: FormObject;
+    static getOne() {
+        if (!FormObject.one)
+            FormObject.one = new FormObject;
+        return FormObject.one;
+    }
     constructor() {
         this.form = loadScriptForm(env.pathes.core + 'forms\\editors.ssf', this);
         this.extentions = {};
@@ -59,7 +65,7 @@ class FormObject {
                 s.Insert(item.ExtName, item.EditorName);
         }
         profileRoot.setValue(profileKeyName(), s);
-        this.form.Close();
+        //this.form.Close();
     }
     CmdbarSetup() {
         try {
@@ -76,11 +82,16 @@ class FormObject {
                 Элемент.val.ChoiceList.Add(ar[k]);
         } catch(e){}
     }
+    ПриЗакрытии() {
+        FormObject.one = null;
+    }
+    AltEditorsEditorNameОчистка(Элемент: {val: ComboBox}, СтандартнаяОбработка) {
+        this.form.Controls.AltEditors.CurrentData.EditorName = "";
+    }
 }
 
 function setup() {
-    var f = new FormObject;
-    f.form.DoModal();
+    FormObject.getOne().form.Open();
 }
 
 (()=>{

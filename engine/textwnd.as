@@ -63,9 +63,7 @@ void insertInSelection(ITextEditor&& pEditor, TextManager&& pTM, ITextManager&& 
         if (needIndent) {
             // Формируем отступ. Для этого к каждой строке вставляемого текста, начиная со второй
             // нужно добавить такой-же отступ, как у строки в редакторе
-            v8string wline;
-            pTM.getLine(tpStart.line, wline);   // получили существующую строку текста в формате 1С
-            string indent = wline.str.rtrim("\r\n").padRight(' ', tpStart.col - 1).match(indentRex).text(0, 0);
+            string indent = getTextLine(pTM, tpStart.line).rtrim("\r\n").padRight(' ', tpStart.col - 1).match(indentRex).text(0, 0);
             if (indent.length > 0)
                 text.replace("\n", "\n" + indent);
         }

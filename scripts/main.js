@@ -1,6 +1,6 @@
 ﻿//engine: JScript
 //uname: starter
-//debug: yes
+//debug: no
 //descr: Самый первый скрипт, который загружает все остальные аддины
 //author: orefkov
 //help: inplace

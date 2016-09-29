@@ -1,7 +1,7 @@
 //engine: JScript
 //uname: repo
 //dname: Репозитарий аддинов
-//debug: yes
+//debug: no
 //descr: Скрипт для организации работы с репозитариями аддинов
 //author: orefkov
 //help: inplace
@@ -60,7 +60,7 @@ import * as stdlib from "./std";
 import * as helpsys from "./help";
 
 /**
- * Введём несколько интерфейсов и типов для удобства 
+ * Введём несколько интерфейсов и типов для удобства
  */
 export interface AddinInfo {
     tags: {

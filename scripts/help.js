@@ -1,7 +1,7 @@
 ﻿//engine: JScript
 //uname: help
 //dname: Справка снегопата
-//debug: yes
+//debug: no
 //descr: Скрипт для организации работы справочной системы снегопата
 //author: orefkov
 //help: inplace

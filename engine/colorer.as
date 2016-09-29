@@ -1,17 +1,33 @@
 ﻿/* colorer.as
-    Внедрение scintilla
+    Внедрение текстового редактора "Scintilla"
+	http://www.scintilla.org/index.html
 */
 #pragma once
 #include "../../all.h"
 
-Packet piScintilla("scintilla", function() {
-	editorsManager._registerEditor(ScintillaInfo());
-	return true;
-}, piOnMainEnter);
+Packet piScintilla("scintilla", function() { editorsManager._registerEditor(ScintillaInfo()); return true; }, piOnMainEnter);
 
 int_ptr hSciDll = 0;
 funcdef LRESULT ScintillaFunc(int_ptr, uint, WPARAM, LPARAM);
 ScintillaFunc&& sciFunc;
+
+enum SciMarkers {
+	markCurrentLine = 10,
+};
+
+enum SciStyles {
+	stKeyword = STYLE_LASTPREDEFINED + 1,
+	stNumbers,
+	stStrings,
+	stDate,
+	stIds,
+	stOperators,
+	stRemarks,
+	stPreproc,
+	stLabel,
+	stDirective,
+	stCurrentWord,
+};
 
 class ScintillaInfo : EditorInfo {
 	string name() override {
@@ -35,6 +51,13 @@ class ScintillaInfo : EditorInfo {
 					Message("Не удалось получить Scintilla_DirectFunction");
 			} else
 				Message("Не удалось загрузить scilexer.dll");
+			// Дальше мы загружаем скрипт, который прочитает настройки редактора
+			// и передаст их в ScintillaSetup
+			Addin&& a = oneDesigner._addins.byUniqueName("scintilla");
+			if (a is null)
+				&&a = oneDesigner._addins.loadAddin("script:<core>scripts\\scintilla.js", oneDesigner._addins._libs);
+			if (a is null)
+				Message("Не удалось загрузить аддин scintilla");
 		}
 	}
 	void doSetup() override {
@@ -48,6 +71,147 @@ class ScintillaInfo : EditorInfo {
 		return ScintillaDocument();
 	}
 };
+
+ScintillaInternalAddin oneSciAddin;
+class ScintillaInternalAddin : BuiltinAddin {
+	ScintillaInternalAddin() {
+		super("scintilla_int", "Внутренний аддин для scintilla", 0);
+	}
+	private IDispatch&& obj;
+	IUnknown&& object() {
+		// Если объект еще не создали - создадим
+		if (obj is null)
+			&&obj = createDispatchFromAS(&&sciSetup);
+		return obj;
+	}
+};
+
+class SciStyleDefinition {
+	int _index;
+	string _name;
+	string fontName = "";	// Пустое имя - шрифт по умолчанию
+	int size = 0;			// Размер в сотых долях пункта. 0 - размер не указан
+	int weight = 0;			// Толщина. 0 - не указана
+	int underline = 0;		// Подчёркнутый. 0 - не задано, 1 - нет, 2 - да
+	int italic = 0;			// Курсив. 0 - не задано, 1 - нет, 2 - да
+	int eolfill = 0;		// Закрашивать фон после конца строки. 0 - не задано, 1 - нет, 2 - да
+	uint fore = uint(-1);	// Цвет текста. -1 - не задан
+	uint back = uint(-1);	// Цвет фона. -1 - не задан
+	SciStyleDefinition(int idx, const string& n) {
+		_index = idx;
+		_name = n;
+	}
+	SciStyleDefinition(int idx, const string& n, uint f, uint b = uint(-1)) {
+		_index = idx;
+		_name = n;
+		fore = f;
+		back = b;
+	}
+	SciStyleDefinition(int idx, const string& n, const string& fn, int s = 0, uint f = uint(-1), uint b = uint(-1)) {
+		_index = idx;
+		_name = n;
+		fontName = fn;
+		size = s;
+		fore = f;
+		back = b;
+	}
+	void _apply(ScintillaEditor&& editor, const NoCaseMap<int>& fonts) {
+		if (!fontName.isEmpty()) {
+			auto fnames = (fontName + ",Courier").split(",");
+			for (uint i = 0; i < fnames.length; i++) {
+				string n = fnames[i];
+				n.trim();
+				if (fonts.contains(n)) {
+					//Message("Set font in style " + _index + " to " + n);
+					editor.scicall(SCI_STYLESETFONT, _index, n.toUtf8().ptr);
+					break;
+				}
+			}
+		}
+		if (size > 0)
+			editor.scicall(SCI_STYLESETSIZEFRACTIONAL, _index, size);
+		if (weight > 0)
+			editor.scicall(SCI_STYLESETWEIGHT, _index, weight);
+		if (underline != 0)
+			editor.scicall(SCI_STYLESETUNDERLINE, _index, underline - 1);
+		if (italic != 0)
+			editor.scicall(SCI_STYLESETITALIC, _index, italic - 1);
+		if (eolfill != 0)
+			editor.scicall(SCI_STYLESETEOLFILLED, _index, eolfill - 1);
+		if (fore != uint(-1))
+			editor.scicall(SCI_STYLESETFORE, _index, fore);
+		if (back != uint(-1))
+			editor.scicall(SCI_STYLESETBACK, _index, back);
+	}
+};
+
+class ScintillaSetup {
+	private array<SciStyleDefinition&&> styles;
+	private void addStyle(SciStyleDefinition&& d) { styles.insertLast(d); }
+
+	ScintillaSetup() {
+		addStyle(SciStyleDefinition(STYLE_DEFAULT, "Базовый стиль", "Consolas,Courier New", 1100, 0, 0xF0FBFF));
+		addStyle(SciStyleDefinition(stKeyword, "Ключевые слова", 0xA55104));
+		addStyle(SciStyleDefinition(stRemarks, "Комментарии", 0x008000));
+		addStyle(SciStyleDefinition(stNumbers, "Числа", 0x5a8809));
+		addStyle(SciStyleDefinition(stStrings, "Строки", 0x1515a3));
+		addStyle(SciStyleDefinition(stDate, "Даты", 0x5a8809));
+		addStyle(SciStyleDefinition(stIds, "Идентификаторы", 0x033E6B));
+		addStyle(SciStyleDefinition(stOperators, "Операторы", 0x050505));
+		addStyle(SciStyleDefinition(stPreproc, "Препроцессоры", 0x0E4AAB));
+		addStyle(SciStyleDefinition(stLabel, "Метка", 0x09885a));
+		addStyle(SciStyleDefinition(stDirective, "Директива", 0x2E75D9));
+		addStyle(SciStyleDefinition(stCurrentWord, "Слово под курсором", uint(-1), 0xFFF3E7));
+		
+		addStyle(SciStyleDefinition(STYLE_LINENUMBER, "Номера строк", "", 900, 0xBBBBBB));
+		addStyle(SciStyleDefinition(STYLE_INDENTGUIDE, "Линии выравнивания", 0xCCCCCC));
+	}
+	uint get_stylesCount() const {
+		return styles.length;
+	}
+	SciStyleDefinition&& style(uint idx) const {
+		return styles[idx];
+	}
+
+	uint caretWidth = 2;
+	uint indentGuide = SC_IV_LOOKBOTH;
+	bool highlightCurrentLine = true;
+	uint clrCurrentLine = 0xF7E8D7;
+	bool showLineNumbers = true;
+	int useTabs = 1;
+	uint tabWidth = 4;
+	
+	array<string>&& enumMonoSpaceFonts() {
+		NoCaseMap<int> fonts;
+		enumMonoFonts(fonts);
+		array<string> result;
+		for (auto it = fonts.begin(); !it.isEnd(); it++)
+			result.insertLast(it.key);
+		result.sortAsc();
+		return result;
+	}
+
+	void _apply(ScintillaEditor&& ed) {
+		NoCaseMap<int> fonts;
+		enumMonoFonts(fonts);
+		styles[0]._apply(ed, fonts);
+		ed.scicall(SCI_STYLECLEARALL);
+		for (uint i = 1; i < styles.length; i++)
+			styles[i]._apply(ed, fonts);
+		ed.scicall(SCI_SETCARETWIDTH, caretWidth);
+		if (showLineNumbers)
+			ed.scicall(SCI_SETMARGINWIDTHN, 0, ed.scicall(SCI_TEXTWIDTH, STYLE_LINENUMBER, "_99999".toUtf8().ptr));
+
+		ed.scicall(SCI_MARKERSETBACK, markCurrentLine, clrCurrentLine);
+		ed.scicall(SCI_SETTABWIDTH, tabWidth);
+		ed.scicall(SCI_SETUSETABS, useTabs);
+		ed.scicall(SCI_SETINDENTATIONGUIDES, indentGuide);
+		ed.scicall(SCI_STYLESETWEIGHT, stPreproc, 600);
+		ed.scicall(SCI_STYLESETWEIGHT, stDirective, 600);
+	}
+};
+ScintillaSetup sciSetup;
+
 
 class ScintillaDocument : TextEditorDocument, TextModifiedReceiver {
 	int_ptr sciDoc = 0;
@@ -110,13 +274,13 @@ class ScintillaDocument : TextEditorDocument, TextModifiedReceiver {
 	}
 };
 
-
 class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 	ScintillaDocument&& owner;
 	ASWnd&& wnd;
 	HWND hEditor;
 	int_ptr editor_ptr;
 	bool inReflection = false;
+	int_ptr curLineMarkerHandle = 0;
 	
 	ScintillaEditor(ScintillaDocument&& o) {
 		&&owner = o;
@@ -240,6 +404,7 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 			}
 			inReflection = false;
 		}
+		updateCurrentLineMarker();
 	}
 
 	LRESULT ScnWndProc(uint msg, WPARAM w, LPARAM l) {
@@ -277,9 +442,8 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 				calcPosition(posSelStart, caretPos);
 				ITemplateProcessor&& tp;
 				getTxtEdtService().getTemplateProcessor(tp);
+				string cline = getTextLine(txtWnd.textDoc.tm, caretPos.line).substr(0, caretPos.col - 1);
 				v8string line;
-				txtWnd.textDoc.tm.getLine(caretPos.line, line);
-				string cline = line.str.substr(0, caretPos.col - 1);
 				if (tp.needSubstitute(v8string(cline), txtWnd.textDoc.tm, line)) {
 					CommandID subst(cmdGroupTxtEdt, cmdProcessTemplate);
 					if ((commandState(subst) & cmdStateEnabled) != 0)
@@ -294,13 +458,11 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 
 	void initWindowSettings() {
 		scicall(SCI_SETMODEVENTMASK, SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT);
-		scicall(SCI_STYLESETFONT, STYLE_DEFAULT, "Consolas".toUtf8().ptr);
-		scicall(SCI_STYLESETSIZE, STYLE_DEFAULT, 12);
-		scicall(SCI_SETMARGINWIDTHN, 0, 50);
-		scicall(SCI_SETTABWIDTH, 4);
+		scicall(SCI_SETLEXER, SCLEX_CONTAINER);
+		scicall(SCI_SETMARGINMASKN, 1, scicall(SCI_GETMARGINMASKN, 1) & ~(1 << markCurrentLine));
 		scicall(SCI_SETTECHNOLOGY, SC_TECHNOLOGY_DIRECTWRITE);
-		scicall(SCI_SETBUFFEREDDRAW, 1);
-		scicall(SCI_SETINDENTATIONGUIDES, SC_IV_LOOKBOTH);
+		//scicall(SCI_SETBUFFEREDDRAW, 1);
+		sciSetup._apply(this);
 	}
 	void onSizeParent() {
 		Rect rc;
@@ -311,9 +473,14 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 		if (scn.nmhdr.hwndFrom != hEditor)
 			return txtWnd.wnd.doDefault();
 		switch (scn.nmhdr.code) {
+		case SCN_STYLENEEDED:
+			stylishText(scn);
+			break;
 		case SCN_UPDATEUI:
-			if ((scn.updated & SC_UPDATE_SELECTION) != 0)
+			if ((scn.updated & SC_UPDATE_SELECTION) != 0) {
 				updateSelectionInParent();
+				updateCurrentLineMarker();
+			}
 			break;
 		case SCN_MODIFIED:
 			if ((scn.modificationType & (SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT)) != 0)
@@ -375,6 +542,60 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 			inReflection = false;
 		}
 	}
+	void stylishText(SCNotification& scn) {
+		uint startPos = scicall(SCI_POSITIONFROMLINE, scicall(SCI_LINEFROMPOSITION, scicall(SCI_GETENDSTYLED)));
+		int len = scn.position - startPos;
+		Sci_TextRange tr;
+		tr.chrg.cpMin = startPos;
+		tr.chrg.cpMax = scn.position;
+		tr.lpstrText = mem::malloc(len + 1);
+		scicall(SCI_GETTEXTRANGE, 0, tr.self);
+		string text;
+		text.fromUtf8(utf8string(tr.lpstrText, len));
+		mem::free(tr.lpstrText);
+		lex_provider lp(text.cstr);
+		lexem lex;
+		scicall(SCI_STARTSTYLING, startPos);
+		startPos = text.cstr;
+		for (;;) {
+			lp.nextWithKeyword(lex);
+			if (lex.type == 0)
+				break;
+			len = lex.text.toUtf8().length;
+			if (lex.start > startPos) {
+				scicall(SCI_SETSTYLING, (lex.start - startPos) / 2, STYLE_DEFAULT);
+				startPos = lex.start;
+			}
+			int style = STYLE_DEFAULT;
+			int type = lexType(lex.type);
+			if (type > ltName) {
+				if (lex.start > text.cstr && mem::word[lex.start - 2] == '.')
+					style = stIds;
+				else
+					style = stKeyword;
+			} else if (type < ltName) {
+				if (type > ltLabel)
+					style = stOperators;
+				else if (type == ltRemark)
+					style = stRemarks;
+				else if (type == ltQuote)
+					style = stStrings;
+				else if (type == ltDate)
+					style = stDate;
+				else if (type == ltNumber)
+					style = stNumbers;
+				else if (type == ltPreproc)
+					style = stPreproc;
+				else if (type == ltDirective)
+					style = stDirective;
+				else
+					style = stLabel;
+			} else
+				style = stIds;
+			scicall(SCI_SETSTYLING, len, style);
+			startPos += lex.length * 2;
+		}
+	}
 	int_ptr getLineText(int line) {
 		int lineLen = scicall(SCI_LINELENGTH, line);
 		int_ptr ptr = malloc(lineLen + 1);
@@ -387,9 +608,7 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 		int pos = scicall(SCI_POSITIONFROMLINE, tp.line - 1);
 		if (col > 0) {
 			v8string line;
-			IUnknown&& cashObject;
-			txtWnd.textDoc.tm.getCashObject(cashObject);
-			txtWnd.textDoc.tm.getLineFast(tp.line, line, cashObject);
+			getTextLine(txtWnd.textDoc.tm, tp.line, line);
 			int_ptr ptr = line.cstr;
 			for (int idx = 0; idx < col; idx++)
 				pos += utf16ToUt8Length(ptr);
@@ -404,15 +623,23 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 		tp.col = 1;
 		if (pos > lineStart) {
 			v8string l;
-			IUnknown&& cashObject;
-			txtWnd.textDoc.tm.getCashObject(cashObject);
-			txtWnd.textDoc.tm.getLineFast(tp.line, l, cashObject);
+			getTextLine(txtWnd.textDoc.tm, tp.line, l);
 			int_ptr ptr = l.cstr;
 			while (lineStart < pos) {
 				tp.col++;
 				lineStart += utf16ToUt8Length(ptr);
 			}
 		}
+	}
+	void updateCurrentLineMarker() {
+		int cl = scicall(SCI_LINEFROMPOSITION, scicall(SCI_GETCURRENTPOS));
+		if (curLineMarkerHandle != 0) {
+			int oldLine = scicall(SCI_MARKERLINEFROMHANDLE, curLineMarkerHandle);
+			if (oldLine == cl)
+				return;
+			scicall(SCI_MARKERDELETEHANDLE, curLineMarkerHandle);
+		}
+		curLineMarkerHandle = scicall(SCI_MARKERADD, cl, markCurrentLine);
 	}
 };
 
@@ -442,6 +669,27 @@ uint utf16ToUt8Length(int_ptr& ptr) {
 			return 6;
 	} else
 		return 3;
+}
+
+int_ptr enumFontCallback = 0;
+
+void enumMonoFonts(NoCaseMap<int>& fonts) {
+	LOGFONT logfont;
+	for (uint i = 0; i < LOGFONT_size; i++)
+		mem::byte[logfont.self + i] = 0;
+	logfont.lfCharSet = 1;
+	logfont.lfPitchAndFamily = 1; // FIXED_PITCH;
+	HDC hdc = GetDC(0);
+	if (enumFontCallback == 0)
+		enumFontCallback = ThunkToFunc(&&FontNameProc);
+	EnumFontFamiliesEx(hdc, logfont, enumFontCallback, fonts, 0);
+	ReleaseDC(0, hdc);
+}
+
+int FontNameProc(LOGFONT& lf, int_ptr lpntme, int FontType, NoCaseMap<int>& names) {
+	if ((lf.lfPitchAndFamily & 1) != 0)
+		names.insert(stringFromAddress(mem::addressOf(lf.lfFaceNameStart)), 1);
+	return 1;
 }
 
 enum SciEnums {
@@ -1470,5 +1718,126 @@ enum SciEnums {
 	SCN_FOCUSIN = 2028,
 	SCN_FOCUSOUT = 2029,
 	SCN_AUTOCCOMPLETED = 2030,
+
+	SCLEX_CONTAINER = 0,
+	SCLEX_NULL = 1,
+	SCLEX_PYTHON = 2,
+	SCLEX_CPP = 3,
+	SCLEX_HTML = 4,
+	SCLEX_XML = 5,
+	SCLEX_PERL = 6,
+	SCLEX_SQL = 7,
+	SCLEX_VB = 8,
+	SCLEX_PROPERTIES = 9,
+	SCLEX_ERRORLIST = 10,
+	SCLEX_MAKEFILE = 11,
+	SCLEX_BATCH = 12,
+	SCLEX_XCODE = 13,
+	SCLEX_LATEX = 14,
+	SCLEX_LUA = 15,
+	SCLEX_DIFF = 16,
+	SCLEX_CONF = 17,
+	SCLEX_PASCAL = 18,
+	SCLEX_AVE = 19,
+	SCLEX_ADA = 20,
+	SCLEX_LISP = 21,
+	SCLEX_RUBY = 22,
+	SCLEX_EIFFEL = 23,
+	SCLEX_EIFFELKW = 24,
+	SCLEX_TCL = 25,
+	SCLEX_NNCRONTAB = 26,
+	SCLEX_BULLANT = 27,
+	SCLEX_VBSCRIPT = 28,
+	SCLEX_BAAN = 31,
+	SCLEX_MATLAB = 32,
+	SCLEX_SCRIPTOL = 33,
+	SCLEX_ASM = 34,
+	SCLEX_CPPNOCASE = 35,
+	SCLEX_FORTRAN = 36,
+	SCLEX_F77 = 37,
+	SCLEX_CSS = 38,
+	SCLEX_POV = 39,
+	SCLEX_LOUT = 40,
+	SCLEX_ESCRIPT = 41,
+	SCLEX_PS = 42,
+	SCLEX_NSIS = 43,
+	SCLEX_MMIXAL = 44,
+	SCLEX_CLW = 45,
+	SCLEX_CLWNOCASE = 46,
+	SCLEX_LOT = 47,
+	SCLEX_YAML = 48,
+	SCLEX_TEX = 49,
+	SCLEX_METAPOST = 50,
+	SCLEX_POWERBASIC = 51,
+	SCLEX_FORTH = 52,
+	SCLEX_ERLANG = 53,
+	SCLEX_OCTAVE = 54,
+	SCLEX_MSSQL = 55,
+	SCLEX_VERILOG = 56,
+	SCLEX_KIX = 57,
+	SCLEX_GUI4CLI = 58,
+	SCLEX_SPECMAN = 59,
+	SCLEX_AU3 = 60,
+	SCLEX_APDL = 61,
+	SCLEX_BASH = 62,
+	SCLEX_ASN1 = 63,
+	SCLEX_VHDL = 64,
+	SCLEX_CAML = 65,
+	SCLEX_BLITZBASIC = 66,
+	SCLEX_PUREBASIC = 67,
+	SCLEX_HASKELL = 68,
+	SCLEX_PHPSCRIPT = 69,
+	SCLEX_TADS3 = 70,
+	SCLEX_REBOL = 71,
+	SCLEX_SMALLTALK = 72,
+	SCLEX_FLAGSHIP = 73,
+	SCLEX_CSOUND = 74,
+	SCLEX_FREEBASIC = 75,
+	SCLEX_INNOSETUP = 76,
+	SCLEX_OPAL = 77,
+	SCLEX_SPICE = 78,
+	SCLEX_D = 79,
+	SCLEX_CMAKE = 80,
+	SCLEX_GAP = 81,
+	SCLEX_PLM = 82,
+	SCLEX_PROGRESS = 83,
+	SCLEX_ABAQUS = 84,
+	SCLEX_ASYMPTOTE = 85,
+	SCLEX_R = 86,
+	SCLEX_MAGIK = 87,
+	SCLEX_POWERSHELL = 88,
+	SCLEX_MYSQL = 89,
+	SCLEX_PO = 90,
+	SCLEX_TAL = 91,
+	SCLEX_COBOL = 92,
+	SCLEX_TACL = 93,
+	SCLEX_SORCUS = 94,
+	SCLEX_POWERPRO = 95,
+	SCLEX_NIMROD = 96,
+	SCLEX_SML = 97,
+	SCLEX_MARKDOWN = 98,
+	SCLEX_TXT2TAGS = 99,
+	SCLEX_A68K = 100,
+	SCLEX_MODULA = 101,
+	SCLEX_COFFEESCRIPT = 102,
+	SCLEX_TCMD = 103,
+	SCLEX_AVS = 104,
+	SCLEX_ECL = 105,
+	SCLEX_OSCRIPT = 106,
+	SCLEX_VISUALPROLOG = 107,
+	SCLEX_LITERATEHASKELL = 108,
+	SCLEX_STTXT = 109,
+	SCLEX_KVIRC = 110,
+	SCLEX_RUST = 111,
+	SCLEX_DMAP = 112,
+	SCLEX_AS = 113,
+	SCLEX_DMIS = 114,
+	SCLEX_REGISTRY = 115,
+	SCLEX_BIBTEX = 116,
+	SCLEX_SREC = 117,
+	SCLEX_IHEX = 118,
+	SCLEX_TEHEX = 119,
+	SCLEX_JSON = 120,
+
 };
 

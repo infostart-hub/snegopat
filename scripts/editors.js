@@ -32,6 +32,11 @@ var FormObject = (function () {
             ;
         }
     }
+    FormObject.getOne = function () {
+        if (!FormObject.one)
+            FormObject.one = new FormObject;
+        return FormObject.one;
+    };
     FormObject.prototype.loadAltEditors = function () {
         for (var i = 0; i < editorsManager.count(); i++) {
             var editor = editorsManager.editor(i);
@@ -49,7 +54,7 @@ var FormObject = (function () {
                 s.Insert(item.ExtName, item.EditorName);
         }
         profileRoot.setValue(profileKeyName(), s);
-        this.form.Close();
+        //this.form.Close();
     };
     FormObject.prototype.CmdbarSetup = function () {
         try {
@@ -68,11 +73,16 @@ var FormObject = (function () {
         }
         catch (e) { }
     };
+    FormObject.prototype.ПриЗакрытии = function () {
+        FormObject.one = null;
+    };
+    FormObject.prototype.AltEditorsEditorNameОчистка = function (Элемент, СтандартнаяОбработка) {
+        this.form.Controls.AltEditors.CurrentData.EditorName = "";
+    };
     return FormObject;
 })();
 function setup() {
-    var f = new FormObject;
-    f.form.DoModal();
+    FormObject.getOne().form.Open();
 }
 (function () {
     initProfileKeys();

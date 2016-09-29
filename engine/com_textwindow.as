@@ -124,11 +124,8 @@ class ITextWindow {
     }
     //[helpstring("Текст строки по номеру (нумерация с 1)")]
     string line(int lineNumber) {
-        if (wnd !is null) {
-            v8string l;
-            wnd.textDoc.tm.getLine(lineNumber, l);
-            return l.str.rtrim("\n");
-        }
+        if (wnd !is null)
+            return getTextLine(wnd.textDoc.tm, lineNumber).rtrim("\n");
         return string();
     }
     //[propget, helpstring("Текст только для чтения")]

@@ -2,7 +2,7 @@
 //uname: snegopatwnd
 //dname: Показ окна Снегопата
 //addin: global
-//debug: yes
+//debug: no
 //author: orefkov
 //descr: Скрипт для работы с окном снегопата
 //help: inplace

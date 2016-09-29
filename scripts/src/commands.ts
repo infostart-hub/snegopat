@@ -1,5 +1,5 @@
 ﻿//engine: JScript
-//debug: yes
+//debug: no
 //uname: stdcommands
 //dname: Стандартные команды
 //author: orefkov

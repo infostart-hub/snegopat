@@ -1,5 +1,5 @@
 ﻿//engine: JScript
-//debug: yes
+//debug: no
 //uname: hotkeys
 //dname: Работа с хоткеями
 //descr: Скрипт организует работу посистемы хоткеев снегопата

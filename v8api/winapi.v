@@ -250,6 +250,7 @@
 	stdcall int GetDeviceCaps(HDC hdc,int index)|GetDeviceCaps
 	stdcall int_ptr GetStockObject(int i)|GetStockObject
 	stdcall int GetObjectW(int_ptr h, uint c, int_ptr pv)|GetObjectW
+	stdcall int EnumFontFamiliesEx(HDC hdc, LOGFONT& lpLogfont, int_ptr lpProc, NoCaseMap<int>&, DWORD dwFlags)|EnumFontFamiliesExW
 
 :global
 :dlls kernel32.dll

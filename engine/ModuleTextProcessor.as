@@ -40,9 +40,17 @@ enum ActivateModes {
 };
 
 string getTextLine(TextManager&& tm, uint line) {
-    v8string wline;
-    tm.getLine(line, wline);
-    return wline.str;
+	v8string s;
+	IUnknown&& u;
+	tm.getCashObject(u);
+	tm.getLineFast(line, s, u);
+	return s.str;
+}
+
+void getTextLine(TextManager&& tm, uint line, v8string& s) {
+	IUnknown&& u;
+	tm.getCashObject(u);
+	tm.getLineFast(line, s, u);
 }
 
 bool my_is_alpha(wchar_t symbol) {
@@ -176,12 +184,15 @@ class ModuleTextProcessor : TextProcessor, ModuleTextSource {
     void smartEnter(TextPosition& caretPos, TextWnd&& editor) {
         v8string lineOver;
         v8string line;
-        editor.textDoc.tm.getLine(caretPos.line - 1, lineOver);
+		IUnknown&& cashObj;
+		TextManager&& tm = editor.textDoc.tm;
+		tm.getCashObject(cashObj);
+        tm.getLineFast(caretPos.line - 1, lineOver, cashObj);
         lex_provider lexSrc(lineOver.cstr);
         lexem lex;
         while (lexSrc.next(lex)) {
             if (lexQuoteOpen == lex.type) {
-                editor.textDoc.tm.getLine(caretPos.line, line);
+                tm.getLineFast(caretPos.line, line, cashObj);
                 if (line.str.ltrim().substr(0, 1) != "|") {
                     // Надо вставить |
                     // Получим пробельные символы для автоотступа

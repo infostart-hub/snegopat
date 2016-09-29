@@ -1,7 +1,7 @@
 //engine: JScript
 //uname: macroswnd
 //dname: Показ окна макросов
-//debug: yes
+//debug: no
 //descr: Отображение окна макросов
 //author: orefkov
 //help: inplace

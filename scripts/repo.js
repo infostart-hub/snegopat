@@ -1,7 +1,7 @@
 ﻿//engine: JScript
 //uname: repo
 //dname: Репозитарий аддинов
-//debug: yes
+//debug: no
 //descr: Скрипт для организации работы с репозитариями аддинов
 //author: orefkov
 //help: inplace

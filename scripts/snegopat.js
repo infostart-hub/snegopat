@@ -1,7 +1,7 @@
 ﻿//engine: JScript
 //uname: SnegopatMainScript
 //dname: Снегопат
-//debug: yes
+//debug: no
 //addin: global
 //descr: Скрипт с основными макросами снегопата
 //author: orefkov

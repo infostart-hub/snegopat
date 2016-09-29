@@ -45,7 +45,6 @@
 	void clearText()|?clearText@TextManager@core@@QAEXXZ
 	bool empty()|?empty@TextManager@core@@QAE_NXZ
 	int getLinesCount()|?getLinesCount@TextManager@core@@QAEHXZ
-	bool getLine(int, v8string&out)|?getLine@TextManager@core@@QAE_NHPAV?$basic_string@_WV?$char_traits@_W@stlp_std@@V?$allocator@_W@2@@stlp_std@@@Z
 	bool save(v8string&)|?save@TextManager@core@@QAE_NAAV?$basic_string@_WV?$char_traits@_W@stlp_std@@V?$allocator@_W@2@@stlp_std@@@Z
 	uint getCashObject(IUnknown@&)|?getCashObject@TextManager@core@@QAE?AV?$InterfacePtr@VITextManagerCash@core@@@2@XZ
 	bool getLineFast(int, v8string&, IUnknown& cash)|?getLineFast@TextManager@core@@QAE_NHPAV?$basic_string@_WV?$char_traits@_W@stlp_std@@V?$allocator@_W@2@@stlp_std@@PAVITextManagerCash@2@@Z
@@ -55,7 +54,9 @@
 	void setSelectRange(int, int, int, int)|?setSelectRange@TextManager@core@@QAEXHHHH@Z
 	void setSelectText(int_ptr, bool)|?setSelectText@TextManager@core@@QAEXPB_W_N@Z
 	void clearTextSelection()|?clearTextSelection@TextManager@core@@QAEXXZ
+	void getTextArea(const TextPosition&in, const TextPosition&in, int_ptr&out result)|?getTextArea@TextManager@core@@QAEXABVTextPosition@2@0PAPA_W@Z
 #if ver<1
+	bool getLine(int, v8string&out)|?getLine@TextManager@core@@QAE_NHPAV?$basic_string@_WV?$char_traits@_W@stlp_std@@V?$allocator@_W@2@@stlp_std@@@Z
 	void addAction(const v8string&in, const TextPosition&in, const TextPosition&in)|?addAction@TextManager@core@@QAEXABV?$basic_string@_WV?$char_traits@_W@stlp_std@@V?$allocator@_W@2@@stlp_std@@ABVTextPosition@2@1@Z
 	void addAction(bool, MarkType, char const*, int, int, bool)|?addAction@TextManager@core@@QAEX_NW4MarkType@2@PBDHH0@Z
 	void clearRedoUndo()|?clearRedoUndo@TextManager@core@@QAEXXZ
@@ -91,7 +92,6 @@
 	wchar_t const* getSelectText()|?getSelectText@TextManager@core@@QAEPB_WXZ
 	void getSelectionLabels(vector<LabelData, allocator<LabelData> >&, vector<LabelData, allocator<LabelData> >&, set<MarkType, struct stlp_std::less<MarkType>, allocator<MarkType> > const&)|?getSelectionLabels@TextManager@core@@QAEXAAV?$vector@VLabelData@core@@V?$allocator@VLabelData@core@@@stlp_std@@@stlp_std@@0ABV?$set@W4MarkType@core@@U?$less@W4MarkType@core@@@stlp_std@@V?$allocator@W4MarkType@core@@@4@@4@@Z
 	bool getSrcLineNoByCurrentLineNo(int, set<int, struct stlp_std::less<int>, allocator<int> >&)|?getSrcLineNoByCurrentLineNo@TextManager@core@@QAE_NHAAV?$set@HU?$less@H@stlp_std@@V?$allocator@H@2@@stlp_std@@@Z
-	void getTextArea(const TextPosition&in, const TextPosition&in, wchar_t**)|?getTextArea@TextManager@core@@QAEXABVTextPosition@2@0PAPA_W@Z
 	ITextManagerSite* getTextManagerSite()|?getTextManagerSite@TextManager@core@@QAEPAVITextManagerSite@2@XZ
 	bool getTextPositionByOffset(TextPosition, unsigned int, TextPosition&)|?getTextPositionByOffset@TextManager@core@@QAE_NVTextPosition@2@IAAV32@@Z
 	bool getUndoActionCode(DocActionType&)|?getUndoActionCode@TextManager@core@@QAE_NAAW4DocActionType@2@@Z

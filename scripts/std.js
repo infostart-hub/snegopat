@@ -1,5 +1,5 @@
 ﻿//engine: JScript
-//debug: yes
+//debug: no
 //uname: stdlib
 //dname: Стандартная библиотека
 //author: orefkov and community
@@ -251,7 +251,7 @@ exports.Class["extend"] = function (def) {
              */
             proto[n] = (function (name, fn) {
                 return function () {
-                    // 1.                
+                    // 1.
                     var tmp = this._super;
                     // Add a new ._super() method that is the same method
                     // but on the super-class
@@ -273,7 +273,7 @@ exports.Class["extend"] = function (def) {
     classDef.prototype = proto;
     // Enforce the constructor to be what we expect
     classDef.prototype.constructor = exports.Class;
-    //Give this new class the same static extend method    
+    //Give this new class the same static extend method
     classDef.extend = this.extend;
     return classDef;
 };

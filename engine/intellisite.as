@@ -465,8 +465,7 @@ class IntelliSite : SmartBoxSite {
 		ITemplateProcessor&& tp;
 		getTxtEdtService().getTemplateProcessor(tp);
 		v8string line;
-		textWnd.textDoc.tm.getLine(caretPos.line, line);
-		string cline = line.str.substr(0, caretPos.col - 1);
+		string cline = getTextLine(textWnd.textDoc.tm, caretPos.line).substr(0, caretPos.col - 1);
 
 		if (tp.needSubstitute(v8string(cline), textWnd.textDoc.tm, line)) {
 			if (templateToolTip.hwnd == 0)
