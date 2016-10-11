@@ -31,8 +31,8 @@
 :virt
 	0
 	void virt_dtor()
-	13
-	save void onTextAreaModified(bool, const TextPosition&in, const TextPosition&in, const TextPosition&in, const TextPosition&in)
+	//13
+	//save void onTextAreaModified(bool, const TextPosition&in, const TextPosition&in, const TextPosition&in, const TextPosition&in)
 	
 :dlls
 #if ver < 8.3
@@ -42,6 +42,7 @@
 #endif
 	//void ctor()|??0TextManager@core@@QAE@XZ
 	//void dtor()|??1TextManager@core@@UAE@XZ
+	void onTextAreaModified(bool, const TextPosition&in, const TextPosition&in, const TextPosition&in, const TextPosition&in)|?onTextAreaModified@TextManager@core@@UAEX_NABVTextPosition@2@111@Z
 	void clearText()|?clearText@TextManager@core@@QAEXXZ
 	bool empty()|?empty@TextManager@core@@QAE_NXZ
 	int getLinesCount()|?getLinesCount@TextManager@core@@QAEHXZ

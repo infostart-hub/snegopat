@@ -575,7 +575,6 @@ class EditorsManager {
 				editorForExtNames.insert(extName, ei);
 				return true;
 			}
-			return false;
 		}
 		return false;
 	}

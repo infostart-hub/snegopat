@@ -11,9 +11,32 @@ int_ptr hSciDll = 0;
 funcdef LRESULT ScintillaFunc(int_ptr, uint, WPARAM, LPARAM);
 ScintillaFunc&& sciFunc;
 
+typedef uint color;
+color clrNone = color(-1);
+
+color rgb(uint r, uint g, uint b) {
+	return r | (g << 8) | (b << 16);
+}
+
 enum SciMarkers {
-	markCurrentLine = 10,
+	markCurrentLine,
+	markBookmark,
+	markBreakPoint,
+	markConditionalBP,
+	markExecutional,
+
+	maskCurrentLine = 1 << markCurrentLine,
 };
+
+enum SciMargins {
+	smLineNumbers = 0,
+	smMarks = 1,
+	smFolding = 2,
+};
+
+enum SciIndicators {
+	indFolding = INDIC_CONTAINER,
+}
 
 enum SciStyles {
 	stKeyword = STYLE_LASTPREDEFINED + 1,
@@ -54,10 +77,11 @@ class ScintillaInfo : EditorInfo {
 			// Дальше мы загружаем скрипт, который прочитает настройки редактора
 			// и передаст их в ScintillaSetup
 			Addin&& a = oneDesigner._addins.byUniqueName("scintilla");
-			if (a is null)
+			if (a is null) {
 				&&a = oneDesigner._addins.loadAddin("script:<core>scripts\\scintilla.js", oneDesigner._addins._libs);
-			if (a is null)
-				Message("Не удалось загрузить аддин scintilla");
+				if (a is null)
+					Message("Не удалось загрузить аддин scintilla: " + oneDesigner._addins._lastAddinError);
+			}
 		}
 	}
 	void doSetup() override {
@@ -85,6 +109,273 @@ class ScintillaInternalAddin : BuiltinAddin {
 		return obj;
 	}
 };
+
+class ScintillaWindow {
+	HWND hEditor;
+	int_ptr editor_ptr;
+
+	void create(HWND hWndParent, uint dwStyle, uint dwExStyle = 0, uint ctrlId = 0, int X = 0, int Y = 0, int nWidth = 0, int nHeight = 0) {
+		hEditor = CreateWindowEx(dwExStyle, "Scintilla".cstr, 0, dwStyle, X, Y, nWidth, nHeight, hWndParent, ctrlId, hSciDll, 0);
+		editor_ptr = SendMessage(hEditor, SCI_GETDIRECTPOINTER);
+	}
+	void destroy() {
+		DestroyWindow(hEditor);
+	}
+
+	int length() const {
+		return sciFunc(editor_ptr, SCI_GETLENGTH, 0, 0);
+	}
+
+	uint textHeight(int line = 0) const {
+		return sciFunc(editor_ptr, SCI_TEXTHEIGHT, 0, 0);
+	}
+	uint textWidth(const string& text, int styleIdx = STYLE_DEFAULT) const {
+		return sciFunc(editor_ptr, SCI_TEXTWIDTH, styleIdx, text.toUtf8().ptr);
+	}
+	void goToPos(int pos) {
+		sciFunc(editor_ptr, SCI_GOTOPOS, pos, 0);
+	}
+	int xFromPos(int pos) const {
+		return sciFunc(editor_ptr, SCI_POINTXFROMPOSITION, 0, pos);
+	}
+	int yFromPos(int pos) const {
+		return sciFunc(editor_ptr, SCI_POINTYFROMPOSITION, 0, pos);
+	}
+	void setSelection(int from, int to) {
+		sciFunc(editor_ptr, SCI_SETSEL, from, to);
+	}
+	void scrollToCaret() {
+		sciFunc(editor_ptr, SCI_SCROLLCARET, 0, 0);
+	}
+	int anchorPos() const {
+		return sciFunc(editor_ptr, SCI_GETANCHOR, 0, 0);
+	}
+	void setAnchorPos(int pos) {
+		sciFunc(editor_ptr, SCI_SETANCHOR, pos, 0);
+	}
+	int currentPos() const {
+		return sciFunc(editor_ptr, SCI_GETCURRENTPOS, 0, 0);
+	}
+	void setCurrentPos(int pos) {
+		sciFunc(editor_ptr, SCI_SETCURRENTPOS, pos, 0);
+	}
+	void setModEventMask(uint mask) {
+		sciFunc(editor_ptr, SCI_SETMODEVENTMASK, mask, 0);
+	}
+	void setLexer(int lexer) {
+		sciFunc(editor_ptr, SCI_SETLEXER, lexer, 0);
+	}
+	void setMarginType(int margin, int type) {
+		sciFunc(editor_ptr, SCI_SETMARGINTYPEN, margin, type);
+	}
+	void setMarginMask(int margin, uint set, uint reset = 0) {
+		int mask = (sciFunc(editor_ptr, SCI_GETMARGINMASKN, margin, 0) | set) & ~reset;
+		sciFunc(editor_ptr, SCI_SETMARGINMASKN, margin, mask);
+	}
+	void setTechnology(int tech) {
+		sciFunc(editor_ptr, SCI_SETTECHNOLOGY, tech, 0);
+	}
+	void setBufferedDraw(int flag) {
+		sciFunc(editor_ptr, SCI_SETBUFFEREDDRAW, flag, 0);
+	}
+	void setStyleFont(int styleIdx, const string& fontName) {
+		sciFunc(editor_ptr, SCI_STYLESETFONT, styleIdx, fontName.toUtf8().ptr);
+	}
+	void setStyleSize(int styleIdx, int size) {
+		sciFunc(editor_ptr, SCI_STYLESETSIZEFRACTIONAL, styleIdx, size);
+	}
+	void setStyleWeight(int styleIdx, int weight) {
+		sciFunc(editor_ptr, SCI_STYLESETWEIGHT, styleIdx, weight);
+	}
+	void setStyleUnderline(int styleIdx, int underline) {
+		sciFunc(editor_ptr, SCI_STYLESETUNDERLINE, styleIdx, underline);
+	}
+	void setStyleItalic(int styleIdx, int italic) {
+		sciFunc(editor_ptr, SCI_STYLESETITALIC, styleIdx, italic);
+	}
+	void setStyleEolFilled(int styleIdx, int eolfill) {
+		sciFunc(editor_ptr, SCI_STYLESETEOLFILLED, styleIdx, eolfill);
+	}
+	void setStyleFore(int styleIdx, color fore) {
+		sciFunc(editor_ptr, SCI_STYLESETFORE, styleIdx, fore);
+	}
+	void setStyleBack(int styleIdx, color back) {
+		sciFunc(editor_ptr, SCI_STYLESETBACK, styleIdx, back);
+	}
+	void styleClearAll() {
+		sciFunc(editor_ptr, SCI_STYLECLEARALL, 0, 0);
+	}
+	void setCaretWidth(int caretWidth) {
+		sciFunc(editor_ptr, SCI_SETCARETWIDTH, caretWidth, 0);
+	}
+	void setMarginWidth(int margin, int width) {
+		sciFunc(editor_ptr, SCI_SETMARGINWIDTHN, margin, width);
+	}
+	void setMarkerFore(int marker, color clr) {
+		sciFunc(editor_ptr, SCI_MARKERSETFORE, marker, clr);
+	}
+	void setMarkerBack(int marker, color clr) {
+		sciFunc(editor_ptr, SCI_MARKERSETBACK, marker, clr);
+	}
+	void setTabWidth(int tabWidth) {
+		sciFunc(editor_ptr, SCI_SETTABWIDTH, tabWidth, 0);
+	}
+	void setUseTabs(int flag) {
+		sciFunc(editor_ptr, SCI_SETUSETABS, flag, 0);
+	}
+	void setIndentGuides(int flag) {
+		sciFunc(editor_ptr, SCI_SETINDENTATIONGUIDES, flag, 0);
+	}
+	void insertText(int pos, int_ptr text) {
+		sciFunc(editor_ptr, SCI_INSERTTEXT, pos, text);
+	}
+	void replaceSel(int_ptr text) {
+		sciFunc(editor_ptr, SCI_REPLACESEL, 0, text);
+	}
+	void setCodePage(int cp) {
+		sciFunc(editor_ptr, SCI_SETCODEPAGE, cp, 0);
+	}
+	void setText(int_ptr text) {
+		sciFunc(editor_ptr, SCI_SETTEXT, 0, text);
+	}
+	int_ptr docPointer() {
+		return sciFunc(editor_ptr, SCI_GETDOCPOINTER, 0, 0);
+	}
+	void setDocPointer(int_ptr doc) {
+		sciFunc(editor_ptr, SCI_SETDOCPOINTER, 0, doc);
+	}
+	int posFromLine(int line) const {
+		return sciFunc(editor_ptr, SCI_POSITIONFROMLINE, line, 0);
+	}
+	int lineFromPos(int pos) const {
+		return sciFunc(editor_ptr, SCI_LINEFROMPOSITION, pos, 0);
+	}
+	int posEndStyled() const {
+		return sciFunc(editor_ptr, SCI_GETENDSTYLED, 0, 0);
+	}
+	int lineLength(int line) const {
+		return sciFunc(editor_ptr, SCI_LINELENGTH, line, 0);
+	}
+	uint charAt(int pos) const {
+		return sciFunc(editor_ptr, SCI_GETCHARAT, pos, 0);
+	}
+	MemoryBuffer&& textRange(int from, int len) const {
+		Sci_TextRange tr;
+		tr.chrg.cpMin = from;
+		tr.chrg.cpMax = from + len;
+		MemoryBuffer buf(len + 1);
+		tr.lpstrText = buf.bytes;
+		sciFunc(editor_ptr, SCI_GETTEXTRANGE, 0, tr.self);
+		return buf;
+	}
+	string text(int from, int len) {
+		return string(utf8string(textRange(from, len).bytes, len));
+	}
+	void startStyling(int pos) {
+		sciFunc(editor_ptr, SCI_STARTSTYLING, pos, 0);
+	}
+	void setStyle(int len, int style) {
+		sciFunc(editor_ptr, SCI_SETSTYLING, len, style);
+	}
+	int lineFromMarkHandle(int_ptr markHandle) const {
+		return sciFunc(editor_ptr, SCI_MARKERLINEFROMHANDLE, markHandle, 0);
+	}
+	void deleteMarkHandle(int_ptr markHandle) {
+		sciFunc(editor_ptr, SCI_MARKERDELETEHANDLE, markHandle, 0);
+	}
+	int_ptr addMarker(int line, int marker) {
+		return sciFunc(editor_ptr, SCI_MARKERADD, line, marker);
+	}
+	void defineMarker(int mark, int symbol) {
+		sciFunc(editor_ptr, SCI_MARKERDEFINE, mark, symbol);
+	}
+	void setFoldMarginColour(int useSettings, color clr) {
+		sciFunc(editor_ptr, SCI_SETFOLDMARGINCOLOUR, useSettings, clr);
+	}
+	void setProperty(const string& name, const string& val) {
+		sciFunc(editor_ptr, SCI_SETPROPERTY, name.toUtf8().ptr, val.toUtf8().ptr);
+	}
+	void setAutoFold(int val) {
+		sciFunc(editor_ptr, SCI_SETAUTOMATICFOLD, val, 0);
+	}
+	void foldSetLevel(int line, int level) {
+		sciFunc(editor_ptr, SCI_SETFOLDLEVEL, line, level);
+	}
+	int foldLevel(int line) const {
+		return sciFunc(editor_ptr, SCI_GETFOLDLEVEL, line, 0);
+	}
+	void foldSetFlag(int flag) {
+		sciFunc(editor_ptr, SCI_SETFOLDFLAGS, flag, 0);
+	}
+	void toggleFold(int line) {
+		sciFunc(editor_ptr, SCI_TOGGLEFOLD, line, 0);
+	}
+	void foldExpandSet(int line, int expanded) {
+		sciFunc(editor_ptr, SCI_SETFOLDEXPANDED, line, expanded);
+	}
+	int foldIsExpanded(int line) {
+		return sciFunc(editor_ptr, SCI_GETFOLDEXPANDED, line, 0);
+	}
+	void marginSetClickable(int margin, int clickable) {
+		sciFunc(editor_ptr, SCI_SETMARGINSENSITIVEN, margin, clickable);
+	}
+	void indStyleSet(int indicatorNumber, int indicatorStyle) {
+		sciFunc(editor_ptr, SCI_INDICSETSTYLE, indicatorNumber, indicatorStyle);
+	}
+	void indForeSet(int indicatorNumber, color clr) {
+		sciFunc(editor_ptr, SCI_INDICSETFORE, indicatorNumber, clr);
+	}
+	void indAlphaSet(int indicatorNumber, int alpha) {
+		sciFunc(editor_ptr, SCI_INDICSETALPHA, indicatorNumber, alpha);
+	}
+	void indAlphaOutlineSet(int indicatorNumber, int alpha) {
+		sciFunc(editor_ptr, SCI_INDICSETOUTLINEALPHA, indicatorNumber, alpha);
+	}
+	void indUnderSet(int indicatorNumber, int under) {
+		sciFunc(editor_ptr, SCI_INDICSETUNDER, indicatorNumber, under);
+	}
+	void indHoverStyleSet(int indicatorNumber, int indicatorStyle) {
+		sciFunc(editor_ptr, SCI_INDICSETHOVERSTYLE, indicatorNumber, indicatorStyle);
+	}
+	void indHovreForeSet(int indicatorNumber, color clr) {
+		sciFunc(editor_ptr, SCI_INDICSETHOVERFORE, indicatorNumber, clr);
+	}
+	void indFlagSet(int indicatorNumber, int flags) {
+		sciFunc(editor_ptr, SCI_INDICSETFLAGS, indicatorNumber, flags);
+	}
+	void indCurrentSet(int indicator) {
+		sciFunc(editor_ptr, SCI_SETINDICATORCURRENT, indicator, 0);
+	}
+	void indValueSet(int value) {
+		sciFunc(editor_ptr, SCI_SETINDICATORVALUE, value, 0);
+	}
+	void indFillRange(int position, int fillLength) {
+		sciFunc(editor_ptr, SCI_INDICATORFILLRANGE, position, fillLength);
+	}
+	void indClearRange(int position, int clearLength) {
+		sciFunc(editor_ptr, SCI_INDICATORCLEARRANGE, position, clearLength);
+	}
+	int indAllOnFor(int position) {
+		return sciFunc(editor_ptr, SCI_INDICATORALLONFOR, position, 0);
+	}
+	int indValueAt(int indicator, int position) {
+		return sciFunc(editor_ptr, SCI_INDICATORVALUEAT, indicator, position);
+	}
+	int indStart(int indicator, int position) {
+		return sciFunc(editor_ptr, SCI_INDICATORSTART, indicator, position);
+	}
+	int indEnd(int indicator, int position) {
+		return sciFunc(editor_ptr, SCI_INDICATOREND, indicator, position);
+	}
+	void unfoldFor(int line) {
+		sciFunc(editor_ptr, SCI_ENSUREVISIBLE, line, 0);
+	}
+	string lineOfText(int line) {
+		MemoryBuffer&& m = textRange(posFromLine(line), lineLength(line));
+		return string().fromUtf8(utf8string(m.bytes, m._length)).rtrim("\r\n");
+	}
+};
+
 
 class SciStyleDefinition {
 	int _index;
@@ -115,33 +406,32 @@ class SciStyleDefinition {
 		fore = f;
 		back = b;
 	}
-	void _apply(ScintillaEditor&& editor, const NoCaseMap<int>& fonts) {
+	void _apply(ScintillaWindow& swnd, const NoCaseMap<int>& fonts) {
 		if (!fontName.isEmpty()) {
 			auto fnames = (fontName + ",Courier").split(",");
 			for (uint i = 0; i < fnames.length; i++) {
 				string n = fnames[i];
 				n.trim();
 				if (fonts.contains(n)) {
-					//Message("Set font in style " + _index + " to " + n);
-					editor.scicall(SCI_STYLESETFONT, _index, n.toUtf8().ptr);
+					swnd.setStyleFont(_index, n);
 					break;
 				}
 			}
 		}
 		if (size > 0)
-			editor.scicall(SCI_STYLESETSIZEFRACTIONAL, _index, size);
+			swnd.setStyleSize(_index, size);
 		if (weight > 0)
-			editor.scicall(SCI_STYLESETWEIGHT, _index, weight);
+			swnd.setStyleWeight(_index, weight);
 		if (underline != 0)
-			editor.scicall(SCI_STYLESETUNDERLINE, _index, underline - 1);
+			swnd.setStyleUnderline(_index, underline - 1);
 		if (italic != 0)
-			editor.scicall(SCI_STYLESETITALIC, _index, italic - 1);
+			swnd.setStyleItalic(_index, italic - 1);
 		if (eolfill != 0)
-			editor.scicall(SCI_STYLESETEOLFILLED, _index, eolfill - 1);
-		if (fore != uint(-1))
-			editor.scicall(SCI_STYLESETFORE, _index, fore);
-		if (back != uint(-1))
-			editor.scicall(SCI_STYLESETBACK, _index, back);
+			swnd.setStyleEolFilled(_index, eolfill - 1);
+		if (fore != clrNone)
+			swnd.setStyleFore(_index, fore);
+		if (back != clrNone)
+			swnd.setStyleBack(_index, back);
 	}
 };
 
@@ -176,10 +466,11 @@ class ScintillaSetup {
 	uint caretWidth = 2;
 	uint indentGuide = SC_IV_LOOKBOTH;
 	bool highlightCurrentLine = true;
-	uint clrCurrentLine = 0xF7E8D7;
+	color clrCurrentLine = 0xF7E8D7;
 	bool showLineNumbers = true;
 	int useTabs = 1;
 	uint tabWidth = 4;
+	bool useFolding = true;
 	
 	array<string>&& enumMonoSpaceFonts() {
 		NoCaseMap<int> fonts;
@@ -191,23 +482,83 @@ class ScintillaSetup {
 		return result;
 	}
 
-	void _apply(ScintillaEditor&& ed) {
+	void _apply(ScintillaWindow& swnd) {
 		NoCaseMap<int> fonts;
 		enumMonoFonts(fonts);
-		styles[0]._apply(ed, fonts);
-		ed.scicall(SCI_STYLECLEARALL);
+		styles[0]._apply(swnd, fonts);
+		swnd.styleClearAll();
 		for (uint i = 1; i < styles.length; i++)
-			styles[i]._apply(ed, fonts);
-		ed.scicall(SCI_SETCARETWIDTH, caretWidth);
+			styles[i]._apply(swnd, fonts);
+		swnd.setCaretWidth(caretWidth);
+		_setupMarks(swnd);
 		if (showLineNumbers)
-			ed.scicall(SCI_SETMARGINWIDTHN, 0, ed.scicall(SCI_TEXTWIDTH, STYLE_LINENUMBER, "_99999".toUtf8().ptr));
+			_setupLineNumbers(swnd);
+		if (useFolding)
+			_setupFolding(swnd);
 
-		ed.scicall(SCI_MARKERSETBACK, markCurrentLine, clrCurrentLine);
-		ed.scicall(SCI_SETTABWIDTH, tabWidth);
-		ed.scicall(SCI_SETUSETABS, useTabs);
-		ed.scicall(SCI_SETINDENTATIONGUIDES, indentGuide);
-		ed.scicall(SCI_STYLESETWEIGHT, stPreproc, 600);
-		ed.scicall(SCI_STYLESETWEIGHT, stDirective, 600);
+		swnd.setTabWidth(tabWidth);
+		swnd.setUseTabs(useTabs);
+		swnd.setIndentGuides(indentGuide);
+		// временно
+		swnd.setStyleWeight(stPreproc, 600);
+		swnd.setStyleWeight(stDirective, 600);
+	}
+	// Настройка столбца пометок
+	void _setupMarks(ScintillaWindow& swnd) {
+		swnd.setMarginType(smMarks, SC_MARGIN_SYMBOL);
+		swnd.setMarginWidth(smMarks, 24);
+		swnd.setMarginMask(smMarks, uint(-1), uint(SC_MASK_FOLDERS) | maskCurrentLine);
+		swnd.setMarkerBack(markCurrentLine, clrCurrentLine);	// Задаем цвет подсветки текущей строки
+
+		swnd.defineMarker(markBookmark, SC_MARK_ROUNDRECT);
+		swnd.setMarkerFore(markBookmark, 0xFF0000);
+	}
+	void _setupLineNumbers(ScintillaWindow& swnd) {
+		swnd.setMarginType(smLineNumbers, SC_MARGIN_NUMBER);
+		swnd.setMarginWidth(smLineNumbers, swnd.textWidth("_99999", STYLE_LINENUMBER));
+	}
+	void _setupFolding(ScintillaWindow& swnd) {
+		swnd.setProperty("fold", "1");
+		swnd.setMarginWidth(smFolding, 16);
+		swnd.setMarginType(smFolding, SC_MARGIN_SYMBOL);
+		swnd.setMarginMask(smFolding, uint(SC_MASK_FOLDERS), 0);
+		swnd.marginSetClickable(smFolding, 1);
+		swnd.indStyleSet(indFolding, INDIC_ROUNDBOX);
+		swnd.indForeSet(indFolding, 0xBB0000);
+
+		//swnd.foldSetFlag(SC_FOLDFLAG_LEVELNUMBERS);
+		//swnd.setFoldMarginColour(1, styles[0].back);
+		/*
+								     Themes
+		SC_MARKNUM_*	Arrow		Plus/minus	Circle tree				Box tree
+		FOLDEROPEN		ARROWDOWN	MINUS		CIRCLEMINUS				BOXMINUS
+		FOLDER			ARROW		PLUS		CIRCLEPLUS				BOXPLUS
+		FOLDERSUB		EMPTY		EMPTY		VLINE					VLINE
+		FOLDERTAIL		EMPTY		EMPTY		LCORNERCURVE			LCORNER
+		FOLDEREND		EMPTY		EMPTY		CIRCLEPLUSCONNECTED		BOXPLUSCONNECTED
+		FOLDEROPENMID	EMPTY		EMPTY		CIRCLEMINUSCONNECTED	BOXMINUSCONNECTED
+		FOLDERMIDTAIL	EMPTY		EMPTY		TCORNERCURVE			TCORNER
+		*/
+		swnd.defineMarker(SC_MARKNUM_FOLDEROPEN,	SC_MARK_BOXMINUS);
+		swnd.defineMarker(SC_MARKNUM_FOLDER,		SC_MARK_BOXPLUS);
+		swnd.defineMarker(SC_MARKNUM_FOLDERSUB,		SC_MARK_VLINE);
+		swnd.defineMarker(SC_MARKNUM_FOLDERTAIL,	SC_MARK_LCORNER);
+		swnd.defineMarker(SC_MARKNUM_FOLDEROPENMID,	SC_MARK_BOXMINUSCONNECTED);
+		swnd.defineMarker(SC_MARKNUM_FOLDEREND,		SC_MARK_BOXPLUSCONNECTED);
+		swnd.defineMarker(SC_MARKNUM_FOLDERMIDTAIL, SC_MARK_TCORNER);
+
+		swnd.setMarkerFore(SC_MARKNUM_FOLDEROPEN, clrCurrentLine);
+		swnd.setMarkerBack(SC_MARKNUM_FOLDEROPEN, 0);
+		swnd.setMarkerFore(SC_MARKNUM_FOLDER, clrCurrentLine);
+		swnd.setMarkerBack(SC_MARKNUM_FOLDER, 0);
+		swnd.setMarkerFore(SC_MARKNUM_FOLDEREND, clrCurrentLine);
+		swnd.setMarkerBack(SC_MARKNUM_FOLDEREND, 0);
+		swnd.setMarkerFore(SC_MARKNUM_FOLDEROPENMID, clrCurrentLine);
+		swnd.setMarkerBack(SC_MARKNUM_FOLDEROPENMID, 0);
+		
+		swnd.setMarkerBack(SC_MARKNUM_FOLDERSUB, 0);
+		swnd.setMarkerBack(SC_MARKNUM_FOLDERTAIL, 0);
+		swnd.setMarkerBack(SC_MARKNUM_FOLDERMIDTAIL, 0);
 	}
 };
 ScintillaSetup sciSetup;
@@ -233,24 +584,22 @@ class ScintillaDocument : TextEditorDocument, TextModifiedReceiver {
 		if (inTextModified)
 			return;
 		ScintillaEditor&& editor = firstEditor();
+		ScintillaWindow&& swnd = editor.swnd;
 		inTextModified = true;
 		editor.inReflection = true;
 		int posStart = editor.getPosition(tpStart);
 		utf8string ustr = newText.toUtf8();
 		if (tpStart == tpEnd) {
-			editor.scicall(SCI_INSERTTEXT, posStart, ustr.ptr);
+			swnd.insertText(posStart, ustr.ptr);
 		} else {
 			int posEnd = editor.getPosition(tpEnd);
-			editor.scicall(SCI_SETANCHOR, posStart);
-			editor.scicall(SCI_SETCURRENTPOS, posEnd);
-			editor.scicall(SCI_REPLACESEL, 0, ustr.ptr);
+			swnd.setAnchorPos(posStart);
+			swnd.setCurrentPos(posEnd);
+			swnd.replaceSel(ustr.ptr);
 		}
 		posStart += ustr.length;
-		editor.scicall(SCI_GOTOPOS, posStart);
-		int x = editor.scicall(SCI_POINTXFROMPOSITION, 0, posStart);
-		int y = editor.scicall(SCI_POINTYFROMPOSITION, 0, posStart);
-		SetCaretPos(x, y);
-		//editor.inReflection = false;
+		swnd.goToPos(posStart);
+		SetCaretPos(swnd.xFromPos(posStart), swnd.yFromPos(posStart));
 		inTextModified = false;
 	}
 	ScintillaEditor&& firstEditor() {
@@ -262,23 +611,22 @@ class ScintillaDocument : TextEditorDocument, TextModifiedReceiver {
 		return cast<ScintillaEditor>(owner.views[0].editor);
 	}
 
-	void connect(ScintillaEditor&& se) {
+	void connect(ScintillaWindow&& swnd) {
 		if (sciDoc == 0) {
 			v8string text;
 			owner.tm.save(text);
-			se.scicall(SCI_SETCODEPAGE, SC_CP_UTF8, 0);
-			se.scicall(SCI_SETTEXT, 0, text.str.toUtf8().ptr);
-			sciDoc = se.scicall(SCI_GETDOCPOINTER);
+			swnd.setCodePage(SC_CP_UTF8);
+			swnd.setText(text.str.toUtf8().ptr);
+			sciDoc = swnd.docPointer();
 		} else
-			se.scicall(SCI_SETDOCPOINTER, 0, sciDoc);
+			swnd.setDocPointer(sciDoc);
 	}
 };
 
 class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 	ScintillaDocument&& owner;
 	ASWnd&& wnd;
-	HWND hEditor;
-	int_ptr editor_ptr;
+	ScintillaWindow swnd;
 	bool inReflection = false;
 	int_ptr curLineMarkerHandle = 0;
 	
@@ -286,16 +634,14 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 		&&owner = o;
 	}
 
-	LRESULT scicall(uint msg, WPARAM w = 0, LPARAM l = 0) {
-		return sciFunc(editor_ptr, msg, w, l);
+	LRESULT _scicall(uint msg, WPARAM w = 0, LPARAM l = 0) {
+		return sciFunc(swnd.editor_ptr, msg, w, l);
 	}
 	void attach(TextWnd&& tw) override {
 		TextEditorWindow::attach(tw);
 		
 		tw.wnd.setMessages(array<uint> = {WM_SETFOCUS, WM_DESTROY, WM_SIZE, WM_NOTIFY, WM_NCCALCSIZE, WM_CHAR, WM_KEYDOWN, WM_SYSKEYDOWN});
-		hEditor = CreateWindowEx(0, "Scintilla".cstr, 0, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
-			0, 0, 0, 0, tw.hWnd, 0, hSciDll, 0);
-		editor_ptr = SendMessage(hEditor, SCI_GETDIRECTPOINTER);
+		swnd.create(tw.hWnd, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS);
 		Rect rc;
 		GetClientRect(txtWnd.hWnd, rc);
 		if (rc.right > 0) { // Окно уже имеет размер, надо развернуться
@@ -303,23 +649,24 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 			SetWindowPos(tw.hWnd, 0, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
 			onSizeParent();	// Разворачиваемся
 		}
-		owner.connect(this);
+		owner.connect(swnd);
 		initWindowSettings();
-		&&wnd = attachWndToFunction(hEditor, WndFunc(this.ScnWndProc), array<uint> = {WM_SETFOCUS, WM_KILLFOCUS, WM_CHAR, WM_KEYDOWN, WM_SYSKEYDOWN, WM_RBUTTONDOWN});
+		stylishText(swnd.length());
+		&&wnd = attachWndToFunction(swnd.hEditor, WndFunc(this.ScnWndProc), array<uint> = {WM_SETFOCUS, WM_KILLFOCUS, WM_CHAR, WM_KEYDOWN, WM_SYSKEYDOWN, WM_RBUTTONDOWN});
 		editorsManager._subscribeToSelChange(tw.ted, this);
 	}
 	
 	void detach() override {
 		txtWnd.wnd.setMessages(txtWnd.defaultMessages());
 		editorsManager._unsubsribeFromSelChange(txtWnd.ted, this);
-		DestroyWindow(hEditor);
+		swnd.destroy();
 		TextEditorWindow::detach();
 	}
 
 	LRESULT wndProc(uint msg, WPARAM w, LPARAM l) override {
 		switch (msg) {
 		case WM_SETFOCUS:
-			SetFocus(hEditor);
+			SetFocus(swnd.hEditor);
 			return 0;
 		case WM_SIZE:
 			onSizeParent();
@@ -331,21 +678,21 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 		case WM_CHAR:
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:
-			return SendMessage(hEditor, msg, w, l);
+			return SendMessage(swnd.hEditor, msg, w, l);
 		}
 		return txtWnd.wnd.doDefault();
 	}
 	void createCaret(uint lineHeight) override {
-		CreateCaret(hEditor, 0, 2, lineHeight);
+		CreateCaret(swnd.hEditor, 0, 2, lineHeight);
 	}
 	void showCaret() override {
-		ShowCaret(hEditor);
+		ShowCaret(swnd.hEditor);
 	}
 	void getFontSize(Size& fontSize) override {
-		fontSize.cy = scicall(SCI_TEXTHEIGHT, 0);
+		fontSize.cy = swnd.textHeight();
 	}
 	uint getTextWidth(const string& text, const Size& fontSize) override {
-		return scicall(SCI_TEXTWIDTH, STYLE_DEFAULT, text.toUtf8().ptr);
+		return swnd.textWidth(text);
 	}
 	// Вызывается после изменения выделения в штатном текстовом редакторе
 	void onSelectionChanged(ITextEditor&&, const TextPosition& tpStart, const TextPosition& tpEnd) override {
@@ -357,23 +704,20 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 		int posColStart = getPosition(tpStart);
 		// если выделение "пустое", то просто переместим каретку
 		if (tpStart == tpEnd) {
-			scicall(SCI_GOTOPOS, posColStart);
-			int x = scicall(SCI_POINTXFROMPOSITION, 0, posColStart);
-			int y = scicall(SCI_POINTYFROMPOSITION, 0, posColStart);
-			SetCaretPos(x, y);
+			swnd.goToPos(posColStart);
+			SetCaretPos(swnd.xFromPos(posColStart), swnd.yFromPos(posColStart));
 		} else {
 			// Иначе установим выделение
-			int posColEnd = getPosition(tpEnd);
-			scicall(SCI_SETSEL, posColStart, posColEnd);
+			swnd.setSelection(posColStart, getPosition(tpEnd));
 		}
 		inReflection = false;
 	}
 	void onScrollToCaretPos(ITextEditor&& editor) override {
-		scicall(SCI_SCROLLCARET);
+		swnd.scrollToCaret();
 	}
 	bool getCaretPosForIS(ITEIntelliSence& teis, Point& caretPos, uint& lineHeight) override {
 		GetCaretPos(caretPos);
-		lineHeight = scicall(SCI_TEXTHEIGHT, 0);
+		lineHeight = swnd.textHeight();
 		return true;
 	}
 	void checkSelectionInIdle(ITextEditor&& editor) override {
@@ -392,15 +736,15 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 			} else
 				posEnd = getPosition(tpEnd);
 		}
-		int posAnchor = scicall(SCI_GETANCHOR);
-		int posCurrent = scicall(SCI_GETCURRENTPOS);
+		int posAnchor = swnd.anchorPos();
+		int posCurrent = swnd.currentPos();
 		if (posStart != posAnchor || posEnd != posCurrent) {
 			inReflection = true;
 			if (posStart == posEnd) {
-				scicall(SCI_GOTOPOS, posStart);
+				swnd.goToPos(posStart);
 			} else {
 				// Иначе установим выделение
-				scicall(SCI_SETSEL, posStart, posEnd);
+				swnd.setSelection(posStart, posEnd);
 			}
 			inReflection = false;
 		}
@@ -420,6 +764,8 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 			if ((w == VK_RETURN || w == VK_SPACE) && inReflection)
 				return 0;
 			LRESULT res = wnd.doDefault();
+			if (w == VK_RETURN)
+				autoIndent();
 			txtWnd.onChar(w);
 			return res;
 		}
@@ -435,8 +781,8 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 	}
 	bool checkForSubst(WPARAM w) {
 		if (w == VK_RETURN || w == VK_SPACE) {
-			int posSelStart = scicall(SCI_GETANCHOR);
-			int posSelEnd = scicall(SCI_GETCURRENTPOS);
+			int posSelStart = swnd.anchorPos();
+			int posSelEnd = swnd.currentPos();
 			if (posSelStart == posSelEnd) {
 				TextPosition caretPos;
 				calcPosition(posSelStart, caretPos);
@@ -455,26 +801,102 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 		}
 		return false;
 	}
+	void autoIndent() {
+		int line = swnd.lineFromPos(swnd.currentPos());
+		if (line < 1)
+			return;
+		string currentLine = swnd.lineOfText(line);
+		string prevLine;
+		for (int pp = line - 1; pp >= 0; pp--) {
+			prevLine = swnd.lineOfText(pp);
+			if (!prevLine.isEmpty())
+				break;
+		}
+		/*Message("Line = " + line);
+		Message(currentLine);
+		Message(prevLine);*/
+		int currentLevel = 0;
+		lexem lex;
+		lex_provider lp(prevLine.cstr);
+		while (lp.nextWithKeyword(lex)) {
+			switch (lexType(lex.type)) {
+			case ltIf:
+			case ltFor:
+			case ltWhile:
+			case ltTry:
+			case ltProcedure:
+			case ltFunction:
+			case ltElsIf:
+			case ltElse:
+			case ltExcept:
+				currentLevel++;
+				break;
+			case ltEndIf:
+			case ltEndDo:
+			case ltEndTry:
+			case ltEndProcedure:
+			case ltEndFunction:
+				if (currentLevel > 0)
+					currentLevel--;
+				break;
+			}
+		}
+		lp.setSource(currentLine.cstr);
+		if (lp.nextWithKeyword(lex)) {
+			switch (lexType(lex.type)) {
+			case ltElsIf:
+			case ltElse:
+			case ltExcept:
+			case ltEndIf:
+			case ltEndDo:
+			case ltEndTry:
+			case ltEndProcedure:
+			case ltEndFunction:
+				currentLevel--;
+				break;
+			}
+		}
+		//Message("cl=" + currentLevel);
+		string indent = prevLine.match(indentRex).text(0, 0);
+		if (currentLevel > 0) {
+			if (sciSetup.useTabs == 1)
+				indent.padRight('\t', indent.length + currentLevel);
+			else
+				indent.padRight(' ', indent.length + currentLevel * sciSetup.tabWidth);
+		} else if (currentLevel < 0) {
+			currentLevel = -currentLevel;
+			string re;
+			if (sciSetup.useTabs == 1)
+				re = "\\t{" + currentLevel + "}";
+			else
+				re = " {" + (currentLevel * sciSetup.tabWidth) + "}";
+			indent.replace(RegExp(re), "", 1);
+		}
+		string indentCurrent = currentLine.match(indentRex).text(0, 0);
+		int start = swnd.posFromLine(line);
+		swnd.setSelection(start, start + indentCurrent.length);
+		swnd.replaceSel(indent.toUtf8().ptr);
+		swnd.goToPos(start + indent.length);
+	}
 
 	void initWindowSettings() {
-		scicall(SCI_SETMODEVENTMASK, SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT);
-		scicall(SCI_SETLEXER, SCLEX_CONTAINER);
-		scicall(SCI_SETMARGINMASKN, 1, scicall(SCI_GETMARGINMASKN, 1) & ~(1 << markCurrentLine));
-		scicall(SCI_SETTECHNOLOGY, SC_TECHNOLOGY_DIRECTWRITE);
-		//scicall(SCI_SETBUFFEREDDRAW, 1);
-		sciSetup._apply(this);
+		swnd.setModEventMask(SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT);
+		swnd.setLexer(SCLEX_CONTAINER);
+		swnd.setTechnology(SC_TECHNOLOGY_DIRECTWRITE);
+		//swnd.setBufferedDraw(1);
+		sciSetup._apply(swnd);
 	}
 	void onSizeParent() {
 		Rect rc;
 		GetClientRect(txtWnd.hWnd, rc);
-		MoveWindow(hEditor, 0, 0, rc.right, rc.bottom, 1);
+		MoveWindow(swnd.hEditor, 0, 0, rc.right, rc.bottom, 1);
 	}
 	LRESULT onNotifyParent(SCNotification& scn) {
-		if (scn.nmhdr.hwndFrom != hEditor)
+		if (scn.nmhdr.hwndFrom != swnd.hEditor)
 			return txtWnd.wnd.doDefault();
 		switch (scn.nmhdr.code) {
 		case SCN_STYLENEEDED:
-			stylishText(scn);
+			stylishText(scn.position);
 			break;
 		case SCN_UPDATEUI:
 			if ((scn.updated & SC_UPDATE_SELECTION) != 0) {
@@ -486,15 +908,38 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 			if ((scn.modificationType & (SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT)) != 0)
 				updateTextInParent(scn);
 			break;
+		case SCN_MARGINCLICK:
+			if (scn.margin == smFolding) {
+				//int level = swnd.foldLevel(swnd.lineFromPos(scn.position));
+				//Message("Level is " + (level & SC_FOLDLEVELNUMBERMASK) + ((level & SC_FOLDLEVELHEADERFLAG) != 0 ? " header" : ""));
+				toggleFold(swnd.lineFromPos(scn.position));
+			}
 		}
 		return 0;
+	}
+	void toggleFold(int line) {
+		swnd.toggleFold(line);
+		int expanded = swnd.foldIsExpanded(line);
+		int posStart = swnd.posFromLine(line), posEnd = posStart + swnd.lineLength(line);
+		swnd.indCurrentSet(indFolding);
+		if (expanded == 0) {
+			while (posStart < posEnd && swnd.charAt(posStart) <= ' ')
+				posStart++;
+			posEnd--;
+			while (posEnd > posStart && swnd.charAt(posEnd) <= ' ')
+				posEnd--;
+			swnd.indFillRange(posStart, posEnd - posStart + 1);
+		} else {
+			swnd.indClearRange(posStart, posEnd - posStart);
+		}
+
 	}
 	void updateSelectionInParent() {
 		if (inReflection)
 			return;
 		inReflection = true;
 		TextPosition tpStart, tpEnd;
-		int posStart = scicall(SCI_GETANCHOR), posEnd = scicall(SCI_GETCURRENTPOS);
+		int posStart = swnd.anchorPos(), posEnd = swnd.currentPos();
 		calcPosition(posStart, tpStart);
 		if (posEnd == posStart) {
 			txtWnd.ted.setCaretPosition(tpStart);
@@ -508,7 +953,7 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 	}
 	void updateTextInParent(SCNotification& scn) {
 		//Message(((scn.modificationType & SC_MOD_INSERTTEXT) != 0 ? "insert in " : "delete at ") + scn.position + " length=" + scn.length + " linesAdded=" + scn.linesAdded);
-		if (GetFocus() == hEditor && !owner.inTextModified) {	// Обрабатываем уведомление только от окна в фокусе
+		if (GetFocus() == swnd.hEditor && !owner.inTextModified) {	// Обрабатываем уведомление только от окна в фокусе
 			owner.inTextModified = true;
 			inReflection = true;
 			TextManager&& tm = txtWnd.textDoc.tm;
@@ -542,34 +987,36 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 			inReflection = false;
 		}
 	}
-	void stylishText(SCNotification& scn) {
-		uint startPos = scicall(SCI_POSITIONFROMLINE, scicall(SCI_LINEFROMPOSITION, scicall(SCI_GETENDSTYLED)));
-		int len = scn.position - startPos;
-		Sci_TextRange tr;
-		tr.chrg.cpMin = startPos;
-		tr.chrg.cpMax = scn.position;
-		tr.lpstrText = mem::malloc(len + 1);
-		scicall(SCI_GETTEXTRANGE, 0, tr.self);
-		string text;
-		text.fromUtf8(utf8string(tr.lpstrText, len));
-		mem::free(tr.lpstrText);
-		lex_provider lp(text.cstr);
+	bool inStylish = false;
+	void stylishText(int position) {
+		if (inStylish)
+			return;
+		inStylish = true;
+		uint line = swnd.lineFromPos(swnd.posEndStyled());
+		FoldingProcessor foldingProcessor(this, line);
+		uint startPos = swnd.posFromLine(line);
+		int len = position - startPos;
+		string text = swnd.text(startPos, len);
+		lex_provider lp(text.cstr, line);
 		lexem lex;
-		scicall(SCI_STARTSTYLING, startPos);
+		swnd.startStyling(startPos);
 		startPos = text.cstr;
+		bool wasPoint = false;
+		//Message("----");
 		for (;;) {
 			lp.nextWithKeyword(lex);
+			int type = lexType(lex.type);
+			foldingProcessor.process(lex.line, type);
 			if (lex.type == 0)
 				break;
 			len = lex.text.toUtf8().length;
 			if (lex.start > startPos) {
-				scicall(SCI_SETSTYLING, (lex.start - startPos) / 2, STYLE_DEFAULT);
+				swnd.setStyle((lex.start - startPos) / 2, STYLE_DEFAULT);
 				startPos = lex.start;
 			}
 			int style = STYLE_DEFAULT;
-			int type = lexType(lex.type);
 			if (type > ltName) {
-				if (lex.start > text.cstr && mem::word[lex.start - 2] == '.')
+				if (wasPoint)
 					style = stIds;
 				else
 					style = stKeyword;
@@ -592,20 +1039,16 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 					style = stLabel;
 			} else
 				style = stIds;
-			scicall(SCI_SETSTYLING, len, style);
+			swnd.setStyle(len, style);
 			startPos += lex.length * 2;
+			wasPoint = type == ltPeriod;
 		}
-	}
-	int_ptr getLineText(int line) {
-		int lineLen = scicall(SCI_LINELENGTH, line);
-		int_ptr ptr = malloc(lineLen + 1);
-		scicall(SCI_GETLINE, line, ptr);
-		return ptr;
+		inStylish = false;
 	}
 	// Пересчёт из координат штатного редактора в позицию документа сцинтиллы
 	int getPosition(const TextPosition& tp) {
 		int col = tp.col - 1;
-		int pos = scicall(SCI_POSITIONFROMLINE, tp.line - 1);
+		int pos = swnd.posFromLine(tp.line - 1);
 		if (col > 0) {
 			v8string line;
 			getTextLine(txtWnd.textDoc.tm, tp.line, line);
@@ -617,8 +1060,8 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 	}
 	// Пересчёт из позиции документа сцинтиллы в текстовые координаты штатного редактора
 	void calcPosition(int pos, TextPosition& tp) {
-		int line = scicall(SCI_LINEFROMPOSITION, pos);
-		int lineStart = scicall(SCI_POSITIONFROMLINE, line);
+		int line = swnd.lineFromPos(pos);
+		int lineStart = swnd.posFromLine(line);
 		tp.line = line + 1;
 		tp.col = 1;
 		if (pos > lineStart) {
@@ -632,14 +1075,97 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 		}
 	}
 	void updateCurrentLineMarker() {
-		int cl = scicall(SCI_LINEFROMPOSITION, scicall(SCI_GETCURRENTPOS));
-		if (curLineMarkerHandle != 0) {
-			int oldLine = scicall(SCI_MARKERLINEFROMHANDLE, curLineMarkerHandle);
-			if (oldLine == cl)
-				return;
-			scicall(SCI_MARKERDELETEHANDLE, curLineMarkerHandle);
+		if (sciSetup.highlightCurrentLine) {
+			int cl = swnd.lineFromPos(swnd.currentPos());
+			if (curLineMarkerHandle != 0) {
+				int oldLine = swnd.lineFromMarkHandle(curLineMarkerHandle);
+				if (oldLine == cl)
+					return;
+				swnd.deleteMarkHandle(curLineMarkerHandle);
+			}
+			curLineMarkerHandle = swnd.addMarker(cl, markCurrentLine);
 		}
-		curLineMarkerHandle = scicall(SCI_MARKERADD, cl, markCurrentLine);
+	}
+};
+
+class FoldingProcessor {
+	int line;
+	int level;
+	int currentLineLevel;
+	bool needHeader = false;
+	ScintillaEditor&& edt;
+	ScintillaWindow&& swnd;
+
+	FoldingProcessor(ScintillaEditor& e, uint& _line) {
+		// Парсить будем со строки, либо содержащей точку свёртки первого уровня, либо начало модуля
+		&&edt = e;
+		&&swnd = e.swnd;
+		for (; !(swnd.foldLevel(_line) == (SC_FOLDLEVELBASE & SC_FOLDLEVELHEADERFLAG) || _line == 0); _line--);
+		line = _line;
+		currentLineLevel = level = SC_FOLDLEVELBASE;
+		//Print("init folding line=" + line + " level=" + level);
+	}
+	void setLevelForProcessedLine() {
+		int l = level;
+		int flag = 0;
+		if (currentLineLevel > level || needHeader)
+			flag = SC_FOLDLEVELHEADERFLAG;
+		if (needHeader) {
+			l--;
+			needHeader = false;
+		}
+		if (l < SC_FOLDLEVELBASE)
+			l = SC_FOLDLEVELBASE;
+		if (flag == 0 && 0 == swnd.foldIsExpanded(line))
+			edt.toggleFold(line);
+		swnd.foldSetLevel(line, l | flag);
+		if (currentLineLevel < SC_FOLDLEVELBASE)
+			currentLineLevel = SC_FOLDLEVELBASE;
+		level = currentLineLevel;
+	}
+	void setLevelForEmptyLines(int currentLexemLine) {
+		if (line != currentLexemLine) {
+			while (++line < currentLexemLine)
+				swnd.foldSetLevel(line, level);
+		}
+	}
+	void calcLevelChange(int lexType) {
+		if (lexType >= ltIf && lexType <= ltEndTry) {
+			switch (lexType) {
+			case ltIf:
+			case ltFor:
+			case ltWhile:
+			case ltTry:
+				currentLineLevel++;
+				break;
+			case ltProcedure:
+			case ltFunction:
+				level = 1024;
+				currentLineLevel = 1025;
+				break;
+			case ltElsIf:
+			case ltElse:
+			case ltExcept:
+				needHeader = true;
+				break;
+			case ltEndIf:
+			case ltEndDo:
+			case ltEndTry:
+				currentLineLevel--;
+				break;
+			case ltEndProcedure:
+			case ltEndFunction:
+				level = 1025;
+				currentLineLevel = 1024;
+				break;
+			}
+		}
+	}
+	void process(int lexLine, int lexType) {
+		if (lexLine != line)
+			setLevelForProcessedLine();
+		setLevelForEmptyLines(lexLine);
+		calcLevelChange(lexType);
 	}
 };
 
