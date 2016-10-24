@@ -374,6 +374,36 @@ class ScintillaWindow {
 		MemoryBuffer&& m = textRange(posFromLine(line), lineLength(line));
 		return string().fromUtf8(utf8string(m.bytes, m._length)).rtrim("\r\n");
 	}
+	
+	
+	int linesOnScreen() {
+		return sciFunc(editor_ptr, SCI_LINESONSCREEN, 0, 0);
+	}
+	int firstVisibleLine() {
+		return sciFunc(editor_ptr, SCI_GETFIRSTVISIBLELINE, 0, 0);
+	}
+	int docLineFromVisibleLine(int line) {
+		return sciFunc(editor_ptr, SCI_DOCLINEFROMVISIBLE, line, 0);
+	}
+	int lineEndPosition(int line) {
+		return sciFunc(editor_ptr, SCI_GETLINEENDPOSITION, line, 0);
+	}
+	int selectionStart() {
+		return sciFunc(editor_ptr, SCI_GETSELECTIONSTART, 0, 0);
+	}
+	int selectionEnd() {
+		return sciFunc(editor_ptr, SCI_GETSELECTIONEND, 0, 0);
+	}
+	int findText(int searchFlags, LPARAM textToFindStructPtr) {
+		return sciFunc(editor_ptr, SCI_FINDTEXT, searchFlags, textToFindStructPtr);
+	}
+	bool isRangeWord(int start, int end) {
+		return sciFunc(editor_ptr, SCI_ISRANGEWORD, start, end) != 0;
+	}
+	void setUsePopup(int allowPopUp) {
+		sciFunc(editor_ptr, SCI_USEPOPUP, allowPopUp, 0);
+	}
+	
 };
 
 
@@ -502,6 +532,8 @@ class ScintillaSetup {
 		// временно
 		swnd.setStyleWeight(stPreproc, 600);
 		swnd.setStyleWeight(stDirective, 600);
+		
+		swnd.setUsePopup(0);
 	}
 	// Настройка столбца пометок
 	void _setupMarks(ScintillaWindow& swnd) {
@@ -523,7 +555,7 @@ class ScintillaSetup {
 		swnd.setMarginType(smFolding, SC_MARGIN_SYMBOL);
 		swnd.setMarginMask(smFolding, uint(SC_MASK_FOLDERS), 0);
 		swnd.marginSetClickable(smFolding, 1);
-		swnd.indStyleSet(indFolding, INDIC_ROUNDBOX);
+		swnd.indStyleSet(indFolding, INDIC_ROUNDBOX);//INDIC_PLAIN
 		swnd.indForeSet(indFolding, 0xBB0000);
 
 		//swnd.foldSetFlag(SC_FOLDFLAG_LEVELNUMBERS);
@@ -629,6 +661,8 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 	ScintillaWindow swnd;
 	bool inReflection = false;
 	int_ptr curLineMarkerHandle = 0;
+	
+	bool selectedWordHighlighted = false;
 	
 	ScintillaEditor(ScintillaDocument&& o) {
 		&&owner = o;
@@ -775,7 +809,7 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 				return 0;
 			break;
 		case WM_RBUTTONDOWN:
-			return SendMessage(txtWnd.hWnd, msg, w, l);
+			//--return SendMessage(txtWnd.hWnd, msg, w, l);
 		}
 		return wnd.doDefault();
 	}
@@ -891,6 +925,57 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 		GetClientRect(txtWnd.hWnd, rc);
 		MoveWindow(swnd.hEditor, 0, 0, rc.right, rc.bottom, 1);
 	}
+	
+	void HighlightSelectedWord(){
+		int selStartPos = swnd.selectionStart();
+		int selEndPos = swnd.selectionEnd();
+		bool needClear = false;
+		
+		if (selStartPos != selEndPos){
+			if (swnd.lineFromPos(selStartPos) == swnd.lineFromPos(selEndPos)){
+				if (swnd.isRangeWord(selStartPos,selEndPos)){
+					int selectedRangeLength = selEndPos - selStartPos;
+					//string selectedText = swnd.text(selStartPos, selectedRangeLength);
+					//Message("selectedText " + selectedText);
+					int firstVisibleLine = swnd.firstVisibleLine();
+					int linesOnScreen = swnd.linesOnScreen();
+					
+					MemoryBuffer&& selectedRangeBuf = swnd.textRange(selStartPos, selectedRangeLength);
+					selectedRangeBuf.set_byte(selectedRangeLength, '\0');
+					Sci_TextToFind tf;
+					tf.lpstrText = selectedRangeBuf.bytes;
+					
+					for (int i=0; i<linesOnScreen; i++){
+						int docLine = swnd.docLineFromVisibleLine(firstVisibleLine+i);
+						int posLineStart = swnd.posFromLine(docLine); 
+						int posLineEnd = swnd.lineEndPosition(docLine);
+						//string currentLine = swnd.text(posLineStart, posLineEnd-posLineStart);
+						//Message("currentLine " + currentLine);
+						tf.chrg.cpMin = posLineStart;
+						tf.chrg.cpMax = posLineEnd;
+						int posFound = swnd.findText(SCFIND_WHOLEWORD,tf.self);
+						while (posFound != -1){ //если несколько значений в одной строке
+							//Message("founded: " + swnd.text(posFound, selectedRangeLength));
+							selectedWordHighlighted = true;
+							swnd.indCurrentSet(indFolding); //todo отдельный стиль
+							swnd.indFillRange(posFound, selectedRangeLength);
+							tf.chrg.cpMin = posFound + selectedRangeLength;
+							if (tf.chrg.cpMin >= posLineEnd) break;
+							posFound = swnd.findText(SCFIND_WHOLEWORD,tf.self);
+						}
+					}
+				}		
+			} else needClear = true;
+		} else needClear = true;
+		
+		if (needClear && selectedWordHighlighted){
+			swnd.indCurrentSet(indFolding); 
+			swnd.indClearRange(0, swnd.length());
+			selectedWordHighlighted = false;
+		}
+	}
+	
+	
 	LRESULT onNotifyParent(SCNotification& scn) {
 		if (scn.nmhdr.hwndFrom != swnd.hEditor)
 			return txtWnd.wnd.doDefault();
@@ -903,6 +988,7 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 				updateSelectionInParent();
 				updateCurrentLineMarker();
 			}
+			HighlightSelectedWord();
 			break;
 		case SCN_MODIFIED:
 			if ((scn.modificationType & (SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT)) != 0)
