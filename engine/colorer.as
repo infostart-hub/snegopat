@@ -1170,7 +1170,7 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 						while (posFound != -1){ //если несколько значений в одной строке
 							//Message("founded: " + swnd.text(posFound, selectedRangeLength));
 							selectedWordHighlighted = true;
-							swnd.indCurrentSet(indSelectedWordHighlight); //todo отдельный стиль
+							swnd.indCurrentSet(indSelectedWordHighlight);
 							swnd.indFillRange(posFound, selectedRangeLength);
 							tf.chrg.cpMin = posFound + selectedRangeLength;
 							if (tf.chrg.cpMin >= posLineEnd) break;
