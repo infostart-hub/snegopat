@@ -22,8 +22,9 @@ enum SciMarkers {
 	markCurrentLine,
 	markBookmark,
 	markBreakPoint,
-	markConditionalBP,
-	markExecutional,
+	markBreakPointConditional,
+	markBreakPointDisabled,
+	markDebugArrow,
 
 	maskCurrentLine = 1 << markCurrentLine,
 };
@@ -36,6 +37,7 @@ enum SciMargins {
 
 enum SciIndicators {
 	indFolding = INDIC_CONTAINER,
+	indSelectedWordHighlight
 }
 
 enum SciStyles {
@@ -50,7 +52,100 @@ enum SciStyles {
 	stLabel,
 	stDirective,
 	stCurrentWord,
+	stPairedBrace
 };
+
+ScintillaDesignerEventsHandler oneSciEventsHandler;
+IDispatch&& sciEventsHandlerDisp;
+NoCaseMap<BreakPointDef> breakpoints;
+array<ScintillaEditor&&> openedSciEditors;
+
+class BreakPointDef {
+	uint line; //номер строки модуля
+	bool isEnabled; //активная или отключенная
+	bool isCondition; //с условием или обычная
+	BreakPointDef() {}
+	BreakPointDef(uint _line, bool _isEnabled, bool _isCondition) {
+		line = _line; isEnabled = _isEnabled; isCondition = _isCondition;
+	}
+};
+
+
+class ScintillaDesignerEventsHandler {
+
+	ScintillaDesignerEventsHandler(){&&sciEventsHandlerDisp = createDispatchFromAS(&&this);}
+
+	bool commandCancelled;
+
+	ScintillaEditor&& activeScintillaEditor() {
+		if (activeTextWnd is null) return null;
+		ScintillaEditor&& e = cast<ScintillaEditor>(activeTextWnd.editor);
+		if (e is null) return null;
+		return e;
+	}
+
+	void OnToggleBreakPoint(CmdHandlerParam& cmd, array<Variant>& params) {
+		//Message("OnToggleBreakPoint: " + cmd._groupID + " _cmdNumber: " + cmd._cmdNumber + " _cmdParam: " + cmd._cmdParam + " isBefore: " + cmd._isBefore + " cancel: " + cmd.cancel);
+		
+		if (cmd._isBefore){
+			commandCancelled = false;
+			//oneDesigner._events.connect(dspWindows, "onMessageBox", sciEventsHandlerDisp, "OnWindowsMessageBox");
+		} else {
+			//oneDesigner._events.disconnect(dspWindows, "onMessageBox", sciEventsHandlerDisp, "OnWindowsMessageBox");
+			if (commandCancelled == false) {
+				ScintillaEditor&& activeSciEditor = this.activeScintillaEditor(); if (activeSciEditor is null) return;
+				string strBPKey = activeSciEditor.getBreakPointKey();
+				int curSciLine = activeSciEditor.swnd.currentLine();
+				CommandState&& st = getMainFrameCommandState(CommandID(Guid("{DE680E96-5826-4E22-834D-692E307A1D9C}"), 13), 0);
+				if (st.cmdState.bEnable) { //если команда "отключить точку останова" активна, значит точка на текущей строке есть 
+					activeSciEditor.swnd.addMarker(curSciLine, markBreakPoint);
+					breakpoints.insert(strBPKey + (curSciLine+1), BreakPointDef(curSciLine + 1, true, false));
+				} else {
+					activeSciEditor.swnd.markerDelete(curSciLine, markBreakPoint);
+					breakpoints.remove(strBPKey + (curSciLine + 1));
+				}
+			}
+		}
+	}
+
+	void OnDeleteAllBreakPoints(CmdHandlerParam& cmd, array<Variant>& params) {
+		if (!cmd._isBefore) {
+			for (uint i = 0; i < openedSciEditors.length; i++){
+				ScintillaEditor&& e = openedSciEditors[i];
+				if (e is null) continue;
+				if (e.swnd is null) continue;
+				//if (IsWindow(e.swnd.hEditor) == 0) continue;
+				e.swnd.markerDeleteAll(markBreakPoint);
+				e.swnd.markerDeleteAll(markBreakPointDisabled);
+				e.swnd.markerDeleteAll(markBreakPointConditional);
+			}
+			breakpoints.clear();
+		}
+	}
+
+	void OnDisableAllBreakPoints(CmdHandlerParam& cmd, array<Variant>& params) {
+		//todo
+		//Message("OnDisableAllBreakPoints");
+	}
+
+	void OnToggleBreakPointCondition(CmdHandlerParam& cmd, array<Variant>& params) {
+		//todo
+		//Message("OnToggleBreakPointCondition");
+	}
+
+	void OnToggleBreakPointState(CmdHandlerParam& cmd, array<Variant>& params) {
+		//todo
+		//Message("OnToggleBreakPointState");
+	}
+
+	void OnWindowsMessageBox(IMsgBoxHook mbh, array<Variant>& params) {
+		if (mbh._text.find("Нельзя установить точку останова в строке") >= 0) {
+			commandCancelled = true;
+		}
+	}
+
+};
+
 
 class ScintillaInfo : EditorInfo {
 	string name() override {
@@ -82,6 +177,10 @@ class ScintillaInfo : EditorInfo {
 				if (a is null)
 					Message("Не удалось загрузить аддин scintilla: " + oneDesigner._addins._lastAddinError);
 			}
+			if (a !is null) {
+				loadBreakPointsFromProfile();
+				connectEvents();
+			}
 		}
 	}
 	void doSetup() override {
@@ -93,6 +192,69 @@ class ScintillaInfo : EditorInfo {
 	}
 	TextEditorDocument&& create() override {
 		return ScintillaDocument();
+	}
+
+	void connectEvents(){
+		oneDesigner._events.addCommandHandler("{DE680E96-5826-4E22-834D-692E307A1D9C}", 11, sciEventsHandlerDisp, "OnToggleBreakPoint");      
+		oneDesigner._events.addCommandHandler("{DE680E96-5826-4E22-834D-692E307A1D9C}", 14, sciEventsHandlerDisp, "OnDeleteAllBreakPoints");  //убрать все точки останова
+		oneDesigner._events.addCommandHandler("{DE680E96-5826-4E22-834D-692E307A1D9C}", 15, sciEventsHandlerDisp, "OnDisableAllBreakPoints"); //отключить все точки останова
+
+		oneDesigner._events.addCommandHandler("{DE680E96-5826-4E22-834D-692E307A1D9C}", 12, sciEventsHandlerDisp, "OnToggleBreakPointCondition");	//точка останова с условием уст/снять
+		oneDesigner._events.addCommandHandler("{DE680E96-5826-4E22-834D-692E307A1D9C}", 13, sciEventsHandlerDisp, "OnToggleBreakPointState");	//точка останова откл/вкл
+
+
+	}
+
+	void loadBreakPointsFromProfile() {
+
+		IProfileFolder&& pflRoot = getProfileRoot();
+		Value val;
+		if (pflRoot.getValue("Debug/Breakpoints", val)) {
+			v8string strInt;
+			val.toString(strInt);
+			//Message(strInt.str);
+			array<string>&& arrPflStrings = strInt.str.split("\n");
+			for (uint i = 0; i < arrPflStrings.length; i++) {
+				string strCurrent = arrPflStrings[i];
+				if ((strCurrent.substr(0, 7) == "{\"\",0},") || // {"",0},8571f235-102d-4e1e-9f93-f3c271dddb55,32e087ab-1491-49b6-aba7-43571b41ac2b,0} 
+				   (strCurrent.substr(0, 7) == "{\"file:")) {   // {"file://C:/ВнешняяОбработка1.epf", 0}, d747b3b0-3043-4ba4-912f-70af7b12852a,a637f77f-3840-441d-a1c3-699c8c5cb7e0,0}
+					array<string>&& arrMdObjGuidsString = strCurrent.split(",");
+					if (arrMdObjGuidsString.length > 2){
+						string strGuidObj = "{" + arrMdObjGuidsString[2] + "}";  strGuidObj.makeLower();
+						string strGuidProp = "{" + arrMdObjGuidsString[3] + "}"; strGuidProp.makeLower();
+						//Message(strGuidObj + strGuidProp);
+						i++; if (i >= arrPflStrings.length)return;
+						string strBPcount = arrPflStrings[i]; //количество точек останова, {4,
+						int commaPos = strBPcount.find(',');
+						if (commaPos>1) {
+							strBPcount = strBPcount.substr(1, commaPos - 1);
+							//Message(strBPcount);
+							uint bpCount = parseInt(strBPcount);
+							for (uint ii = 0; ii < bpCount; ii++) {
+								i++; if (i >= arrPflStrings.length)return;
+								string strBP = arrPflStrings[i].substr(1); // {14,1,"",0,2}, номер строки, активность, условие
+								array<string>&& arrBP = strBP.split(",");
+								if (arrBP.length > 2) {
+									uint lineNum = parseInt(arrBP[0]);
+									bool isEnabled = arrBP[1] == "1";
+									bool isCondition = arrBP[2] != "\"\"";
+									//Message("строка " + lineNum + (isEnabled ? " включена " : " отключена ") + (isCondition ? " с условием " : " обычная "));
+									breakpoints.insert(strGuidObj + strGuidProp + lineNum, BreakPointDef(lineNum, isEnabled, isCondition));
+								}
+							}
+						}
+					}
+				}
+			}
+		} //else Message("Breakpoints not found");
+
+		//for (auto it = breakpoints.begin(); it++;) {
+		//	string strGuid = it.key;
+		//	BreakPointDef&& bpDescr = it.value;
+		//	Message("key: " + strGuid + ", value: " + "строка " + bpDescr.line + (bpDescr.isEnabled ? " включена" : " отключена") + (bpDescr.isCondition ? " с условием" : " обычная"));
+		//}
+
+
 	}
 };
 
@@ -284,6 +446,7 @@ class ScintillaWindow {
 		sciFunc(editor_ptr, SCI_MARKERDELETEHANDLE, markHandle, 0);
 	}
 	int_ptr addMarker(int line, int marker) {
+		if (line == -1) line = currentLine();
 		return sciFunc(editor_ptr, SCI_MARKERADD, line, marker);
 	}
 	void defineMarker(int mark, int symbol) {
@@ -374,8 +537,6 @@ class ScintillaWindow {
 		MemoryBuffer&& m = textRange(posFromLine(line), lineLength(line));
 		return string().fromUtf8(utf8string(m.bytes, m._length)).rtrim("\r\n");
 	}
-	
-	
 	int linesOnScreen() {
 		return sciFunc(editor_ptr, SCI_LINESONSCREEN, 0, 0);
 	}
@@ -402,6 +563,41 @@ class ScintillaWindow {
 	}
 	void setUsePopup(int allowPopUp) {
 		sciFunc(editor_ptr, SCI_USEPOPUP, allowPopUp, 0);
+	}
+	int markerGet(int line) {
+		return sciFunc(editor_ptr, SCI_MARKERGET, line, 0);
+	}
+	void markerDelete(int line, int markerNumber) {
+		if (line == -1) line = currentLine();
+		sciFunc(editor_ptr, SCI_MARKERDELETE, line, markerNumber);
+	}
+	void markerDeleteAll(int markerNumber) {
+		sciFunc(editor_ptr, SCI_MARKERDELETEALL, markerNumber, 0);
+	}
+	int currentLine() {
+		return lineFromPos(currentPos());
+	}
+	void toggleBreakPoint(int line = -1) {
+		if (line == -1) line = currentLine();
+		if ((markerGet(line) & (1 << markBreakPoint)) != 0)
+			markerDelete(line, markBreakPoint);
+		else
+			addMarker(line, markBreakPoint);
+	}
+	void toggleBookmark(int line = -1) {
+		if (line == -1) line = currentLine();
+		if ((markerGet(line) & (1 << markBookmark)) != 0)
+			markerDelete(line, markBookmark);
+		else
+			addMarker(line, markBookmark);
+	}
+
+	void markerDefinePixMaps() {
+		sciFunc(editor_ptr, SCI_MARKERDEFINEPIXMAP, markBreakPoint, mem::addressOf(xpm_breakpoint[0]));
+		sciFunc(editor_ptr, SCI_MARKERDEFINEPIXMAP, markBreakPointDisabled, mem::addressOf(xpm_breakpoint_disabled[0]));
+		sciFunc(editor_ptr, SCI_MARKERDEFINEPIXMAP, markBreakPointConditional, mem::addressOf(xpm_breakpoint_condition[0]));
+		sciFunc(editor_ptr, SCI_MARKERDEFINEPIXMAP, markBookmark, mem::addressOf(xpm_bookmark[0]));
+		sciFunc(editor_ptr, SCI_MARKERDEFINEPIXMAP, markDebugArrow, mem::addressOf(xpm_debug_arrow[0]));
 	}
 	
 };
@@ -482,6 +678,7 @@ class ScintillaSetup {
 		addStyle(SciStyleDefinition(stLabel, "Метка", 0x09885a));
 		addStyle(SciStyleDefinition(stDirective, "Директива", 0x2E75D9));
 		addStyle(SciStyleDefinition(stCurrentWord, "Слово под курсором", uint(-1), 0xFFF3E7));
+		addStyle(SciStyleDefinition(STYLE_BRACELIGHT, "Парная скобка", uint(-1), rgb(155,155,255)));
 		
 		addStyle(SciStyleDefinition(STYLE_LINENUMBER, "Номера строк", "", 900, 0xBBBBBB));
 		addStyle(SciStyleDefinition(STYLE_INDENTGUIDE, "Линии выравнивания", 0xCCCCCC));
@@ -497,6 +694,7 @@ class ScintillaSetup {
 	uint indentGuide = SC_IV_LOOKBOTH;
 	bool highlightCurrentLine = true;
 	color clrCurrentLine = 0xF7E8D7;
+	color clrSelectedWordHighlight = rgb(0,0,255);
 	bool showLineNumbers = true;
 	int useTabs = 1;
 	uint tabWidth = 4;
@@ -534,6 +732,10 @@ class ScintillaSetup {
 		swnd.setStyleWeight(stDirective, 600);
 		
 		swnd.setUsePopup(0);
+		swnd.indStyleSet(indSelectedWordHighlight, INDIC_ROUNDBOX);
+		swnd.indForeSet(indSelectedWordHighlight, clrSelectedWordHighlight);
+		swnd.indAlphaSet(indSelectedWordHighlight, 125); // SC_ALPHA_OPAQUE / 2
+			
 	}
 	// Настройка столбца пометок
 	void _setupMarks(ScintillaWindow& swnd) {
@@ -542,8 +744,14 @@ class ScintillaSetup {
 		swnd.setMarginMask(smMarks, uint(-1), uint(SC_MASK_FOLDERS) | maskCurrentLine);
 		swnd.setMarkerBack(markCurrentLine, clrCurrentLine);	// Задаем цвет подсветки текущей строки
 
-		swnd.defineMarker(markBookmark, SC_MARK_ROUNDRECT);
-		swnd.setMarkerFore(markBookmark, 0xFF0000);
+		swnd.marginSetClickable(smMarks, 1);
+		//swnd.defineMarker(markBookmark, SC_MARK_ROUNDRECT);
+		//swnd.setMarkerFore(markBookmark, 0xFF0000);
+		//swnd.defineMarker(markBreakPoint, SC_MARK_CIRCLE);
+		//swnd.setMarkerBack(markBreakPoint, rgb(255,0,0));
+
+		swnd.markerDefinePixMaps();
+
 	}
 	void _setupLineNumbers(ScintillaWindow& swnd) {
 		swnd.setMarginType(smLineNumbers, SC_MARGIN_NUMBER);
@@ -688,6 +896,7 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 		stylishText(swnd.length());
 		&&wnd = attachWndToFunction(swnd.hEditor, WndFunc(this.ScnWndProc), array<uint> = {WM_SETFOCUS, WM_KILLFOCUS, WM_CHAR, WM_KEYDOWN, WM_SYSKEYDOWN, WM_RBUTTONDOWN});
 		editorsManager._subscribeToSelChange(tw.ted, this);
+		openedSciEditors.insertLast(&&this); //Message("insert");
 	}
 	
 	void detach() override {
@@ -695,6 +904,8 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 		editorsManager._unsubsribeFromSelChange(txtWnd.ted, this);
 		swnd.destroy();
 		TextEditorWindow::detach();
+		int found = openedSciEditors.findByRef(&&this);
+		if (found >= 0) { openedSciEditors.removeAt(found); /*Message("remove");*/}
 	}
 
 	LRESULT wndProc(uint msg, WPARAM w, LPARAM l) override {
@@ -919,6 +1130,7 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 		swnd.setTechnology(SC_TECHNOLOGY_DIRECTWRITE);
 		//swnd.setBufferedDraw(1);
 		sciSetup._apply(swnd);
+		restoreBreakPoints();
 	}
 	void onSizeParent() {
 		Rect rc;
@@ -926,7 +1138,8 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 		MoveWindow(swnd.hEditor, 0, 0, rc.right, rc.bottom, 1);
 	}
 	
-	void HighlightSelectedWord(){
+	void highlightSelectedWord(){
+		
 		int selStartPos = swnd.selectionStart();
 		int selEndPos = swnd.selectionEnd();
 		bool needClear = false;
@@ -957,7 +1170,7 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 						while (posFound != -1){ //если несколько значений в одной строке
 							//Message("founded: " + swnd.text(posFound, selectedRangeLength));
 							selectedWordHighlighted = true;
-							swnd.indCurrentSet(indFolding); //todo отдельный стиль
+							swnd.indCurrentSet(indSelectedWordHighlight); //todo отдельный стиль
 							swnd.indFillRange(posFound, selectedRangeLength);
 							tf.chrg.cpMin = posFound + selectedRangeLength;
 							if (tf.chrg.cpMin >= posLineEnd) break;
@@ -969,9 +1182,55 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 		} else needClear = true;
 		
 		if (needClear && selectedWordHighlighted){
-			swnd.indCurrentSet(indFolding); 
+			swnd.indCurrentSet(indSelectedWordHighlight);
 			swnd.indClearRange(0, swnd.length());
 			selectedWordHighlighted = false;
+		}
+	}
+
+	void highlightPairBracket(){
+		int curPos = swnd.currentPos();
+		int matchPos = _scicall(SCI_BRACEMATCH, curPos-1);
+		if (matchPos >= 0) {
+			//Message("found " + curPos + " - " + matchPos);
+			_scicall(SCI_BRACEHIGHLIGHT, curPos-1, matchPos);
+		} else
+			_scicall(SCI_BRACEHIGHLIGHT, uint(-1), uint(-1));
+	}
+
+	string getBreakPointKey() {
+		//Message("id из ScintillaEditor " + string(txtWnd.textDoc.mdInfo.object.id)); //не такой гуид как через ComWrapper
+		string strThisMdObjGuid;
+		IV8MDObject&& mdoThis = txtWnd.getComWrapper().get_mdObj();
+		if (mdoThis is null) return strThisMdObjGuid;
+		strThisMdObjGuid = mdoThis.get_id();
+		//для модулей приложения в профиле хранится гуид конфигурации, а не свой
+		IV8MDObject&& mdoRoot = oneDesigner._metadata.get_current().get_rootObject();
+		if (mdoThis.get_name() == mdoRoot.get_name()) {
+			strThisMdObjGuid = mdoRoot.get_id();
+			//Message("guid changed to root");
+		}
+
+		strThisMdObjGuid = strThisMdObjGuid + string(txtWnd.textDoc.mdInfo.mdPropUuid);
+		strThisMdObjGuid.makeLower();
+		//Message("id из ScintillaEditor " + strThisMdObjGuid);
+		return strThisMdObjGuid;
+	}
+
+	void restoreBreakPoints() {
+		string strThisBPKey = getBreakPointKey();
+		if (strThisBPKey.isEmpty()) return;
+
+		for (auto it = breakpoints.begin(); it++;) {
+			if (it.key.find(strThisBPKey) == 0){
+				BreakPointDef&& bpDef = it.value;
+				if (!bpDef.isEnabled)
+					swnd.addMarker(bpDef.line - 1, markBreakPointDisabled);
+				else if (bpDef.isCondition)
+					swnd.addMarker(bpDef.line - 1, markBreakPointConditional);
+				else
+					swnd.addMarker(bpDef.line - 1, markBreakPoint);
+			}
 		}
 	}
 	
@@ -988,7 +1247,8 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 				updateSelectionInParent();
 				updateCurrentLineMarker();
 			}
-			HighlightSelectedWord();
+			highlightSelectedWord();
+			highlightPairBracket();
 			break;
 		case SCN_MODIFIED:
 			if ((scn.modificationType & (SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT)) != 0)
@@ -999,7 +1259,15 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 				//int level = swnd.foldLevel(swnd.lineFromPos(scn.position));
 				//Message("Level is " + (level & SC_FOLDLEVELNUMBERMASK) + ((level & SC_FOLDLEVELHEADERFLAG) != 0 ? " header" : ""));
 				toggleFold(swnd.lineFromPos(scn.position));
+			} else if (scn.margin == smMarks) {
+				swnd.setCurrentPos(scn.position);
+				swnd.setAnchorPos(scn.position);
+				TextPosition tp; 
+				calcPosition(scn.position, tp);
+				txtWnd.ted.setCaretPosition(tp);
+				sendCommandToMainFrame(CommandID(Guid("{DE680E96-5826-4E22-834D-692E307A1D9C}"), 11)); //toggle breakpoint
 			}
+
 		}
 		return 0;
 	}
@@ -1303,6 +1571,393 @@ int FontNameProc(LOGFONT& lf, int_ptr lpntme, int FontType, NoCaseMap<int>& name
 		names.insert(stringFromAddress(mem::addressOf(lf.lfFaceNameStart)), 1);
 	return 1;
 }
+
+
+uint WideStringToAnsiString(string str) {
+	bool useDef;
+	int len = WideCharToMultiByte(CP_ACP, 0, str.cstr, str.length, 0, 0, 0, useDef);
+	uint bytes = malloc(len + 1);
+	WideCharToMultiByte(CP_ACP, 0, str.cstr, str.length, bytes, len, 0, useDef);
+	mem::byte[bytes + len] = '\0';
+	return bytes; //не забывать потом free(bytes);
+}
+
+array<uint> xpm_breakpoint = { //в оригинале это char* []
+	WideStringToAnsiString("15 15 65 1"),
+	WideStringToAnsiString(" 	c None"),
+	WideStringToAnsiString(".	c #D6D7D5"),
+	WideStringToAnsiString("+	c #D3DEDF"),
+	WideStringToAnsiString("@	c #CABEBE"),
+	WideStringToAnsiString("#	c #CE9A98"),
+	WideStringToAnsiString("$	c #D2827E"),
+	WideStringToAnsiString("%	c #CB7571"),
+	WideStringToAnsiString("&	c #D39791"),
+	WideStringToAnsiString("*	c #DF827B"),
+	WideStringToAnsiString("=	c #E88C82"),
+	WideStringToAnsiString("-	c #E57F75"),
+	WideStringToAnsiString(";	c #E5756F"),
+	WideStringToAnsiString(">	c #D76057"),
+	WideStringToAnsiString(",	c #C0504A"),
+	WideStringToAnsiString("'	c #BC8081"),
+	WideStringToAnsiString(")	c #DCDEDC"),
+	WideStringToAnsiString("!	c #D18E8B"),
+	WideStringToAnsiString("~	c #ED8F85"),
+	WideStringToAnsiString("{	c #ED9589"),
+	WideStringToAnsiString("]	c #EE9E96"),
+	WideStringToAnsiString("^	c #E7827D"),
+	WideStringToAnsiString("/	c #E17971"),
+	WideStringToAnsiString("(	c #DE6158"),
+	WideStringToAnsiString("_	c #BE443E"),
+	WideStringToAnsiString(":	c #B26E6E"),
+	WideStringToAnsiString("<	c #F0A69A"),
+	WideStringToAnsiString("[	c #ED9791"),
+	WideStringToAnsiString("}	c #E67A72"),
+	WideStringToAnsiString("|	c #E27266"),
+	WideStringToAnsiString("1	c #D55851"),
+	WideStringToAnsiString("2	c #B33731"),
+	WideStringToAnsiString("3	c #D7E4E5"),
+	WideStringToAnsiString("4	c #DD7C77"),
+	WideStringToAnsiString("5	c #F4AAA4"),
+	WideStringToAnsiString("6	c #D95C53"),
+	WideStringToAnsiString("7	c #CA4A40"),
+	WideStringToAnsiString("8	c #9A2626"),
+	WideStringToAnsiString("9	c #BCB4B4"),
+	WideStringToAnsiString("0	c #AD2825"),
+	WideStringToAnsiString("a	c #AA6A6A"),
+	WideStringToAnsiString("b	c #DF6761"),
+	WideStringToAnsiString("c	c #863436"),
+	WideStringToAnsiString("d	c #BF6861"),
+	WideStringToAnsiString("e	c #CE4440"),
+	WideStringToAnsiString("f	c #791D21"),
+	WideStringToAnsiString("g	c #D55349"),
+	WideStringToAnsiString("h	c #C73E37"),
+	WideStringToAnsiString("i	c #A72421"),
+	WideStringToAnsiString("j	c #7D292D"),
+	WideStringToAnsiString("k	c #9D1713"),
+	WideStringToAnsiString("l	c #986265"),
+	WideStringToAnsiString("m	c #BB3D37"),
+	WideStringToAnsiString("n	c #820A0A"),
+	WideStringToAnsiString("o	c #D6524E"),
+	WideStringToAnsiString("p	c #D95751"),
+	WideStringToAnsiString("q	c #CF453B"),
+	WideStringToAnsiString("r	c #AC3026"),
+	WideStringToAnsiString("s	c #8F0F0B"),
+	WideStringToAnsiString("t	c #8E565A"),
+	WideStringToAnsiString("u	c #DFE9E4"),
+	WideStringToAnsiString("v	c #9C4E51"),
+	WideStringToAnsiString("w	c #87474D"),
+	WideStringToAnsiString("x	c #9C5A5B"),
+	WideStringToAnsiString("y	c #9A5E63"),
+	WideStringToAnsiString("z	c #700E17"),
+	WideStringToAnsiString("   +@#$%%#@+   "),
+	WideStringToAnsiString("   &*==-;>,')  "),
+	WideStringToAnsiString("  !~{]{~^/(_:) "),
+	WideStringToAnsiString("+&=]<<][=}|12:3"),
+	WideStringToAnsiString("@4{]<5][~}|6789"),
+	WideStringToAnsiString("#}{]<<]{=}|670a"),
+	WideStringToAnsiString("%-~[]][~^/b670c"),
+	WideStringToAnsiString("d;^~{{~^}|b1e0f"),
+	WideStringToAnsiString("db}--^-}|b6ghij"),
+	WideStringToAnsiString("'1||//;|b6ge2kl"),
+	WideStringToAnsiString("@_6(bbb(6gem0n9"),
+	WideStringToAnsiString("3:mo16pogqmrstu"),
+	WideStringToAnsiString("  v2heehh20sw+ "),
+	WideStringToAnsiString("   x8i00iknw)  "),
+	WideStringToAnsiString("   39yjzft9u   ") 
+};
+
+array<uint> xpm_breakpoint_disabled = {
+	WideStringToAnsiString("15 15 56 1"),
+	WideStringToAnsiString(" 	g None"),
+	WideStringToAnsiString(".	g #D6D6D6"),
+	WideStringToAnsiString("+	g #DCDCDC"),
+	WideStringToAnsiString("@	g #C9C9C9"),
+	WideStringToAnsiString("#	g #AEAEAE"),
+	WideStringToAnsiString("$	g #9B9B9B"),
+	WideStringToAnsiString("%	g #8F8F8F"),
+	WideStringToAnsiString("&	g #ADADAD"),
+	WideStringToAnsiString("*	g #9F9F9F"),
+	WideStringToAnsiString("=	g #A8A8A8"),
+	WideStringToAnsiString("-	g #949494"),
+	WideStringToAnsiString(";	g #828282"),
+	WideStringToAnsiString(">	g #6E6E6E"),
+	WideStringToAnsiString(",	g #DDDDDD"),
+	WideStringToAnsiString("'	g #A6A6A6"),
+	WideStringToAnsiString(")	g #ABABAB"),
+	WideStringToAnsiString("!	g #B1B1B1"),
+	WideStringToAnsiString("~	g #B9B9B9"),
+	WideStringToAnsiString("{	g #A2A2A2"),
+	WideStringToAnsiString("]	g #969696"),
+	WideStringToAnsiString("^	g #858585"),
+	WideStringToAnsiString("/	g #646464"),
+	WideStringToAnsiString("(	g #838383"),
+	WideStringToAnsiString("_	g #C0C0C0"),
+	WideStringToAnsiString(":	g #B3B3B3"),
+	WideStringToAnsiString("<	g #919191"),
+	WideStringToAnsiString("[	g #7A7A7A"),
+	WideStringToAnsiString("}	g #555555"),
+	WideStringToAnsiString("|	g #E1E1E1"),
+	WideStringToAnsiString("1	g #999999"),
+	WideStringToAnsiString("2	g #C4C4C4"),
+	WideStringToAnsiString("3	g #7F7F7F"),
+	WideStringToAnsiString("4	g #6B6B6B"),
+	WideStringToAnsiString("5	g #424242"),
+	WideStringToAnsiString("6	g #BEBEBE"),
+	WideStringToAnsiString("7	g #484848"),
+	WideStringToAnsiString("8	g #898989"),
+	WideStringToAnsiString("9	g #808080"),
+	WideStringToAnsiString("0	g #696969"),
+	WideStringToAnsiString("a	g #333333"),
+	WideStringToAnsiString("b	g #757575"),
+	WideStringToAnsiString("c	g #626262"),
+	WideStringToAnsiString("d	g #3E3E3E"),
+	WideStringToAnsiString("e	g #343434"),
+	WideStringToAnsiString("f	g #747474"),
+	WideStringToAnsiString("g	g #5B5B5B"),
+	WideStringToAnsiString("h	g #252525"),
+	WideStringToAnsiString("i	g #767676"),
+	WideStringToAnsiString("j	g #4C4C4C"),
+	WideStringToAnsiString("k	g #2C2C2C"),
+	WideStringToAnsiString("l	g #666666"),
+	WideStringToAnsiString("m	g #E7E7E7"),
+	WideStringToAnsiString("n	g #636363"),
+	WideStringToAnsiString("o	g #595959"),
+	WideStringToAnsiString("p	g #6D6D6D"),
+	WideStringToAnsiString("q	g #717171"),
+	WideStringToAnsiString("   +@#$%%#@+   "),
+	WideStringToAnsiString("   &*==*-;>-,  "),
+	WideStringToAnsiString("  ')!~!){]^/(, "),
+	WideStringToAnsiString("+&=~__~:=$<[}(|"),
+	WideStringToAnsiString("@1!~_2~:)$<3456"),
+	WideStringToAnsiString("#$!~__~!=$<3473"),
+	WideStringToAnsiString("%*):~~:){]83477"),
+	WideStringToAnsiString("9-{)!!){$<8[07a"),
+	WideStringToAnsiString("98$**{*$<83bc5d"),
+	WideStringToAnsiString("-[<<]]-<83b0}ef"),
+	WideStringToAnsiString("@/3^888^3b0g7h6"),
+	WideStringToAnsiString("|(gi[3[ib0gjklm"),
+	WideStringToAnsiString("  n}c00cc}7ko+ "),
+	WideStringToAnsiString("   p55775eho,  "),
+	WideStringToAnsiString("   |6qdhal6m   ") 
+};
+
+array<uint> xpm_breakpoint_condition = {
+	WideStringToAnsiString("16 16 66 1"),
+	WideStringToAnsiString(" 	c None"),
+	WideStringToAnsiString(".	c #951013"),
+	WideStringToAnsiString("+	c #791920"),
+	WideStringToAnsiString("@	c #871B1B"),
+	WideStringToAnsiString("#	c #A4231F"),
+	WideStringToAnsiString("$	c #83383B"),
+	WideStringToAnsiString("%	c #B2312D"),
+	WideStringToAnsiString("&	c #9C3A3C"),
+	WideStringToAnsiString("*	c #C23931"),
+	WideStringToAnsiString("=	c #AF3E3B"),
+	WideStringToAnsiString("-	c #545C61"),
+	WideStringToAnsiString(";	c #954C4E"),
+	WideStringToAnsiString(">	c #C7403B"),
+	WideStringToAnsiString(",	c #D34843"),
+	WideStringToAnsiString("'	c #B8514C"),
+	WideStringToAnsiString(")	c #596B76"),
+	WideStringToAnsiString("!	c #517085"),
+	WideStringToAnsiString("~	c #D6524B"),
+	WideStringToAnsiString("{	c #D0554D"),
+	WideStringToAnsiString("]	c #4C789C"),
+	WideStringToAnsiString("^	c #70787A"),
+	WideStringToAnsiString("/	c #BE6760"),
+	WideStringToAnsiString("(	c #DE6357"),
+	WideStringToAnsiString("_	c #3E88C1"),
+	WideStringToAnsiString(":	c #A87173"),
+	WideStringToAnsiString("<	c #5286B0"),
+	WideStringToAnsiString("[	c #668396"),
+	WideStringToAnsiString("}	c #9F777A"),
+	WideStringToAnsiString("|	c #E06761"),
+	WideStringToAnsiString("1	c #4091C9"),
+	WideStringToAnsiString("2	c #4996CB"),
+	WideStringToAnsiString("3	c #E2756C"),
+	WideStringToAnsiString("4	c #CC7B77"),
+	WideStringToAnsiString("5	c #8D908B"),
+	WideStringToAnsiString("6	c #5A9BCA"),
+	WideStringToAnsiString("7	c #7497B0"),
+	WideStringToAnsiString("8	c #6C9BBE"),
+	WideStringToAnsiString("9	c #E7827A"),
+	WideStringToAnsiString("0	c #779FB9"),
+	WideStringToAnsiString("a	c #6DA1C6"),
+	WideStringToAnsiString("b	c #BA9090"),
+	WideStringToAnsiString("c	c #69A2D0"),
+	WideStringToAnsiString("d	c #CF8D8C"),
+	WideStringToAnsiString("e	c #DD8A85"),
+	WideStringToAnsiString("f	c #E98B7B"),
+	WideStringToAnsiString("g	c #EA8E83"),
+	WideStringToAnsiString("h	c #A0A29B"),
+	WideStringToAnsiString("i	c #76ACD7"),
+	WideStringToAnsiString("j	c #EE938E"),
+	WideStringToAnsiString("k	c #CFA3A0"),
+	WideStringToAnsiString("l	c #EE9C93"),
+	WideStringToAnsiString("m	c #AEAFA9"),
+	WideStringToAnsiString("n	c #8DB7DB"),
+	WideStringToAnsiString("o	c #B5B6A7"),
+	WideStringToAnsiString("p	c #F0A89D"),
+	WideStringToAnsiString("q	c #97BDD9"),
+	WideStringToAnsiString("r	c #BCBCB4"),
+	WideStringToAnsiString("s	c #AAC8DD"),
+	WideStringToAnsiString("t	c #CAC9C7"),
+	WideStringToAnsiString("u	c #CFCFBB"),
+	WideStringToAnsiString("v	c #C0D4E1"),
+	WideStringToAnsiString("w	c #D9DAC3"),
+	WideStringToAnsiString("x	c #DAE5E9"),
+	WideStringToAnsiString("y	c #E2ECE7"),
+	WideStringToAnsiString("z	c #EFF0D9"),
+	WideStringToAnsiString("A	c #F9FCFB"),
+	WideStringToAnsiString("     rrmmmr     "),
+	WideStringToAnsiString("   r8aqssq88o   "),
+	WideStringToAnsiString("  m7svvssvvs7h  "),
+	WideStringToAnsiString(" r7ssssssssss[o "),
+	WideStringToAnsiString("z[innqxAAxsnqi)u"),
+	WideStringToAnsiString("o<cnnxAssAxnnc]o"),
+	WideStringToAnsiString("h_cciqqinvxic6_h"),
+	WideStringToAnsiString("^__ccciisAqcc__h"),
+	WideStringToAnsiString("5__26ccnAqc62__5"),
+	WideStringToAnsiString("5<_1222qx221___5"),
+	WideStringToAnsiString("o<211111111112!o"),
+	WideStringToAnsiString("w-c2622xx2122c^z"),
+	WideStringToAnsiString(" o!i26266622i!u "),
+	WideStringToAnsiString("  h)i66ccc6i!m  "),
+	WideStringToAnsiString("   m-0qssq0-r   "),
+	WideStringToAnsiString("    um---5hw    ")
+};
+
+array<uint> xpm_debug_arrow = {
+	WideStringToAnsiString("15 15 6 1"),
+	WideStringToAnsiString(" 	c None"),
+	WideStringToAnsiString(".	c #A48B6F"),
+	WideStringToAnsiString("+	c #C3A185"),
+	WideStringToAnsiString("@	c #BDA88D"),
+	WideStringToAnsiString("#	c #FFE5CF"),
+	WideStringToAnsiString("$	c #784C2A"),
+	WideStringToAnsiString("               "),
+	WideStringToAnsiString("        .      "),
+	WideStringToAnsiString("        $.     "),
+	WideStringToAnsiString("        $$.    "),
+	WideStringToAnsiString("        $#$.   "),
+	WideStringToAnsiString("     $$$+##$.  "),
+	WideStringToAnsiString("     $######$. "),
+	WideStringToAnsiString("     $#######$."),
+	WideStringToAnsiString("     $######$. "),
+	WideStringToAnsiString("     $$$+##$.  "),
+	WideStringToAnsiString("        $#$.   "),
+	WideStringToAnsiString("        $$.    "),
+	WideStringToAnsiString("        $.     "),
+	WideStringToAnsiString("        .      "),
+	WideStringToAnsiString("               ")
+};
+
+array<uint> xpm_bookmark = {
+	WideStringToAnsiString("15 15 87 1"),
+	WideStringToAnsiString(" 	c None"),
+	WideStringToAnsiString(".	c #A9ABA8"),
+	WideStringToAnsiString("+	c #2374F8"),
+	WideStringToAnsiString("@	c #1163F6"),
+	WideStringToAnsiString("#	c #0061F2"),
+	WideStringToAnsiString("$	c #1259EC"),
+	WideStringToAnsiString("%	c #0357E1"),
+	WideStringToAnsiString("&	c #0056D9"),
+	WideStringToAnsiString("*	c #0054D6"),
+	WideStringToAnsiString("=	c #1851CE"),
+	WideStringToAnsiString("-	c #1952C8"),
+	WideStringToAnsiString(";	c #005DE7"),
+	WideStringToAnsiString(">	c #759EEC"),
+	WideStringToAnsiString(",	c #A2BAE6"),
+	WideStringToAnsiString("'	c #92B9F5"),
+	WideStringToAnsiString(")	c #9ABCF3"),
+	WideStringToAnsiString("!	c #97B5F3"),
+	WideStringToAnsiString("~	c #98B7F4"),
+	WideStringToAnsiString("{	c #8EB3F6"),
+	WideStringToAnsiString("]	c #85B0F8"),
+	WideStringToAnsiString("^	c #7BADFB"),
+	WideStringToAnsiString("/	c #78A7FC"),
+	WideStringToAnsiString("(	c #4E88EC"),
+	WideStringToAnsiString("_	c #265EF2"),
+	WideStringToAnsiString(":	c #A0BDEE"),
+	WideStringToAnsiString("<	c #8CADF7"),
+	WideStringToAnsiString("[	c #86B1F9"),
+	WideStringToAnsiString("}	c #8BACF6"),
+	WideStringToAnsiString("|	c #6EA6FF"),
+	WideStringToAnsiString("1	c #5E96F5"),
+	WideStringToAnsiString("2	c #1447AF"),
+	WideStringToAnsiString("3	c #1664F7"),
+	WideStringToAnsiString("4	c #8AABF5"),
+	WideStringToAnsiString("5	c #8CB0F3"),
+	WideStringToAnsiString("6	c #82AAFA"),
+	WideStringToAnsiString("7	c #77A6FB"),
+	WideStringToAnsiString("8	c #75A2FD"),
+	WideStringToAnsiString("9	c #679DFD"),
+	WideStringToAnsiString("0	c #5990F6"),
+	WideStringToAnsiString("a	c #1146A7"),
+	WideStringToAnsiString("b	c #005EF7"),
+	WideStringToAnsiString("c	c #84AFF7"),
+	WideStringToAnsiString("d	c #7DAFFD"),
+	WideStringToAnsiString("e	c #80A8F7"),
+	WideStringToAnsiString("f	c #77A4FF"),
+	WideStringToAnsiString("g	c #6DA5FE"),
+	WideStringToAnsiString("h	c #669AFF"),
+	WideStringToAnsiString("i	c #568BF8"),
+	WideStringToAnsiString("j	c #0B45A5"),
+	WideStringToAnsiString("k	c #8FB4F7"),
+	WideStringToAnsiString("l	c #8EAFF9"),
+	WideStringToAnsiString("m	c #83AEF6"),
+	WideStringToAnsiString("n	c #79A8FD"),
+	WideStringToAnsiString("o	c #6BA0FF"),
+	WideStringToAnsiString("p	c #6297FE"),
+	WideStringToAnsiString("q	c #4689FA"),
+	WideStringToAnsiString("r	c #1C419C"),
+	WideStringToAnsiString("s	c #84ABFB"),
+	WideStringToAnsiString("t	c #689EFF"),
+	WideStringToAnsiString("u	c #5595FF"),
+	WideStringToAnsiString("v	c #18409A"),
+	WideStringToAnsiString("w	c #165AED"),
+	WideStringToAnsiString("x	c #8FB7F3"),
+	WideStringToAnsiString("y	c #5E91FF"),
+	WideStringToAnsiString("z	c #4287F8"),
+	WideStringToAnsiString("A	c #163F93"),
+	WideStringToAnsiString("B	c #5293FF"),
+	WideStringToAnsiString("C	c #4D83F6"),
+	WideStringToAnsiString("D	c #0C3C8F"),
+	WideStringToAnsiString("E	c #005AE2"),
+	WideStringToAnsiString("F	c #4F8FFF"),
+	WideStringToAnsiString("G	c #2168ED"),
+	WideStringToAnsiString("H	c #5B87EE"),
+	WideStringToAnsiString("I	c #6B96F8"),
+	WideStringToAnsiString("J	c #588FF4"),
+	WideStringToAnsiString("K	c #2475F2"),
+	WideStringToAnsiString("L	c #084EB5"),
+	WideStringToAnsiString("M	c #0161EC"),
+	WideStringToAnsiString("N	c #1350C5"),
+	WideStringToAnsiString("O	c #0047B4"),
+	WideStringToAnsiString("P	c #0A44AB"),
+	WideStringToAnsiString("Q	c #0042A2"),
+	WideStringToAnsiString("R	c #113C9D"),
+	WideStringToAnsiString("S	c #004098"),
+	WideStringToAnsiString("T	c #093A94"),
+	WideStringToAnsiString("U	c #023992"),
+	WideStringToAnsiString("V	c #1F4BB4"),
+	WideStringToAnsiString(" +@#$%%%&&*=-; "),
+	WideStringToAnsiString("+>,')!!~{{]^/(&"),
+	WideStringToAnsiString("_:<[[{{{}}^/|12"),
+	WideStringToAnsiString("3[[4<55]667890a"),
+	WideStringToAnsiString("b'cd]66effg9hij"),
+	WideStringToAnsiString("_kl<mnn|oo9hpqr"),
+	WideStringToAnsiString("b~s6/88otthpuqv"),
+	WideStringToAnsiString("b~^7|88otthpuqv"),
+	WideStringToAnsiString("wx|oo99hhhpuyzA"),
+	WideStringToAnsiString("%{ooohhpuuuByCD"),
+	WideStringToAnsiString("wx|oo99hhhpuyzA"),
+	WideStringToAnsiString("%{ooohhpuuuByCD"),
+	WideStringToAnsiString("E}99hppuyyyFFCD"),
+	WideStringToAnsiString("GHIJiiiqzzCCCKL"),
+	WideStringToAnsiString(" MNOPjjQRRSTUV ")
+ };
+
 
 enum SciEnums {
 	INVALID_POSITION = -1,
