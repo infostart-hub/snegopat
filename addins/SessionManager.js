@@ -236,8 +236,8 @@ SessionManager = ScriptForm.extend({
                         if (n =="Форма"){
                             mdObj.openModule(n.toString());
                         } else {
-                            text = mdObj.getModuleText(n.toString());
                             mdObj.editProperty(n.toString());
+                            text = mdObj.getModuleText(n.toString());
                         }
                         if (currRow.curLine && text.length>0) {
                             //попробуем обойтись без таймера... 
