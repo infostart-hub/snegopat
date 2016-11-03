@@ -101,15 +101,13 @@ class SynEditDocument : TextEditorDocument, TextModifiedReceiver {
 		return sEditor;
 	}
 	void onTextModified(TextManager& tm, const TextPosition& tpStart, const TextPosition& tpEnd, const string& newText) {
-		return;
 		//Message("Set text " + tpstr(tpStart) + " " + tpstr(tpEnd) + " '" + newText + "'");
-		/*array<Variant> args(4);
+		array<Variant> args(4);
 		args[0].setDispatch(createDispatchFromAS(&&strWrapper(newText)));
 		args[1].setDispatch(createDispatchFromAS(&&ITextPos(tpEnd)));
 		args[2].setDispatch(createDispatchFromAS(&&ITextPos(tpStart)));
 		args[3].setDispatch(createDispatchFromAS(&&ITextPos(tpStart)));//TextManager will be here...
-		Selection begin(tpStart, tpEnd);
-		oneDesigner._events.fireEvent(oneDesigner._me(), "onChangeTextManager", args);*/
+		oneDesigner._events.fireEvent(oneDesigner._me(), "SynEditonTextModified", args);
 	}
 /*	ScintillaEditor&& firstEditor() {
 		if (activeTextWnd !is null) {
@@ -132,17 +130,22 @@ class SynEditDocument : TextEditorDocument, TextModifiedReceiver {
 	}*/
 };
 
-class SynEditEditor : TextEditorWindow {
+class SynEditEditor : TextEditorWindow, SelectionChangedReceiver {
+	int WM_USER = 0x400;
+	int WM_TEXTWND_CHANGED = WM_USER + 665;
+
 	SynEditEditor(SynEditDocument&& o) {
 	}
 	void attach(TextWnd&& tw) override {
 		TextEditorWindow::attach(tw);
+		editorsManager._subscribeToSelChange(tw.ted, this);
 		array<Variant> args(2);
         args[0].setDispatch(createDispatchFromAS(&&this));
         args[1].setDispatch(createDispatchFromAS(&&tw.getComWrapper()));
         oneDesigner._events.fireEvent(oneDesigner._me(), "SynEditcreateTextWindow", args);
 	}
 	void detach() override {
+		editorsManager._unsubsribeFromSelChange(txtWnd.ted, this);
 		TextEditorWindow::detach();
 	}
 	void onFocused() {
@@ -150,6 +153,27 @@ class SynEditEditor : TextEditorWindow {
 	}
 	void onUnfocused() {
 		&&activeTextWnd = null;
+	}
+	// Вызывается после изменения выделения в штатном текстовом редакторе
+	void onSelectionChanged(ITextEditor&&, const TextPosition& tpStart, const TextPosition& tpEnd) override {
+		array<Variant> args(2);
+        args[0].setDispatch(createDispatchFromAS(&&ITextPos(tpStart)));
+        args[1].setDispatch(createDispatchFromAS(&&ITextPos(tpEnd)));
+        oneDesigner._events.fireEvent(oneDesigner._me(), "SynEditOnSelectionChanged", args);
+	}
+	void onScrollToCaretPos(ITextEditor&& editor) override {
+		//Message("onScrollToCaretPos");
+	}
+	bool getCaretPosForIS(ITEIntelliSence& teis, Point& caretPos, uint& lineHeight) override {
+		//Message("getCaretPosForIS");
+		GetCaretPos(caretPos);
+		lineHeight = 24;
+		return true;
+	}
+	void checkSelectionInIdle(ITextEditor&& editor) override {
+		//Message("checkSelectionInIdle");
+		SendMessage(txtWnd.hWnd, WM_TEXTWND_CHANGED, 1);
+		return;
 	}
 }
 
