@@ -607,13 +607,15 @@ void initSelChangeTrap(ITextEditor&& ted) {
 		trSTCP.setTrap(ted, ITextEditor_scrollToCaretPos, scrollToCaretPos_trap);
 		trSS.setTrap(ted, ITextEditor_setSelection, setSelection_trap);
 		ITEIntelliSence&& teis = ted.unk;
-		trGetListPos.setTrap(teis, ITEIntelliSence_getContextListPos, getContextListPos_trap);
+		if (teis !is null) //вылетает в окне сравнения модулей
+			trGetListPos.setTrap(teis, ITEIntelliSence_getContextListPos, getContextListPos_trap);
 	} else if (trSSN.state == trapDisabled) {
 		trSSN.swap();
 		trSCP.swap();
 		trSTCP.swap();
 		trSS.swap();
-		trGetListPos.swap();
+		if (trGetListPos.state == trapDisabled) 
+			trGetListPos.swap();
 	}
 }
 
