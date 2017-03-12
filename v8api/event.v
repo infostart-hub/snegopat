@@ -23,8 +23,13 @@
 :iface IIdleService {6B1FFDD4-36BE-11D4-9859-008048DA1252}
 :virt
 	+2
+	#if ver < 8.3.10
     void addIdleHandler(IIdleHandler@ handler)
     void removeIdleHandler(IIdleHandler@ handler)
+	#else
+    void addIdleHandler(IIdleHandler@& handler)
+    void removeIdleHandler(IIdleHandler@& handler)
+	#endif
 	+1
 	void postEvent(const Guid& id, int val = 0, IUnknown@+ obj=null)
 :global

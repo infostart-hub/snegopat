@@ -244,6 +244,8 @@
 	0x24C ModuleTxtExtSettingsMap
   #elif ver < 8.3.8
 	0x290 ModuleTxtExtSettingsMap
-  #else
+  #elif ver < 8.3.10
 	0x294 ModuleTxtExtSettingsMap
+  #else
+	0x2B0 ModuleTxtExtSettingsMap
   #endif

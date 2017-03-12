@@ -77,7 +77,7 @@ class strWrapper {
 class ITextPos {
 	int line;
 	int col;
-	ITextPos(TextPosition& pos) {
+	ITextPos(const TextPosition& pos) {
 		line = pos.line;
 		col = pos.col;
 	}
@@ -155,13 +155,13 @@ class SynEditEditor : TextEditorWindow, SelectionChangedReceiver {
 		&&activeTextWnd = null;
 	}
 	// Вызывается после изменения выделения в штатном текстовом редакторе
-	void onSelectionChanged(ITextEditor&&, const TextPosition& tpStart, const TextPosition& tpEnd) override {
+	void onSelectionChanged(ITextEditor&, const TextPosition& tpStart, const TextPosition& tpEnd) override {
 		array<Variant> args(2);
         args[0].setDispatch(createDispatchFromAS(&&ITextPos(tpStart)));
         args[1].setDispatch(createDispatchFromAS(&&ITextPos(tpEnd)));
         oneDesigner._events.fireEvent(oneDesigner._me(), "SynEditOnSelectionChanged", args);
 	}
-	void onScrollToCaretPos(ITextEditor&& editor) override {
+	void onScrollToCaretPos(ITextEditor& editor) override {
 		//Message("onScrollToCaretPos");
 	}
 	bool getCaretPosForIS(ITEIntelliSence& teis, Point& caretPos, uint& lineHeight) override {
@@ -170,7 +170,7 @@ class SynEditEditor : TextEditorWindow, SelectionChangedReceiver {
 		lineHeight = 24;
 		return true;
 	}
-	void checkSelectionInIdle(ITextEditor&& editor) override {
+	void checkSelectionInIdle(ITextEditor& editor) override {
 		//Message("checkSelectionInIdle");
 		SendMessage(txtWnd.hWnd, WM_TEXTWND_CHANGED, 1);
 		return;

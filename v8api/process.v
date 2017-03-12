@@ -40,9 +40,9 @@
 	void val2var(const Value&, Variant&)|?value_to_variant_val@core@@YAXABVGenericValue@1@AAUtagVARIANT@@@Z
 	v8string load_module_wstring(uint charNameModule, uint charResID)|?load_module_wstring@core@@YA?AV?$basic_string@_WV?$char_traits@_W@stlp_std@@V?$allocator@_W@2@@stlp_std@@PBD0@Z
 #if ver < 8.3.6
-	void var2val(Variant&, Value&, int i=0)|?variant_to_value@core@@YAXAAUtagVARIANT@@AAVGenericValue@1@H@Z
+	void var2val(const Variant&, Value&, int i=0)|?variant_to_value@core@@YAXAAUtagVARIANT@@AAVGenericValue@1@H@Z
 #else
-	void var2val(Variant&, Value&, int=0, bool=false)|?variant_to_value@core@@YAXAAUtagVARIANT@@AAVGenericValue@1@H_N@Z
+	void var2val(const Variant&, Value&, int=0, bool=false)|?variant_to_value@core@@YAXAAUtagVARIANT@@AAVGenericValue@1@H_N@Z
 #endif
 
 :global

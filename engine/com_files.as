@@ -69,7 +69,7 @@ enum StringDataMode {
 };
 
 class MemoryBuffer {
-    uint bytes;
+    int_ptr bytes;
     uint _length;
     MemoryBuffer(uint l) {
         _length = l;

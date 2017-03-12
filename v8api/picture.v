@@ -8,8 +8,13 @@
 		Point pxForTransparent
 		bool withTransparent
 		bool isGlyph
+	  #if ver < 8.3.10
 		Size szGlyph
 		Point ptGlyph
+	  #else
+		Point ptGlyph
+		Size szGlyph
+	  #endif
 	:dlls
 	  #if ver < 8.3
 		core82.dll

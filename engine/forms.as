@@ -221,7 +221,11 @@ class ScriptRuntimeModule {
         return 0;
     }
     // Вызов метода. В params приходит вектор, содержащий указатели на Value
-    bool call(int meth, Value& retVal, Vector& params, bool) {
+    bool call(int meth, Value& retVal, Vector& params, bool
+	#if ver >= 8.3.9.2016
+		, int
+	#endif
+	) {
         if (pEventObject is null)
             return false;
         uint paramsCount = params.count(4);

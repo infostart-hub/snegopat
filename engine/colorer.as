@@ -1262,7 +1262,7 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 		return swnd.textWidth(text);
 	}
 	// Вызывается после изменения выделения в штатном текстовом редакторе
-	void onSelectionChanged(ITextEditor&&, const TextPosition& tpStart, const TextPosition& tpEnd) override {
+	void onSelectionChanged(ITextEditor&, const TextPosition& tpStart, const TextPosition& tpEnd) override {
 		//Message("onSelectionChanged");
 		if (inReflection)	// идёт смена выделения, инициализированная нами
 			return;
@@ -1282,7 +1282,7 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 		swnd.ensureLineVisible();
 		swnd.scrollToCaret();
 	}
-	void onScrollToCaretPos(ITextEditor&& editor) override {
+	void onScrollToCaretPos(ITextEditor& editor) override {
 		swnd.scrollToCaret();
 	}
 	bool getCaretPosForIS(ITEIntelliSence& teis, Point& caretPos, uint& lineHeight) override {
@@ -1290,7 +1290,7 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 		lineHeight = swnd.textHeight();
 		return true;
 	}
-	void checkSelectionInIdle(ITextEditor&& editor) override {
+	void checkSelectionInIdle(ITextEditor& editor) override {
 		if (inReflection)
 			inReflection = false;
 		TextPosition tpStart, tpEnd, tpCaret;

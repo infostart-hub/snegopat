@@ -82,8 +82,7 @@ class CommandDescription {
 	}
 	string get_text() const { return __cmdDescr.text(); }
 	string get_accel() const { return __cmdDescr.accelText(); }
-	Variant get_picture() const
-	{
+	Variant get_picture() const {
 		IImage&& img;
 		__cmdDescr.image(img);
 		return image2pict(img);

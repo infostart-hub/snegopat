@@ -264,7 +264,7 @@ class TextDoc {
 			ISettingsConsumer&& st = ext.unk;
             IAssistantData&& data;
 			//dumpVtable(&&ext);
-			//dumpVtable(&&st);
+			//dumpVtable(&&st, "_stet");
 			//Print("cons=" + st.self + " offset=" + (st.self + ModuleTxtExtSettingsMap));
             for (uint node = mem::dword[st.self + ModuleTxtExtSettingsMap]; node != 0; node = mem::dword[node]) {
                 GuidRef&& pg = toGuid(node + 4);
@@ -418,13 +418,13 @@ interface TextModifiedReceiver {
 // Интерфейс получателя уведомлений об изменениях в окне редактора, сделанных программно
 interface SelectionChangedReceiver {
 	// Программно изменили границы выделения в редакторе
-	void onSelectionChanged(ITextEditor&& editor, const TextPosition& tpStart, const TextPosition& tpEnd);
+	void onSelectionChanged(ITextEditor& editor, const TextPosition& tpStart, const TextPosition& tpEnd);
 	// Вызван скроллинг окна до позиции каретки
-	void onScrollToCaretPos(ITextEditor&& editor);
+	void onScrollToCaretPos(ITextEditor& editor);
 	// Список штатной подсказки 1С запрашивает оконные координаты, где его показать
 	bool getCaretPosForIS(ITEIntelliSence& teis, Point& caretPos, uint& lineHeight);
 	// Проверить границы выделения в режиме ожидания
-	void checkSelectionInIdle(ITextEditor&& editor);
+	void checkSelectionInIdle(ITextEditor& editor);
 };
 
 // Описание альтернативного редактора
@@ -491,7 +491,7 @@ class EditorsManager {
 		subscribers.insertLast(receiver);
 	}
 	// Отписка от изменений в окне редактора
-	void _unsubsribeFromSelChange(ITextEditor&& editor, SelectionChangedReceiver&& receiver) {
+	void _unsubsribeFromSelChange(ITextEditor&& editor, SelectionChangedReceiver& receiver) {
 		auto fnd = selChangeSubscribers.find(editor.self);
 		if (!fnd.isEnd()) {
 			for (uint i = 0; i < fnd.value.length; i++) {
@@ -508,7 +508,7 @@ class EditorsManager {
 		}
 	}
 	// Подписка на изменения в тексте документа
-	void _subscribeToTextChange(TextManager& tm, TextModifiedReceiver&& receiver) {
+	void _subscribeToTextChange(TextManager& tm, TextModifiedReceiver& receiver) {
 		initTextModifiedTraps();
 		array<TextModifiedReceiver&&>&& subscribers;
 		auto fnd = textChangeSubscribers.find(tm.self);
@@ -520,7 +520,7 @@ class EditorsManager {
 		subscribers.insertLast(receiver);
 	}
 	// Отписка от изменений в тексте документа
-	void _unsubsribeFromTextChange(TextManager& tm, TextModifiedReceiver&& receiver) {
+	void _unsubsribeFromTextChange(TextManager& tm, TextModifiedReceiver& receiver) {
 		auto fnd = textChangeSubscribers.find(tm.self);
 		if (!fnd.isEnd()) {
 			for (uint i = 0; i < fnd.value.length; i++) {

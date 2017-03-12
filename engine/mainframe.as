@@ -21,7 +21,9 @@ class EventTopLevelFrame {
                     &&mainFrame = frame;
                     mainFrame.getCoreTopLevelFrame(coreMainFrame);
                     // Создаем подписчика на уведомления о простое
-                    getIdleService().addIdleHandler(AStoIUnknown(IdleHandler(), IID_IIdleHandler));
+					IIdleHandler&& ih = AStoIUnknown(IdleHandler(), IID_IIdleHandler);
+					ih.AddRef();
+                    getIdleService().addIdleHandler(ih);
                     // Инициализируем пакеты.
                     initPackets(piOnMainWindow);
                 }
@@ -140,22 +142,22 @@ bool sendCommandToMainFrame(const CommandID& cmd, int subCommandIdx = 0) {
 array<PVV&&> idleHandlers;
 array<PVV&&> idleHandlersSingle;
 class IdleHandler {
-    bool first = true;
-    bool onIdle(int count) {
-        if (first) {
-            first = false;
-            initPackets(piOnFirstIdle);
-        }
-        for (uint i = 0, im = idleHandlers.length; i < im; i++)
-            idleHandlers[i]();
-        uint im = idleHandlersSingle.length;
-        for (uint i = 0; i < im; i++) {
-            idleHandlersSingle[0]();
-            idleHandlersSingle.removeAt(0);
-        }
-        return false;
-    }
-    int unknown() {
-        return idleHandlerUnknownFuncAnswer;
-    }
+	bool first = true;
+	bool onIdle(int count) {
+		if (first) {
+			first = false;
+			initPackets(piOnFirstIdle);
+		}
+		for (uint i = 0, im = idleHandlers.length; i < im; i++)
+			idleHandlers[i]();
+		uint im = idleHandlersSingle.length;
+		for (uint i = 0; i < im; i++) {
+			idleHandlersSingle[0]();
+			idleHandlersSingle.removeAt(0);
+		}
+		return false;
+	}
+	int unknown() {
+		return idleHandlerUnknownFuncAnswer;
+	}
 };

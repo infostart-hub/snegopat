@@ -155,8 +155,10 @@
 		35
 	  #elif ver < 8.3.9
 		38
-	  #else
+	  #elif ver < 8.3.10
 		82
+	  #else
+	    83
 	  #endif
 		IMDContainer@+ getMDCont(int i = 0)
 
@@ -192,9 +194,6 @@
 	:virt
 	  #if ver < 8.3.5
 	    8
-	  #else
-	    22
-	  #endif
 		void getTreeItemInfo(const Guid& id, MDTreeItemInfo& info, int k = 0)
 		IMDObject@+ getMDObj()
 		+4
@@ -202,15 +201,31 @@
 		+4
 		bool changeProperty(const Guid& propId, const Value& value)
 	    void editProperty(const Guid& propUuid)
-	  #if ver < 8.3.5
 		+3
-	  #else
-		13
-	  #endif
 		uint extPropEditor(IUnknown@&, const Guid& propUuid)
 		const Guid& extPropEditorCLSID(const Guid& propUuid)
 		uint extProp(IUnknown@&, const Guid& propUuid, bool noCached = false)
 		const Guid& extPropCLSID(const Guid& propUuid)
+	  #else
+		13
+		uint extPropEditor(IUnknown@&, const Guid& propUuid)
+		const Guid& extPropEditorCLSID(const Guid& propUuid)
+		uint extProp(IUnknown@&, const Guid& propUuid, bool noCached = false)
+		const Guid& extPropCLSID(const Guid& propUuid)
+	    22
+		void getTreeItemInfo(const Guid& id, MDTreeItemInfo& info, int k = 0)
+		IMDObject@+ getMDObj()
+		+4
+	    void openEditor()
+	  #if ver < 8.3.10
+		+4
+	  #else
+		+6
+	  #endif
+
+		bool changeProperty(const Guid& propId, const Value& value)
+	    void editProperty(const Guid& propUuid)
+	  #endif
 
 :iface IMDBaseObj {D3624077-1010-45F0-A596-77ADD399D777}
 	:base IMDObject
