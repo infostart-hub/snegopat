@@ -54,6 +54,9 @@
     +1 //uint addControl(const Guid& guid, bool visible, uint uint, uint layouterId)
     +1 //uint addFVControl(const Guid& guid, bool visible, uint uint, uint layouterId)
     +1 //void removeControl(uint uint)
+  #if ver>8.3.9
+    +2
+  #endif
     uint getControlID(IUnknown& control)
     uint getControlID(uint index)
     uint controlsCount()
