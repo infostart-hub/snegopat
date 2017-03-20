@@ -43,6 +43,8 @@
 	//void ctor()|??0TextManager@core@@QAE@XZ
 	//void dtor()|??1TextManager@core@@UAE@XZ
 	void onTextAreaModified(bool, const TextPosition&in, const TextPosition&in, const TextPosition&in, const TextPosition&in)|?onTextAreaModified@TextManager@core@@UAEX_NABVTextPosition@2@111@Z
+	void onSelectionRecalculateFinished(void)|?onSelectionRecalculateFinished@TextManager@core@@UAEXXZ
+	void onSetSelectRangeStop(const TextPosition&,const TextPosition&)|?onSetSelectRangeStop@TextManager@core@@UAEXABVTextPosition@2@0@Z
 	void clearText()|?clearText@TextManager@core@@QAEXXZ
 	bool empty()|?empty@TextManager@core@@QAE_NXZ
 	int getLinesCount()|?getLinesCount@TextManager@core@@QAEHXZ

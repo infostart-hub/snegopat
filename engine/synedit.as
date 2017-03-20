@@ -4,7 +4,8 @@
 #pragma once
 #include "../../all.h"
 
-Packet piSynEdit("synedit", function() { editorsManager._registerEditor(SynEditInfo()); return true; }, piOnMainEnter);
+SynEditInfo seInfo = SynEditInfo();
+Packet piSynEdit("synedit", function() { editorsManager._registerEditor(seInfo); return true; }, piOnMainEnter);
 
 IDispatch&& addinObj;
 
@@ -37,6 +38,7 @@ class SynEditInfo : EditorInfo {
 		Variant retVar;
 		addinObj.call(meth, args, retVar);
 		initTextAreaModifiedTraps();
+		initCaretSelectionTraps();
 		//&&eventManager = a.invokeMacros("_Get_EventManager").getDispatch();
 	}
 	void doSetup() override {
@@ -49,19 +51,37 @@ class SynEditInfo : EditorInfo {
 	TextEditorDocument&& create() override {
 		return SynEditDocument();
 	}
-	Variant activeSynEditEditor() {
+	SynEditEditor&& activeEditor() {
 		SynEditEditor&& e;
-		array<Variant> args(1);
 		if (activeTextWnd !is null) {
 			&&e = cast<SynEditEditor>(activeTextWnd.editor);
 			if (e !is null) {
-				args[0].setDispatch(createDispatchFromAS(&&e));
+				return e;
 			}
+		}
+		return null;
+	}
+	Variant activeSynEditEditor() {
+		SynEditEditor&& e = activeEditor();
+		array<Variant> args(1);
+		if (e !is null) {
+			args[0].setDispatch(createDispatchFromAS(&&e));
 		}
 		Variant res;
 		res.setDispatch(createDispatchFromAS(&&e));
         return res;
 	}
+    bool showSmartBox() {
+        IntelliSite&& isite = getIntelliSite();
+        if (isite.isActive())
+            isite.hide();
+        if (activeTextWnd !is null) {
+            ModuleTextProcessor&& tp = cast<ModuleTextProcessor>(activeTextWnd.textDoc.tp);
+            if (tp !is null)
+                tp.activate(activeTextWnd);
+        }
+        return true;
+    }
 };
 
 // Обертка для передачи строки в массиве Variant
@@ -70,6 +90,14 @@ class strWrapper {
 	string _val;
 	strWrapper(const string& str) {
 		_val = str;
+	}
+}
+
+// Обертка над TextManager
+class textManagerWrapper {
+	uint _id;
+	textManagerWrapper(const TextManager& tm) {
+		_id = tm.self;
 	}
 }
 
@@ -106,7 +134,7 @@ class SynEditDocument : TextEditorDocument, TextModifiedReceiver {
 		args[0].setDispatch(createDispatchFromAS(&&strWrapper(newText)));
 		args[1].setDispatch(createDispatchFromAS(&&ITextPos(tpEnd)));
 		args[2].setDispatch(createDispatchFromAS(&&ITextPos(tpStart)));
-		args[3].setDispatch(createDispatchFromAS(&&ITextPos(tpStart)));//TextManager will be here...
+		args[3].setDispatch(createDispatchFromAS(&&textManagerWrapper(tm)));
 		oneDesigner._events.fireEvent(oneDesigner._me(), "SynEditonTextModified", args);
 	}
 /*	ScintillaEditor&& firstEditor() {
@@ -172,8 +200,11 @@ class SynEditEditor : TextEditorWindow, SelectionChangedReceiver {
 	}
 	void checkSelectionInIdle(ITextEditor& editor) override {
 		//Message("checkSelectionInIdle");
-		SendMessage(txtWnd.hWnd, WM_TEXTWND_CHANGED, 1);
+		//SendMessage(txtWnd.hWnd, WM_TEXTWND_CHANGED, 1);
 		return;
+	}
+	void selectionChanged() {
+		SendMessage(txtWnd.hWnd, WM_TEXTWND_CHANGED, 0);
 	}
 }
 
@@ -216,4 +247,37 @@ void notifyTextAreaModified(TextManager& tm, bool b, Selection&& before, Selecti
 	args[1].setDispatch(createDispatchFromAS(&&before));
 	args[2].setDispatch(createDispatchFromAS(&&before));//TextManager will be here...
 	oneDesigner._events.fireEvent(oneDesigner._me(), "onChangeTextManager", args);
+}
+
+// test
+TrapSwap trCaretSelection;
+
+void initCaretSelectionTraps() {
+	if (trCaretSelection.state == trapNotActive) {
+	#if ver<8.3
+		string dll = "core82.dll";
+	#else
+		string dll = "core83.dll";
+	#endif
+	//onSelectionRecalculateFinished(void)
+		trCaretSelection.setTrapByName(dll, "?onSelectionRecalculateFinished@TextManager@core@@UAEXXZ", asCALL_THISCALL, onSelectionRecalculateFinished_trap);
+	} else if (trCaretSelection.state == trapDisabled) {
+		trCaretSelection.swap();
+	}
+}
+
+void disableCaretSelectionTrap() {
+	if (trCaretSelection.state == trapEnabled) {
+		trCaretSelection.swap();
+	}
+}
+
+void onSelectionRecalculateFinished_trap(TextManager& tm) {
+	trCaretSelection.swap();
+	SynEditEditor&& e = seInfo.activeEditor();
+	if (e !is null) {
+		e.selectionChanged();
+	}
+	tm.onSelectionRecalculateFinished();
+	trCaretSelection.swap();
 }
