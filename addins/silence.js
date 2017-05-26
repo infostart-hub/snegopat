@@ -24,8 +24,11 @@ var appender = new Log4js.BrowserConsoleAppender();
 appender.setLayout(new Log4js.PatternLayout(Log4js.PatternLayout.TTCC_CONVERSION_PATTERN));
 logger.addAppender(appender);
 logger.setLevel(Log4js.Level.ERROR);
+// logger.setLevel(Log4js.Level.DEBUG);
 
 global.connectGlobals(SelfScript);
+
+logger.debug("Проверка скрипта Тишина");
 
 // # Подпишемся на событие при выводе предупреждения/вопроса
 // ## подписки на события показа окон: 
@@ -48,13 +51,13 @@ RE_PROC              = new RegExp('^\\s*((?:procedure)|(?:function)|(?:проц�
 //```
 function onMessageBox(param)
 {
+logger.debug("onMessageBox param.text" + param.text);
 
     // При отработке события перехват с MessageBox'а снимается, и в обработчике
     // можно смело его вызывать, не боясь зацикливания. Например мы сами хотим узнать ответ
     // пользователя и в зависимости от него выполнить какие-то действия
     // param.result = MessageBox(param.text, param.type, param.caption, param.timeout)
     // param.cancel = true
-
     if(param.text == "Внимание!!! Месторасположение информационной базы изменилось.\nПродолжить?")
     {
         param.result = mbaYes
@@ -84,6 +87,7 @@ function onMessageBox(param)
 // фраза "При проверке модуля обнаружены ошибки!" тогда подавляем данно сообщение с выводом в трее неблокируюещего 
 // сообщения о наличии ошибок. 
 function onDoModal(dlgInfo){
+logger.debug("onDoModal dlgInfo.Caption" + dlgInfo.Caption);
 
     if(dlgInfo.stage == openModalWnd)
     {
@@ -102,6 +106,7 @@ function onDoModal(dlgInfo){
                 if (!text){
                     continue;
                 }
+logger.debug("onDoModal ctr.value" + text);
 
                 if (text.indexOf("При проверке модуля обнаружены ошибки!")!=-1){
                     try{
@@ -229,6 +234,7 @@ ProcedurCreateHelper = ScriptForm.extend({
     },
 
     onDoModalAtClient : function(dlgInfo){
+logger.debug("onDoModalAtClient dlgInfo.Caption" + dlgInfo.Caption);
 
          if(dlgInfo.stage == afterInitial) //beforeDoModal afterInitial
         {
@@ -237,6 +243,7 @@ ProcedurCreateHelper = ScriptForm.extend({
                     return;
                 }
                 var crt = dlgInfo.form.getControl(1);
+logger.debug("onDoModalAtClient crt.name" + crt.name);
                 if (crt.name == "OnlyClient"){
 
                     if(!this.form.useAltenate){
@@ -286,11 +293,13 @@ ProcedurCreateHelper = ScriptForm.extend({
         this.beginRow = textWindow.GetCaretPos().beginRow;
 
         var str = textWindow.GetLine(curPos);
+logger.debug("analiseTextAndView str" + str);
         Matches = RE_PROC.exec(str);
         if( Matches != null )
         {
             this.form.Controls.НадписьНазвание.Заголовок = Matches[2];
             this.selectedText = textWindow.GetSelectedText();
+logger.debug("analiseTextAndView this.selectedText" + this.selectedText);
             canCreate = true;
             if (this.isOpen() && this.form.Panel.Pages.CurrentPage == this.form.Panel.Pages.Settings){ //Если открыто окно с настройками, тогда не показываем варианты создания. 
                 canCreate = false;
@@ -487,7 +496,8 @@ DebugModeHelper = stdlib.Class.extend({
 
     settingsRootPath : 'sillenceDebugModeHelper',
     defaultSettings : {
-            use: false
+            // use: false
+            use: true // АРтур
     },
 
     construct : function () {    
@@ -504,6 +514,7 @@ DebugModeHelper = stdlib.Class.extend({
         this.settings.LoadSettings();
         if(!this.settings.current.use)
             this.settings.current.use = false;
+this.settings.current.use = true; // АРтур
 
         if (this.settings.current.use==true){
             stdcommands.CDebug.Start.addHandler(this, "onRestartDebug");
@@ -533,6 +544,7 @@ DebugModeHelper = stdlib.Class.extend({
             } else if (dlg.selectedValue == "off") {
                 this.settings.current.use = false;
             }
+this.settings.current.use = true; // Артур
         }
 
         this.settings.SaveSettings();
@@ -541,6 +553,7 @@ DebugModeHelper = stdlib.Class.extend({
 
      //Перехватим событие о старте отладки . 
      onRestartDebug:function(cmd){
+logger.debug("onRestartDebug ");
         if (!this.settings.current.use) {
             return;
         }
@@ -561,6 +574,7 @@ DebugModeHelper = stdlib.Class.extend({
     // Определим находимся ли в режиме отладки или нет. 
     isDebugEnabled:function()
     {
+logger.debug("isDebugEnabled ");
         // Команда "Перезапустить " неактивна - значит, мы не в режиме отладки.
         var state = stdcommands.CDebug.Restart.getState()
         return state && state.enabled
@@ -569,16 +583,19 @@ DebugModeHelper = stdlib.Class.extend({
 
     onDoModalRestart:function(dlgInfo){
         
+logger.debug("onDoModalRestart dlgInfo.caption " + dlgInfo.caption);
         if(dlgInfo.caption == "Конфигуратор" && dlgInfo.stage == afterInitial)
         {
             try{
                 var text = dlgInfo.form.getControl(0).value;
+logger.debug("onDoModalRestart dlgInfo.form.getControl(0).value " + text);
                 if (text == "Приложение запущено. Перезапустить?") {
                     if (stdlib.isConfigsDifferent()){
                         this.first = true;
                         dlgInfo.form.sendEvent(dlgInfo.form.getControl(2).id, 0);
                     }
-                } else if(text == "Редактируемая конфигурация отличается от конфигурации базы данных.\nОбновить конфигурацию базы данных?" && this.first) {
+                // } else if(text == "Редактируемая конфигурация отличается от конфигурации базы данных.\nОбновить конфигурацию базы данных?" && this.first) {
+                } else if(text.indexOf("отличается от конфигурации базы данных.\nОбновить конфигурацию базы данных?") != -1 && this.first) {
                     this.first = false;
                     dlgInfo.form.sendEvent(dlgInfo.form.getControl(2).id, 0);
                 }

@@ -1,6 +1,6 @@
 var settings =
 {
-  "debug": false, // if true server messages will be written on the log window
+  "debug": true, // if true server messages will be written on the log window
   "ip": '127.0.0.1', // server ip
   "port": '9002', // server listen port
   "reconnectdelay": 1500, // time between each attempt connect to server

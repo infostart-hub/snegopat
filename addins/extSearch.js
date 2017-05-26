@@ -195,7 +195,7 @@ SelfScript.self['macrosГлобальный поиск (с диалогом)'] =
 //// МАКРОСЫ ДЛЯ УПРАВЛЕНИЯ ОКНОМ РЕЗУЛЬТАТОВ ПОИСКА 
 
 SelfScript.self['macrosОткрыть окно поиска'] = function() {
-    debugger
+    // debugger
     GetExtSearch().show();
 }
 
@@ -271,7 +271,7 @@ var SearchAreas = {
 };
 
 //[+] СофтЛаб:Brad  (19.02.2015) 
-function getCurentTask() {
+function getCurrentTask() {
 	
 	var pflCurTask = 'Задачи/ТекущаяЗадача';
 	
@@ -290,15 +290,19 @@ function openSearchDialog(initSearchArea) {
 		initSearchArea = SearchAreas.ActiveWindow;
 	
 	var w = GetTextWindow();    
-    if (!w) return false;
-            
-    var selText = w.GetSelectedText();
-    if (selText == '')
-        selText = w.GetWordUnderCursor();
-		
+    // Артур
+    //if (!w) return false;
+    //
+    // var selText = w.GetSelectedText();
+    var selText = '';
+    if(w) {
+        selText = w.GetSelectedText();
+        if (selText == '')
+            selText = w.GetWordUnderCursor();
+    }
 	//[+] СофтЛаб:Brad  (19.02.2015) 
 	if (selText == '')	
-		selText = getCurentTask();		
+		selText = getCurrentTask();		
 	// СофтЛаб:Brad  (19.02.2015) 
 		
     var sDlg = new ExtSearchDialog(selText, initSearchArea);

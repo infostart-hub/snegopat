@@ -256,12 +256,15 @@ void readGlobals() {
                     if (type !is null) {
                         IValue&& val;
                         type.createValue(val);
-                        IEnumValCreator&& eval = val.unk;
-                        if (eval !is null) {
-                            &&creator = createSysEnumItem;
-                            ts = stockSysEnums;
-                            sysEnums.insert(contextValueInfo.nameEng.str);
-                            sysEnums.insert(contextValueInfo.nameRus.str);
+                        
+                        if (val !is null) {
+                            IEnumValCreator&& eval = val.unk;
+                            if (eval !is null) {
+                                &&creator = createSysEnumItem;
+                                ts = stockSysEnums;
+                                sysEnums.insert(contextValueInfo.nameEng.str);
+                                sysEnums.insert(contextValueInfo.nameRus.str);
+                            }
                         }
                     }
                 }

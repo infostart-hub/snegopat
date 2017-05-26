@@ -1,4 +1,4 @@
-﻿/* com_metadata.as
+/* com_metadata.as
     Работа с метаданными из аддинов.
 */
 // Данные строки нужны только для среды разработки и вырезаются препроцессором
@@ -151,6 +151,9 @@ class IV8MDContainer {
 UintMap<IV8MDContainer&&> contFind;
 array<IV8MDContainer&&> contWrappers;
 IV8MDContainer&& getContainerWrapper(IMDContainer&& container) {
+    //+ mike_a
+    if(container is null)
+        return null;
     uint s = container.self;
     auto find = contFind.find(s);
     if (!find.isEnd())
@@ -175,7 +178,7 @@ class IV8MDClass {
     protected NoCaseMap<Guid> names2childs;
     IV8MDClass(IMDClass&& c) {
         &&mdClass = c;
-		IMDService&& pMDS = mdService;
+        IMDService&& pMDS = mdService;
         for (uint i = 0, m = mdClass.childClassesCount(); i < m; i++) {
             Guid clsId = mdClass.childClassIDAt(i);
             IMDClass&& pClass = pMDS.mdClass(clsId);
@@ -523,6 +526,8 @@ class IV8MDObject {
     }
     ITextWindow&& openModule(Variant propIdx) {
         Guid propUuid;
+                            Value val123;
+                            v8string n123;
         if (mdclass._findPropId(propIdx, propUuid)) {
             IMDEditHelper&& peh;
             getMDEditService().getEditHelper(peh, object);
@@ -532,17 +537,33 @@ class IV8MDObject {
                     Vector v;
                     emh.hasModule(propUuid, v);
                     if (v.end > v.start) {
-                        ITextEditor&& textEditor;
-                        ITextManager&& textMan;
-                        emh.openModule(textMan, propUuid, true, true, textEditor);
-                        if (textEditor !is null) {
-                            TextDoc&& tdoc = textDocStorage.find(textMan);
-                            if (tdoc !is null) {
-                                TextWnd&& wnd = tdoc.findWnd(textEditor);
-                                if (wnd !is null)
-                                    return wnd.getComWrapper();
+                        // Артур в 8.3.10 и 8.3.9 метод IMDEditModuleHelper.openModule не работает, поэтому использую хак выше!
+                        #if ver >= 8.3.9
+                            var2val(propIdx, val123);
+                            val123.getString(n123);
+                            if (n123 == "Форма"){
+                                Value val124("Модуль");
+                                Variant var;
+                                val2var(val124, var);
+                                editProperty(var);
                             }
-                        }
+                            else
+                                editProperty(propIdx);
+                            
+                            return oneDesigner._snegopat.activeTextWindow();
+                        #else
+                            ITextEditor&& textEditor;
+                            ITextManager&& textMan;
+                            emh.openModule(textMan, propUuid, true, true, textEditor);
+                            if (textEditor !is null) {
+                                TextDoc&& tdoc = textDocStorage.find(textMan);
+                                if (tdoc !is null) {
+                                    TextWnd&& wnd = tdoc.findWnd(textEditor);
+                                    if (wnd !is null)
+                                        return wnd.getComWrapper();
+                                }
+                            }
+                        #endif 
                     }
                 }
             }
@@ -711,34 +732,39 @@ bool loadObject(IV8DataFile&& file, IUnknown&& obj) {
 }
 
 class IObjectProperties {
-	int get_count() {
-		return 0;
-	}
-	string propName(int idx) {
-		return "";
-	}
-	Variant getValue(Variant idx) {
-		return Variant();
-	}
-	void setValue(Variant idx, Variant val) {
-	}
-	void activateProperty(Variant idx) {
-	}
+    int get_count() {
+        return 0;
+    }
+    string propName(int idx) {
+        return "";
+    }
+    Variant getValue(Variant idx) {
+        return Variant();
+    }
+    void setValue(Variant idx, Variant val) {
+    }
+    void activateProperty(Variant idx) {
+    }
 };
 
 IMDContainer&& getIBMDCont() {
-    return getDefaultInfoBase().getConfigMgr().getMDCont();
-    /*
+    //return getDefaultInfoBase().getConfigMgr().getMDCont();
+    
     IInfoBaseService&& ibs = currentProcess().getService(IID_IInfoBaseService);
     dumpVtable(&&ibs);
     IInfoBase&& ib = getDefaultInfoBase();
     dumpVtable(&&ib);
     IConfigMngr&& mng = ib.getConfigMgr();
+    
+    //+ mike_a
+    if(mng is null)
+        return null;
+    
     dumpVtable(&&mng);
-	IMDContainer&& mdcont = mng.getMDCont();
+    IMDContainer&& mdcont = mng.getMDCont();
     dumpVtable(&&mdcont);
     return mdcont;
-	*/
+    
 }
 
 IMDContainer&& editedMetaDataCont() {
@@ -804,19 +830,19 @@ void trapOpenConfig(IMDEditService& pService, IConfigMngrUI& mngr, IMDContainer&
 enum MetaDataEvents {
     //[helpstring("Добавление")]
     mdeAdd = 0,
-    //[helpstring("Изменение свойства")]	
+    //[helpstring("Изменение свойства")]    
     mdeChangeProp,
-    //[helpstring("Удаление")]			
+    //[helpstring("Удаление")]          
     mdeDelete,
-    //[helpstring("Изменение объекта")]	
+    //[helpstring("Изменение объекта")] 
     mdeChange,
-    //[helpstring("Перед сохранением")]	
+    //[helpstring("Перед сохранением")] 
     mdeSave,
-    //[helpstring("Закрытие UI")]			
+    //[helpstring("Закрытие UI")]           
     mdeClose,
-    //[helpstring("После сохранения")]	
+    //[helpstring("После сохранения")]  
     mdeAfterSave,
-    //[helpstring("Открытие UI")]			
+    //[helpstring("Открытие UI")]           
     mdeOpen,
 };
 
@@ -918,7 +944,7 @@ Variant image2pict(IUnknown&& img) {
 }
 
 IMDContainer&& getMasterContainer(IMDContainer&& cont) {
-	//dumpVtable(&&cont);
+    //dumpVtable(&&cont);
     for (IMDContainer&& master = cont.masterContainer(); master !is null; &&master = cont.masterContainer())
         &&cont = master;
     return cont;

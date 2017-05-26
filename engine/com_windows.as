@@ -163,28 +163,30 @@ IMDObject&& getMdObjFromView(IFramedView&& view) {
     if (dv !is null) {
         IDocument&& doc;
         dv.document(doc);
-        IConfigMngrUI&& ui = doc.unk;
-        if (ui is null) {
-            IConfigMngrUIOwner&& ow = doc.unk;
-            if (ow !is null)
-                &&ui = ow.getUI();
-        }
-        if (ui !is null)
-            return ui.getMDCont();
-        else {
-            if (doc.getConfigMode()) {
-                IConnectionPointContainer&& pCont = doc.unk;
-                if (pCont !is null) {
-                    IUnknown&& pCP;
-                    if (0 == pCont.FindConnectionPoint(IID_IDocumentSink, pCP) && pCP !is null) {
-                        uint pdata = mem::dword[pCP.self + 4];
-                        uint size = mem::dword[pCP.self + 8];
-                        for (uint i = 0; i < size; i++) {
-                            DocSinkRef&& pSink = toDocSink(mem::dword[pdata + i * 4]);
-                            if (pSink !is null && pSink.ref.refCount < 10) {
-                                IMDEditHelper&& eh = pSink.ref.editHelper;
-                                if (eh !is null)
-                                    return eh.getMDObj();
+        if (doc !is null) {
+            IConfigMngrUI&& ui = doc.unk;
+            if (ui is null) {
+                IConfigMngrUIOwner&& ow = doc.unk;
+                if (ow !is null)
+                    &&ui = ow.getUI();
+            }
+            if (ui !is null)
+                return ui.getMDCont();
+            else {
+                if (doc.getConfigMode()) {
+                    IConnectionPointContainer&& pCont = doc.unk;
+                    if (pCont !is null) {
+                        IUnknown&& pCP;
+                        if (0 == pCont.FindConnectionPoint(IID_IDocumentSink, pCP) && pCP !is null) {
+                            uint pdata = mem::dword[pCP.self + 4];
+                            uint size = mem::dword[pCP.self + 8];
+                            for (uint i = 0; i < size; i++) {
+                                DocSinkRef&& pSink = toDocSink(mem::dword[pdata + i * 4]);
+                                if (pSink !is null && pSink.ref.refCount < 10) {
+                                    IMDEditHelper&& eh = pSink.ref.editHelper;
+                                    if (eh !is null)
+                                        return eh.getMDObj();
+                                }
                             }
                         }
                     }
@@ -521,6 +523,7 @@ class IV8View {
     }
     protected IV8MDObject&& myMdObj;
     IV8MDObject&& get_mdObj() {
+// debugger();//Артур
         IFramedView&& view = _getView();
         if (view is null)
             return null;

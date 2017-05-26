@@ -110,8 +110,14 @@
 		+2
 	  #elif ver <8.3.7.1759
 	    +6
-	  #else
+		// Артур
+	  // #else
+	  //   +7
+	  #elif ver <8.3.10
 	    +7
+	  #else
+	    +8
+		// завершение
 	  #endif
 		IMDObject@+ objById(const Guid& objId)
 		+4
@@ -230,12 +236,20 @@
 :iface IMDBaseObj {D3624077-1010-45F0-A596-77ADD399D777}
 	:base IMDObject
 	:virt
-	  #if ver >= 8.3.6
-	    +4
+		// Артур
+	  #if ver >= 8.3.10
+	    44
+		#else
+		//завершение
+			#if ver >= 8.3.6
+				+4
+			#endif
+			#if ver >= 8.3.7.1759
+				+1
+			#endif
+		// Артур
 	  #endif
-	  #if ver >= 8.3.7.1759
-	    +1
-	  #endif
+		// завершение
 		const v8string& getName()
 		v8string getSynonym(const v8string&in lc)
 		+1
@@ -255,6 +269,9 @@
 		+2
 		const Guid& moduleExpandType(const Guid& propId)
 		+1
+		// //Артур
+		// +1
+		// // +10 Артур завершение
 		uint openModule(ITextManager@&, const Guid& propId, bool s, bool open, ITextEditor@& editor)
 
 :iface IMDTypedObj {752BB41D-05DA-4FD1-A680-78DFB6C6EB1C}

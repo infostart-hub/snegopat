@@ -84,6 +84,10 @@
 :iface IDocumentView {425EE301-9DD3-11D4-84AE-008048DA06DF}
 	:base IFramedView
 	:virt
+	// Артур
+	#if ver>=8.3.10
+		+1
+	#endif
 		uint document(IDocument@&)
 
 :enum TopLevelFrameType

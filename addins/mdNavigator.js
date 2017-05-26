@@ -24,6 +24,12 @@ var appender = new Log4js.BrowserConsoleAppender();
 appender.setLayout(new Log4js.PatternLayout(Log4js.PatternLayout.TTCC_CONVERSION_PATTERN));
 logger.addAppender(appender);
 logger.setLevel(Log4js.Level.ERROR);
+// // Артур
+// var appender2 = new Log4js.FileAppender("w:\\somefile.log"); // file appender logs to C:\\somefile.log
+// appender2.setLayout(new Log4js.PatternLayout(Log4js.PatternLayout.TTCC_CONVERSION_PATTERN));
+// logger.addAppender(appender2);
+// // logger.setLevel(Log4js.Level.DEBUG);
+// завершение
 
 
 // (c) Евгений JohnyDeath Мартыненков

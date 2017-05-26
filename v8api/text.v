@@ -97,9 +97,18 @@
 :iface ITextParserCache {9FCB75A7-B688-4069-9B25-FC9F7F06358D}
 :virt
 	+1
+	//7OH - проблема с невалидным текстом после выравнивания по знаку равно
+	//+1
+	#if ver<8.3.9
 	+1
+	#endif	
+	//7OH end
 	+1
 	void clearCache()
+	//7OH - проблема с невалидным текстом после выравнивания по знаку равно
+	#if ver>=8.3.9
+	+1
+	#endif
 
 :iface ITxtEdtOptions {F7016521-5751-11d5-B0B7-008048DA0765}
 :virt

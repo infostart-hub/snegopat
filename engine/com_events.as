@@ -50,6 +50,7 @@ class IEventConnector {
                     continue;
                 args.insertAt(0, Variant(createDispatchFromAS(&&pHN)));
                 Variant res;
+                //if (pHN.nameOfHandler == "onDoModal") continue; // artbear https://snegopat.ru/forum/viewtopic.php?f=1&t=766&sid=53cb2ca3c71c92165f7f787195f4238a&start=90#p10509
                 pHN.handler.call(id, args, res);
             }
             fireEventEnters--;

@@ -26,6 +26,11 @@ OnPressDeleteInComment предназначены для более удобно
 клавиш.
 
    4. Макрос Удалить строку. Удаляет целиком строку, где находится курсор. Горячие клавиши Ctrl + Y.
+   
+   5. Макросы Переместить строку вниз/Переместить строку вверх. Меняет 
+местами строку, где находится курсор со строкой ниже/выше без 
+использования буфера обмена.
+
 @*/
 
 global.connectGlobals(SelfScript);
@@ -49,10 +54,11 @@ function getPredefinedHotkeys(predef){
     predef.add("Установить кавычки 2", "Shift + '");
     predef.add("Установить скобки", "Shift + 9");
     predef.add("Установить скобки 2", "Shift + 0");
-	//<gigabyte-artur@mail.ru 04.08.2016
+	//<gigabyte-artur@mail.ru 23.03.2017
     predef.add("Удалить строку", "Ctrl + Y");
-	//gigabyte-artur@mail.ru 04.08.2016>
-
+	predef.add("Переместить строку вниз", "Ctrl + Shift + Down");
+	predef.add("Переместить строку вверх", "Ctrl + Shift + Up");
+	//gigabyte-artur@mail.ru 23.03.2017>
 }
 
 function macrosНайтиВыделенныйТекстВниз(){
@@ -118,6 +124,37 @@ SelfScript.Self['macrosУдалить строку'] = function()
 		w.setSelection(pos.beginRow, 1, pos.beginRow+1, 1);			// Нет выделения - удалим строку курсора.
 		w.SetSelectedText('');
 		w.setCaretPos(pos.beginRow, pos.beginCol);
+	}
+}
+
+SelfScript.Self['macrosПереместить строку вниз'] = function() 
+{
+    var w = GetTextWindow();
+    if (!w || w.IsReadOnly() || windows.modalMode != msNone) 
+		return false;
+    var pos = w.getCaretPos();
+	str_this = w.line(pos.beginRow);
+	str_next = w.line(pos.beginRow+1);
+	w.setSelection(pos.beginRow, 1, pos.beginRow, str_this.length+1);			
+	w.SetSelectedText(str_next);
+	w.setSelection(pos.beginRow+1, 1, pos.beginRow+1, str_next.length+1);			
+	w.SetSelectedText(str_this);
+}
+
+SelfScript.Self['macrosПереместить строку вверх'] = function() 
+{
+    var w = GetTextWindow();
+    if (!w || w.IsReadOnly() || windows.modalMode != msNone) 
+		return false;
+    var pos = w.getCaretPos();
+	if (pos.beginRow > 1) 
+	{	
+		str_this = w.line(pos.beginRow);
+		str_last = w.line(pos.beginRow-1);
+		w.setSelection(pos.beginRow, 1, pos.beginRow, str_this.length+1);			
+		w.SetSelectedText(str_last);
+		w.setSelection(pos.beginRow-1, 1, pos.beginRow-1, str_last.length+1);			
+		w.SetSelectedText(str_this);
 	}
 }
 
