@@ -1208,6 +1208,28 @@ class ScintillaDocument : TextEditorDocument, TextModifiedReceiver {
 	}
 };
 
+class WINDOWPOS {
+	HWND    hwnd;
+	HWND    hwndInsertAfter;
+	int     x;
+	int     y;
+	int     cx;
+	int     cy;
+	UINT    flags;
+};
+
+class RECT{
+	LONG    left;
+	LONG    top;
+	LONG    right;
+	LONG    bottom;
+};
+
+class NCCALCSIZE_PARAMS {
+	RECT       rgrc; //RECT       rgrc[3];
+	WINDOWPOS&& lppos;
+};
+
 class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 	ScintillaDocument&& owner;
 	ASWnd&& wnd;
@@ -1228,7 +1250,7 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 	void attach(TextWnd&& tw) override {
 		TextEditorWindow::attach(tw);
 		
-		tw.wnd.setMessages(array<uint> = {WM_SETFOCUS, WM_DESTROY, WM_SIZE, WM_NOTIFY, WM_NCCALCSIZE, WM_CHAR, WM_KEYDOWN, WM_SYSKEYDOWN});
+		tw.wnd.setMessages(array<uint> = {WM_SETFOCUS, WM_DESTROY, WM_SIZE, WM_NOTIFY, WM_NCCALCSIZE, WM_CHAR, WM_KEYDOWN, WM_SYSKEYDOWN, 0x0084, 0x0085});
 		swnd.create(tw.hWnd, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS);
 		Rect rc;
 		GetClientRect(txtWnd.hWnd, rc);
@@ -1258,6 +1280,7 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 	}
 
 	LRESULT wndProc(uint msg, WPARAM w, LPARAM l) override {
+		//return txtWnd.wnd.doDefault();
 		switch (msg) {
 		case WM_SETFOCUS:
 			if (!needFocus) {
@@ -1268,8 +1291,11 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 		case WM_SIZE:
 			onSizeParent();
 			break;
-		case WM_NCCALCSIZE:
-			return 0;	// чтобы убрать 1Сные скроллеры
+		case WM_NCCALCSIZE: 
+			return 0; // чтобы убрать 1Сные скроллеры
+		case 0x0084: //WM_NCHITTEST:
+		case 0x0085: //WM_NCPAINT:
+			return 0;
 		case WM_NOTIFY:
 			return l != 0 ? onNotifyParent(toSCNotification(l).ref) : 0;
 		case WM_CHAR:
@@ -1966,6 +1992,7 @@ class FoldingProcessor {
 	int lexemIdxInLine;
 	int initLine;
 	uint preprocType; //1 - открывающий (#Если, #Область), 2 - закрывающий (#КонецЕсли, #КонецОбласти)
+	int lastProcessedMultiline = -1;
 
 	FoldingProcessor(ScintillaEditor& e, uint& _line) {
 		// Парсить будем со строки, либо содержащей точку свёртки первого уровня, либо начало модуля
@@ -2065,7 +2092,7 @@ class FoldingProcessor {
 				break;
 
 			case ltQuote:
-				if ((swnd.getLineState(line) & LS_MULTILINESTRING) != 0) {
+				if ((line > lastProcessedMultiline) && ((swnd.getLineState(line) & LS_MULTILINESTRING) != 0)) {
 					bool prevLineIsMultiString = ((swnd.getLineState(line - 1) & LS_MULTILINESTRING) != 0);
 					if (!prevLineIsMultiString) {
 						currentLineLevel++;
@@ -2084,12 +2111,15 @@ class FoldingProcessor {
 						currentLineLevel--;
 						//Message("MultiString end, line=" + (line + 1) + " level=" + currentLineLevel);
 					}
+					lastProcessedMultiline = line;
 				}
 				break;
 			}
 		} 
+		
 	}
 	void process(int lexLine, int lexType) {
+		
 		if (lexLine != line)
 			setLevelForProcessedLine();
 		setLevelForEmptyLines(lexLine);
