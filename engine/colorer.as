@@ -1296,12 +1296,13 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 	}
 	// Вызывается после изменения выделения в штатном текстовом редакторе
 	void onSelectionChanged(ITextEditor&, const TextPosition& tpStart, const TextPosition& tpEnd) override {
-		//Message("onSelectionChanged");
+		//Message("onSelectionChanged 1");
 		if (inReflection)	// идёт смена выделения, инициализированная нами
 			return;
+		//Message("onSelectionChanged 2");
 		// Установка этого флага блокирует уведомление штатного редактора об изменении выделения
 		// в сцинтилле, чтобы избежать лишнего цикла
-		inReflection = true;
+		inReflection = true; //Message("inReflection true 1");
 		int posColStart = getPosition(tpStart);
 		// если выделение "пустое", то просто переместим каретку
 		if (tpStart == tpEnd) {
@@ -1324,6 +1325,7 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 		return true;
 	}
 	void checkSelectionInIdle(ITextEditor& editor) override {
+		//Message("checkSelectionInIdle");
 		if (inReflection)
 			inReflection = false;
 		TextPosition tpStart, tpEnd, tpCaret;
@@ -1342,13 +1344,15 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 		int posAnchor = swnd.anchorPos();
 		int posCurrent = swnd.currentPos();
 		if (posStart != posAnchor || posEnd != posCurrent) {
-			inReflection = true;
+			inReflection = true; //Message("inReflection true 2");
 			if (posStart == posEnd) {
 				swnd.goToPos(posStart);
 			} else {
 				// Иначе установим выделение
 				swnd.setSelection(posStart, posEnd);
 			}
+			//Message("ensureLineVisible");
+			swnd.ensureLineVisible();
 			inReflection = false;
 			
 		}
@@ -1690,9 +1694,11 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 
 	}
 	void updateSelectionInParent() {
+		//Message("updateSelectionInParent 1");
 		if (inReflection)
 			return;
-		inReflection = true;
+		//Message("updateSelectionInParent 2");
+		inReflection = true; //Message("inReflection true 3");
 		TextPosition tpStart, tpEnd;
 		int posStart = swnd.anchorPos(), posEnd = swnd.currentPos();
 		calcPosition(posStart, tpStart);
