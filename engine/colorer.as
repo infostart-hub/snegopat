@@ -1208,28 +1208,6 @@ class ScintillaDocument : TextEditorDocument, TextModifiedReceiver {
 	}
 };
 
-class WINDOWPOS {
-	HWND    hwnd;
-	HWND    hwndInsertAfter;
-	int     x;
-	int     y;
-	int     cx;
-	int     cy;
-	UINT    flags;
-};
-
-class RECT{
-	LONG    left;
-	LONG    top;
-	LONG    right;
-	LONG    bottom;
-};
-
-class NCCALCSIZE_PARAMS {
-	RECT       rgrc; //RECT       rgrc[3];
-	WINDOWPOS&& lppos;
-};
-
 class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 	ScintillaDocument&& owner;
 	ASWnd&& wnd;
@@ -1280,7 +1258,6 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 	}
 
 	LRESULT wndProc(uint msg, WPARAM w, LPARAM l) override {
-		//return txtWnd.wnd.doDefault();
 		switch (msg) {
 		case WM_SETFOCUS:
 			if (!needFocus) {
