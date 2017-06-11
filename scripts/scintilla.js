@@ -127,6 +127,13 @@ var SetupFormObject = (function () {
         }
     };
     SetupFormObject.prototype.StylesBgColorПриИзменении = function (Элемент) {
+        if (toV8Value(Элемент.val.Значение).typeName(1) == "Цвет"){
+			var valClr = Элемент.val.Значение;
+			if ((valClr.Зеленый < 0) && (valClr.Красный < 0) && (valClr.Синий < 0)){
+				Предупреждение("Встроенный тип 1С \"Цвет\" не поддерживается. Измените любую из составляющих цвета, чтобы он превратился в тип RGB");
+				return;
+			}
+		}
         if (this.form.ЭлементыФормы.Styles.ТекущаяСтрока.StyleName == "default") {
             var currColor = Элемент.val.Значение;
             if (Вопрос("Установить этот цвет фона для остальных стилей?", РежимДиалогаВопрос.ДаНет, 0) == КодВозвратаДиалога.Нет)
@@ -138,6 +145,15 @@ var SetupFormObject = (function () {
                     break;
             }
         }
+    };
+    SetupFormObject.prototype.StylesFontColorПриИзменении = function (Элемент) {
+        if (toV8Value(Элемент.val.Значение).typeName(1) == "Цвет"){
+			var valClr = Элемент.val.Значение;
+			if ((valClr.Зеленый < 0) && (valClr.Красный < 0) && (valClr.Синий < 0)){
+				Предупреждение("Встроенный тип 1С \"Цвет\" не поддерживается. Измените любую из составляющих цвета, чтобы он превратился в тип RGB");
+				return;
+			}
+		}
     };
     return SetupFormObject;
 })();

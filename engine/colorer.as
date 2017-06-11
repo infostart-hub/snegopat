@@ -959,7 +959,7 @@ class ScintillaSetup {
 		addStyle(SciStyleDefinition(STYLE_INDENTGUIDE, "Линии выравнивания", 0xCCCCCC));
 		addStyle(SciStyleDefinition(stCurrentLine, "Цвет фона текущей линии", 0xF7E8D7));
 		addStyle(SciStyleDefinition(stSelectionHighlight, "Цвет фона подсветки выделенного слова", rgb(0, 0, 255)));
-
+		
 		stylesByName.insert("default", STYLE_DEFAULT);
 		stylesByName.insert("keyword", stKeyword);
 		stylesByName.insert("comment", stRemark);
@@ -1042,7 +1042,10 @@ class ScintillaSetup {
 
 		//если цвет текущей строки равен цвету фона редактора тогда выключаем подсветку текущей строки
 		highlightCurrentLine = (clrCurrentLine != styleByNum(STYLE_DEFAULT).back);
-
+		
+		swnd.setStyleEolFilled(stString, 1);
+		//sciFunc(swnd.editor_ptr, SCI_SETVIEWEOL, 1, 0);
+		
 		swnd.setCaretWidth(caretWidth);
 		_setupMarks(swnd);
 		if (showLineNumbers)
@@ -1063,7 +1066,6 @@ class ScintillaSetup {
 			sciFunc(swnd.editor_ptr, SCI_SETCARETLINEVISIBLE, 1,0);
 			sciFunc(swnd.editor_ptr, SCI_SETCARETLINEBACK, clrCurrentLine,0);
 		}
-		//sciFunc(swnd.editor_ptr, SCI_FOLDALL, 0, 0);
 	}
 	void Preview(bool msg) {
 		if (openedSciEditors.length > 0) {
@@ -1776,15 +1778,29 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 		for (;;) {
 			lp.nextWithKeyword(lex);
 			if (lex.line > linesCount) break; //на пустом модуле лексер глючит и выдает случайный номер строки
+
+			int type = lexType(lex.type);
+			//Message("line " + (lex.line + 1) + ", lexemIdxInLine " + lexemIdxInLine + ", type " + type + ", text " + lex.text + ", start " + lex.start);
 			
 			if (lex.line > prevLine) {
+				if ((style == stString) && ((swnd.getLineState(prevLine) & LS_MULTILINESTRING) != 0)) {
+					//последняя лексема предыдущей строки была "многосточный текст", 
+					//раскрасим символы перевода строки в стиль stString, чтобы сработал механизм SCI_STYLESETEOLFILLED
+					string strPrevLine = getTextLine(txtWnd.textDoc.tm, prevLine+1);//нумерация с 1
+					//string strMsg = strPrevLine.dup(); strMsg = strMsg.replace("\r", "\\r"); strMsg = strMsg.replace("\n", "\\n"); Message("prev line: " + strMsg);
+					if (strPrevLine.find("\r\n") > 0) {
+						swnd.setStyle(2, stString); //в байтах utf-8, \r\n по байту на символ
+						startPos = startPos + 4; //в байтах string, 2 байта на символ
+					} else if (strPrevLine.find("\n") > 0) {
+						swnd.setStyle(1, stString);
+						startPos = startPos + 2;
+					}
+				}
 				lexemIdxInLine = 0;
 				prevLine = lex.line;
 				swnd.setLineState(lex.line, 0);
 			}
 
-			int type = lexType(lex.type);
-			//Message("line " + (lex.line + 1) + ", lexemIdxInLine " + lexemIdxInLine + ", type " + type + ", text " + lex.text);
 			foldingProcessor.preprocType = 0;
 			if (lexemIdxInLine == 0) {
 				switch (type) {
@@ -1850,7 +1866,7 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 
 			len = lex.text.toUtf8().length;
 			if (lex.start > startPos) {
-				swnd.setStyle((lex.start - startPos) / 2, STYLE_DEFAULT);
+				swnd.setStyle((lex.start - startPos) / 2, STYLE_DEFAULT); //пробельные символы в utf-8 по одному байту
 				startPos = lex.start;
 			}
 			
@@ -1878,8 +1894,10 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 					style = stLabel;
 			} else
 				style = stIdentifier;
+
 			swnd.setStyle(len, style);
 			startPos += lex.length * 2;
+
 			wasPoint = type == ltPeriod;
 			lexemIdxInLine++;
 			if (lex.type == 0 || lp.atEnd()) {
@@ -3694,6 +3712,4 @@ enum SciEnums {
 	SCLEX_IHEX = 118,
 	SCLEX_TEHEX = 119,
 	SCLEX_JSON = 120,
-
 };
-
