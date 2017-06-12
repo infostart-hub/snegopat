@@ -1045,6 +1045,7 @@ class ScintillaSetup {
 		
 		swnd.setStyleEolFilled(stString, 1);
 		//sciFunc(swnd.editor_ptr, SCI_SETVIEWEOL, 1, 0);
+		sciFunc(swnd.editor_ptr, SCI_SETEOLMODE, SC_EOL_LF, 0);
 		
 		swnd.setCaretWidth(caretWidth);
 		_setupMarks(swnd);
@@ -1789,9 +1790,11 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 					string strPrevLine = getTextLine(txtWnd.textDoc.tm, prevLine+1);//нумерация с 1
 					//string strMsg = strPrevLine.dup(); strMsg = strMsg.replace("\r", "\\r"); strMsg = strMsg.replace("\n", "\\n"); Message("prev line: " + strMsg);
 					if (strPrevLine.find("\r\n") > 0) {
+						//Message("RN");
 						swnd.setStyle(2, stString); //в байтах utf-8, \r\n по байту на символ
 						startPos = startPos + 4; //в байтах string, 2 байта на символ
 					} else if (strPrevLine.find("\n") > 0) {
+						//Message("N");
 						swnd.setStyle(1, stString);
 						startPos = startPos + 2;
 					}
