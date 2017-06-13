@@ -1,4 +1,4 @@
-/* colorer.as
+﻿/* colorer.as
     Внедрение текстового редактора "Scintilla"
 	http://www.scintilla.org/index.html
 */

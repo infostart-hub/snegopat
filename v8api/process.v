@@ -59,8 +59,7 @@
 
 :iface IGlobalContext {151C4C40-37A4-48EA-990C-14B584EF8A6C}
 :virt
-//Артур	void none()
-    0
+	void none()
 
 :iface IGlobalContextInit {845491E6-70AF-4495-B4E2-D77AC794E797}
 :virt

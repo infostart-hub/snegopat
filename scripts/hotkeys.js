@@ -1,10 +1,12 @@
-﻿//engine: JScript
+﻿"use strict";
+//engine: JScript
 //debug: no
 //uname: hotkeys
 //dname: Работа с хоткеями
 //descr: Скрипт организует работу посистемы хоткеев снегопата
 //help: inplace
 //author: orefkov
+exports.__esModule = true;
 exports.KeyCodes = (function () {
     var _KeyCodes = {
         "Ctrl": hkCtrl, "Shift": hkShift, "Alt": hkAlt, "BkSpace": 0x8, "Tab": 0x9, "Enter": 0x0D, "Esc": 0x1B, "Space": 0x20,
@@ -77,7 +79,7 @@ exports.ProfileExchanger = (function () {
             profileRoot.setValue(profileAddinsWithKey, map);
         };
         return Worker;
-    })();
+    }());
     ;
     return new Worker;
 })();
@@ -124,7 +126,7 @@ var PredefinedHotKeyReceiver = (function () {
         this.version = version;
     };
     return PredefinedHotKeyReceiver;
-})();
+}());
 exports.PredefinedHotKeyReceiver = PredefinedHotKeyReceiver;
 ;
 function registerAddinHotkeys(addin) {
@@ -227,5 +229,5 @@ var SelectHotKey = (function () {
         this.form.Закрыть(result);
     };
     return SelectHotKey;
-})();
+}());
 exports.SelectHotKey = SelectHotKey;

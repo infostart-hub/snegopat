@@ -1,4 +1,5 @@
-﻿//engine: JScript
+﻿"use strict";
+//engine: JScript
 //uname: SnegopatMainScript
 //dname: Снегопат
 //debug: no
@@ -6,6 +7,7 @@
 //descr: Скрипт с основными макросами снегопата
 //author: orefkov
 //help: inplace
+exports.__esModule = true;
 /// <reference path="../snegopat.d.ts"/>
 /// <reference path="../v8.d.ts"/>
 /*@

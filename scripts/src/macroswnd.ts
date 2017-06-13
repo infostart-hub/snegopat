@@ -142,7 +142,7 @@ export var MacrosWnd = (function(){
                     if (this.pattern || macroses.length == 1)
                         parentRows = rows;
                     else {
-                        // Иначе создается узел для аддина, и макросы добавляются в него, без добавления имени аддина
+                        // �?наче создается узел для аддина, и макросы добавляются в него, без добавления имени аддина
                         prefix = "";
                         var row = <MacrosTreeRow><any>rows.Добавить();
                         row.Addin = addin.displayName;
@@ -169,24 +169,6 @@ export var MacrosWnd = (function(){
                             macrosRow.Хоткей = rowInfo.info.hotkey;
                         if (key == this.lastMacros)
                             this.lastMacrosRow = macrosRow;
-                    }
-
-                    function insertSubGroups(parentRows: ValueTreeRowCollection, macrosName: string): { rows: ValueTreeRowCollection, name: string } {
-                        for (; ;) {
-                            var k = macrosName.indexOf("\\");
-                            if (k < 0)
-                                return { rows: parentRows, name: macrosName };
-                            var subGroupName = macrosName.substr(0, k);
-                            var row = <MacrosTreeRow><any>parentRows.Find(subGroupName, "Addin");
-                            if (!row) {
-                                row = <MacrosTreeRow><any>parentRows.Add();
-                                row.Картинка = 0;
-                                row.Addin = subGroupName;
-                                row.rowInfo = new RowInfo(TypeofObjects.Group, {});
-                            }
-                            parentRows = row.Rows;
-                            macrosName = macrosName.substr(k + 1);
-                        }
                     }
                 }
             }
@@ -325,7 +307,7 @@ export var MacrosWnd = (function(){
             return row.Строки.Получить(0)
         for (; ;) {
             var parentRows = row.Parent ? row.Parent.Строки : row.Owner().Строки
-            var rowIdx = parentRows.Индекс(row)
+            var rowIdx = parentRows.�?ндекс(row)
             if (rowIdx < parentRows.Количество() - 1)
                 return parentRows.Получить(rowIdx + 1)
             row = row.Parent
@@ -337,7 +319,7 @@ export var MacrosWnd = (function(){
 
     function findPrevRowInTree(row, tree) {
         var parentRows = row.Parent ? row.Parent.Строки : row.Owner().Строки
-        var rowIdx = parentRows.Индекс(row)
+        var rowIdx = parentRows.�?ндекс(row)
         if (0 == rowIdx)
             return row.Parent
         row = parentRows.Получить(rowIdx - 1)
@@ -353,5 +335,22 @@ export var MacrosWnd = (function(){
         if (!_one)
             _one = new MacrosWnd();
         return _one;
+    }
+    function insertSubGroups(parentRows: ValueTreeRowCollection, macrosName: string): { rows: ValueTreeRowCollection, name: string } {
+        for (; ;) {
+            var k = macrosName.indexOf("\\");
+            if (k < 0)
+                return { rows: parentRows, name: macrosName };
+            var subGroupName = macrosName.substr(0, k);
+            var row = <MacrosTreeRow><any>parentRows.Find(subGroupName, "Addin");
+            if (!row) {
+                row = <MacrosTreeRow><any>parentRows.Add();
+                row.Картинка = 0;
+                row.Addin = subGroupName;
+                row.rowInfo = new RowInfo(TypeofObjects.Group, {});
+            }
+            parentRows = row.Rows;
+            macrosName = macrosName.substr(k + 1);
+        }
     }
 })();

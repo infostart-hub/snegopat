@@ -243,6 +243,8 @@ bool unloadIdleHandlerSet = false;
 
 void extractTags(array<array<string>&&>& tags, string& sources, uint& firstLineIdx) {
     uint startPos = 0;
+	if (sources.length > 13 && sources.substr(0, 14) == "\"use strict\";\n")
+		startPos = 14;
     for (;;) {
         auto match = scriptTagsRex.match(sources, 1, startPos);
         if (match.matches == 0 || match.begin(0, 0) != startPos)

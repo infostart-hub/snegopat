@@ -211,12 +211,12 @@ export class SelectHotKey {
         hk &= 0xFFFF;
         // заполняем список выбора
         for (var k in KeyCodes.code2str) {
-            if (k < 256) {
+            if (<any>k < 256) {
                 var str = KeyCodes.code2str[k];
                 if (str.substr(0, 2) == "v8")
                     continue;
                 this.form.Controls.Key.СписокВыбора.Добавить(str);
-                if (k == hk)
+                if (<any>k == hk)
                     this.form.key = str;
             }
         }

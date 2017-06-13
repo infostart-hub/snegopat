@@ -380,7 +380,7 @@ class AddinsPage implements Page {
         (function copyvt(src, dst) {
             for (var i = 0; i < src.Count(); i++) {
                 var from: LoadRow = src.Get(i);
-                var to: UserListRow = dst.Add();
+                var to: UserListRow = <UserListRow>dst.Add();
                 var ai = rp.findByLoadStr(from.Addin);
                 to.LoadStr = from.Addin;
                 to.Dname = ai ? ai.name() : "";
@@ -408,8 +408,8 @@ class AddinsPage implements Page {
         vt.Rows.Clear();
         (function copyvt(src, dst) {
             for (var i = 0; i < src.Count(); i++) {
-                var from: UserListRow = src.Get(i);
-                var to: LoadRow = dst.Add();
+                var from: UserListRow = <UserListRow>src.Get(i);
+                var to: LoadRow = <LoadRow>dst.Add();
                 to.Addin = from.LoadStr;
                 to.isGroup = from.isGroup;
                 copyvt(from.Rows, to.Rows);
@@ -975,7 +975,7 @@ class UpdatePage implements Page {
             var cmd = this.pathToFossil + command;
             if (visible)
                 cmd += this.pathToFecho;
-            td.AddLine(cmd + ' >> "' + this.pathToOut + '"');
+            td.AddLine(cmd + ` >> "${this.pathToOut}"`);
             td.Write(this.pathToCmd, "cp866");
             this.wsh.Run(this.pathToCmd, visible ? 1 : 0, 1);
             if (ntlmStarted)
@@ -1056,7 +1056,7 @@ class UpdatePage implements Page {
                 var res = JSON.parse(this.runFossilLocal("json timeline checkin --tag trunk --limit 20 --files 1", false, false));
                 this.fillRepoRow(this.localRepoRow, res);
                 var dt = new Date(res.payload.timeline[0].timestamp * 1000)
-                function a2(p:number) { return (p < 10 ? '0' : '') + p;}
+                var a2 = (p:number)=> p < 10 ? '0' : '' + p
                 return '' + dt.getFullYear() + '-' + a2(dt.getMonth() + 1) + '-' + a2(dt.getDate()) + '%20' + a2(dt.getHours()) + ':' + a2(dt.getMinutes()) + ':' + a2(dt.getSeconds());
             } else {
                 this.fillRepoRow(this.localRepoRow, {payload: {timeline:[{timestamp: 0, comment: "История локального репозитария отсутствует"}]}});

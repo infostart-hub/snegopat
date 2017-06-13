@@ -1,4 +1,5 @@
-﻿//engine: JScript
+﻿"use strict";
+//engine: JScript
 //uname: scintilla
 //dname: Настройка редактора Scintilla
 //debug: yes
@@ -7,6 +8,7 @@
 //help: inplace
 //addin: global
 //addin: scintilla_int
+exports.__esModule = true;
 global.connectGlobals(SelfScript);
 var pflScintillaStyles = "Scintilla/Styles/";
 var pflScintillaSettings = "Scintilla/Settings/";
@@ -67,7 +69,6 @@ var SetupFormObject = (function () {
         profileRoot.createValue(pflScintillaSettings + "foldPreproc", false, pflSnegopat);
         profileRoot.createValue(pflScintillaSettings + "foldProc", false, pflSnegopat);
         profileRoot.createValue(pflScintillaSettings + "foldTry", false, pflSnegopat);
-        
         profileRoot.setValue(pflScintillaSettings + "foldComment", this.form.foldComment);
         profileRoot.setValue(pflScintillaSettings + "foldCond", this.form.foldCond);
         profileRoot.setValue(pflScintillaSettings + "foldLoop", this.form.foldLoop);
@@ -75,7 +76,6 @@ var SetupFormObject = (function () {
         profileRoot.setValue(pflScintillaSettings + "foldPreproc", this.form.foldPreproc);
         profileRoot.setValue(pflScintillaSettings + "foldProc", this.form.foldProc);
         profileRoot.setValue(pflScintillaSettings + "foldTry", this.form.foldTry);
-        
         macros_getSettings();
         this.form.Закрыть();
     };
@@ -156,7 +156,7 @@ var SetupFormObject = (function () {
 		}
     };
     return SetupFormObject;
-})();
+}());
 ;
 function macros_setup() {
     SetupFormObject.get().form.Open();

@@ -47,11 +47,7 @@
 
 ////////////////////////////////////////////////////////
 // Сообщить
-     // Артур
-	#if ver >= 8.3.10
-	    52
-        // Артур
-	#elif ver >= 8.3.9
+	#if ver >= 8.3.9
 	    50
 	#elif ver >= 8.3.7
 		49
@@ -161,7 +157,7 @@
     {
         return currentProcess().getService(IID_IBkEndUI);
     }
-   ---
+    ---
     void Message(const string& text, MessageMarker mm=mNone)
     {
         getBkEndUI().doMsgLine(v8string(text), mm);
@@ -170,4 +166,4 @@
     {
         return getBkEndUI().messageBox(text, type, timeout, caption.isEmpty() ? 0 : caption.cstr);
     }
-   ---
+    ---

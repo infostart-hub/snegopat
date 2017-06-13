@@ -1,4 +1,5 @@
-﻿//engine: JScript
+﻿"use strict";
+//engine: JScript
 //uname: help
 //dname: Справка снегопата
 //debug: no
@@ -6,6 +7,7 @@
 //author: orefkov
 //help: inplace
 //addin: global
+exports.__esModule = true;
 /// <reference path="../snegopat.d.ts"/>
 /// <reference path="../v8.d.ts"/>
 global.connectGlobals(SelfScript);
@@ -279,7 +281,7 @@ var HelpSystem = (function () {
         repoRoot.name = old;
     };
     return HelpSystem;
-})();
+}());
 ;
 function createTopics(file, canonicName, title, ai) {
     var vt = v8New("ValueTable");

@@ -1,10 +1,12 @@
-﻿//engine: JScript
+﻿"use strict";
+//engine: JScript
 //debug: no
 //uname: stdcommands
 //dname: Стандартные команды
 //author: orefkov
 //help: inplace
 //descr: Аддин для работы со стандартными командами 1С
+exports.__esModule = true;
 /*@
 Описание различных стандартных команд Конфигуратора.
 Список не полон, и пополняется по мере исследований.
@@ -68,7 +70,7 @@ var Command = (function () {
         events.delCommandHandler(this.groupID, this.num, obj, member);
     };
     return Command;
-})();
+}());
 // Описание групп команд
 exports.Frame = {
     groupID: "{00000000-0000-0000-0000-000000000000}",
@@ -381,7 +383,7 @@ var TestForm = (function () {
         this.form.TraceCommands = develop.cmdTrace;
     };
     return TestForm;
-})();
+}());
 exports.TestForm = TestForm;
 // Создадим макросы для всех команд, для возможности привязки к хоткеям
 (function () {

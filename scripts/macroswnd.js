@@ -1,10 +1,12 @@
-﻿//engine: JScript
+﻿"use strict";
+//engine: JScript
 //uname: macroswnd
 //dname: Показ окна макросов
 //debug: no
 //descr: Отображение окна макросов
 //author: orefkov
 //help: inplace
+exports.__esModule = true;
 /// <reference path="../snegopat.d.ts"/>
 /// <reference path="../v8.d.ts"/>
 var stdlib = require("./std");
@@ -57,7 +59,7 @@ var RowInfo = (function () {
         return this.addin + "::" + this.macros;
     };
     return RowInfo;
-})();
+}());
 ;
 // real singleton
 exports.MacrosWnd = (function () {
@@ -157,23 +159,6 @@ exports.MacrosWnd = (function () {
                             macrosRow.Хоткей = rowInfo.info.hotkey;
                         if (key == this.lastMacros)
                             this.lastMacrosRow = macrosRow;
-                    }
-                    function insertSubGroups(parentRows, macrosName) {
-                        for (;;) {
-                            var k = macrosName.indexOf("\\");
-                            if (k < 0)
-                                return { rows: parentRows, name: macrosName };
-                            var subGroupName = macrosName.substr(0, k);
-                            var row = parentRows.Find(subGroupName, "Addin");
-                            if (!row) {
-                                row = parentRows.Add();
-                                row.Картинка = 0;
-                                row.Addin = subGroupName;
-                                row.rowInfo = new RowInfo(TypeofObjects.Group, {});
-                            }
-                            parentRows = row.Rows;
-                            macrosName = macrosName.substr(k + 1);
-                        }
                     }
                 }
             }
@@ -287,7 +272,7 @@ exports.MacrosWnd = (function () {
             return this.doSelect(TypeofObjects.Group);
         };
         return MacrosWnd;
-    })();
+    }());
     function testPattern(p, s) {
         s = s.toLowerCase();
         for (var k in p)
@@ -328,4 +313,21 @@ exports.MacrosWnd = (function () {
             _one = new MacrosWnd();
         return _one;
     };
+    function insertSubGroups(parentRows, macrosName) {
+        for (;;) {
+            var k = macrosName.indexOf("\\");
+            if (k < 0)
+                return { rows: parentRows, name: macrosName };
+            var subGroupName = macrosName.substr(0, k);
+            var row = parentRows.Find(subGroupName, "Addin");
+            if (!row) {
+                row = parentRows.Add();
+                row.Картинка = 0;
+                row.Addin = subGroupName;
+                row.rowInfo = new RowInfo(TypeofObjects.Group, {});
+            }
+            parentRows = row.Rows;
+            macrosName = macrosName.substr(k + 1);
+        }
+    }
 })();

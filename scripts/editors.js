@@ -1,4 +1,5 @@
-﻿//engine: JScript
+﻿"use strict";
+//engine: JScript
 //uname: alteditors
 //dname: Настройка альтернативных редакторов
 //debug: yes
@@ -6,6 +7,7 @@
 //author: orefkov
 //help: inplace
 //addin: global
+exports.__esModule = true;
 /// <reference path="../snegopat.d.ts"/>
 /// <reference path="../v8.d.ts"/>
 global.connectGlobals(SelfScript);
@@ -80,7 +82,7 @@ var FormObject = (function () {
         this.form.Controls.AltEditors.CurrentData.EditorName = "";
     };
     return FormObject;
-})();
+}());
 function setup() {
     FormObject.getOne().form.Open();
 }

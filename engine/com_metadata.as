@@ -1,4 +1,4 @@
-/* com_metadata.as
+﻿/* com_metadata.as
     Работа с метаданными из аддинов.
 */
 // Данные строки нужны только для среды разработки и вырезаются препроцессором
@@ -732,19 +732,19 @@ bool loadObject(IV8DataFile&& file, IUnknown&& obj) {
 }
 
 class IObjectProperties {
-    int get_count() {
-        return 0;
-    }
-    string propName(int idx) {
-        return "";
-    }
-    Variant getValue(Variant idx) {
-        return Variant();
-    }
-    void setValue(Variant idx, Variant val) {
-    }
-    void activateProperty(Variant idx) {
-    }
+	int get_count() {
+		return 0;
+	}
+	string propName(int idx) {
+		return "";
+	}
+	Variant getValue(Variant idx) {
+		return Variant();
+	}
+	void setValue(Variant idx, Variant val) {
+	}
+	void activateProperty(Variant idx) {
+	}
 };
 
 IMDContainer&& getIBMDCont() {
@@ -760,9 +760,9 @@ IMDContainer&& getIBMDCont() {
     if(mng is null)
         return null;
     
-    dumpVtable(&&mng);
+    //dumpVtable(&&mng);
     IMDContainer&& mdcont = mng.getMDCont();
-    dumpVtable(&&mdcont);
+    //dumpVtable(&&mdcont);
     return mdcont;
     
 }
@@ -830,19 +830,19 @@ void trapOpenConfig(IMDEditService& pService, IConfigMngrUI& mngr, IMDContainer&
 enum MetaDataEvents {
     //[helpstring("Добавление")]
     mdeAdd = 0,
-    //[helpstring("Изменение свойства")]    
+    //[helpstring("Изменение свойства")]	
     mdeChangeProp,
-    //[helpstring("Удаление")]          
+    //[helpstring("Удаление")]			
     mdeDelete,
-    //[helpstring("Изменение объекта")] 
+    //[helpstring("Изменение объекта")]	
     mdeChange,
-    //[helpstring("Перед сохранением")] 
+    //[helpstring("Перед сохранением")]	
     mdeSave,
-    //[helpstring("Закрытие UI")]           
+    //[helpstring("Закрытие UI")]			
     mdeClose,
-    //[helpstring("После сохранения")]  
+    //[helpstring("После сохранения")]	
     mdeAfterSave,
-    //[helpstring("Открытие UI")]           
+    //[helpstring("Открытие UI")]			
     mdeOpen,
 };
 
@@ -944,7 +944,7 @@ Variant image2pict(IUnknown&& img) {
 }
 
 IMDContainer&& getMasterContainer(IMDContainer&& cont) {
-    //dumpVtable(&&cont);
+	//dumpVtable(&&cont);
     for (IMDContainer&& master = cont.masterContainer(); master !is null; &&master = cont.masterContainer())
         &&cont = master;
     return cont;

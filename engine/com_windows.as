@@ -523,7 +523,6 @@ class IV8View {
     }
     protected IV8MDObject&& myMdObj;
     IV8MDObject&& get_mdObj() {
-// debugger();//Артур
         IFramedView&& view = _getView();
         if (view is null)
             return null;

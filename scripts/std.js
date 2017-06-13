@@ -1,4 +1,5 @@
-﻿//engine: JScript
+﻿"use strict";
+//engine: JScript
 //debug: no
 //uname: stdlib
 //dname: Стандартная библиотека
@@ -6,6 +7,7 @@
 //descr: Библиотека для общеупотребительных стандартных функций
 //help: inplace
 //addin: global
+exports.__esModule = true;
 /*@
 В данном скрипте собраны несколько методов, полезных для сторонних разработчиков аддинов, чтобы
 им не приходилось "изобретать велосипед", а также более "бесшовно" встраиваться в существующую
@@ -392,7 +394,7 @@ var TextChangesWatcher = (function () {
         }
     };
     return TextChangesWatcher;
-})();
+}());
 exports.TextChangesWatcher = TextChangesWatcher;
 ;
 /**

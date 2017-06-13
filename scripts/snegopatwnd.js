@@ -1,4 +1,5 @@
-﻿//engine: JScript
+﻿"use strict";
+//engine: JScript
 //uname: snegopatwnd
 //dname: Показ окна Снегопата
 //addin: global
@@ -6,11 +7,17 @@
 //author: orefkov
 //descr: Скрипт для работы с окном снегопата
 //help: inplace
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+exports.__esModule = true;
 /// <reference path="../snegopat.d.ts"/>
 /// <reference path="../v8.d.ts"/>
 /*@
@@ -532,7 +539,7 @@ var AddinsPage = (function () {
         }
     };
     return AddinsPage;
-})();
+}());
 // Базовый класс обработчика параметра настроек снегопата
 var Param = (function () {
     function Param(control) {
@@ -554,7 +561,7 @@ var Param = (function () {
         return false;
     };
     return Param;
-})();
+}());
 ;
 // Данный обработчик параметра раскидывает параметр-битовый набор флагов по отдельным флажкам на форме
 var ParamFlags = (function (_super) {
@@ -562,10 +569,11 @@ var ParamFlags = (function (_super) {
     function ParamFlags() {
         var ctrls = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            ctrls[_i - 0] = arguments[_i];
+            ctrls[_i] = arguments[_i];
         }
-        _super.call(this, '');
-        this.controls = ctrls;
+        var _this = _super.call(this, '') || this;
+        _this.controls = ctrls;
+        return _this;
     }
     ParamFlags.prototype.fromForm = function (form) {
         var v = 0, flag = 1;
@@ -583,12 +591,12 @@ var ParamFlags = (function (_super) {
         }
     };
     return ParamFlags;
-})(Param);
+}(Param));
 ;
 var ParamColor = (function (_super) {
     __extends(ParamColor, _super);
     function ParamColor() {
-        _super.apply(this, arguments);
+        return _super !== null && _super.apply(this, arguments) || this;
     }
     ParamColor.prototype.validate = function (val) {
         if (ValueToStringInternal(val.Type) != '{"#",7c626d2b-6cc1-4f6c-9367-352a9da94a2e,0}') {
@@ -601,7 +609,7 @@ var ParamColor = (function (_super) {
         return ValueToStringInternal(val1) == ValueToStringInternal(val2);
     };
     return ParamColor;
-})(Param);
+}(Param));
 ;
 var SettingsPage = (function () {
     function SettingsPage() {
@@ -725,7 +733,7 @@ var SettingsPage = (function () {
         addins.byUniqueName('alteditors').object().setup();
     };
     return SettingsPage;
-})();
+}());
 var HotkeysPage = (function () {
     function HotkeysPage() {
     }
@@ -811,7 +819,7 @@ var HotkeysPage = (function () {
         return null;
     };
     return HotkeysPage;
-})();
+}());
 var UpdatePage = (function () {
     function UpdatePage() {
         this.wsh = new ActiveXObject("WScript.Shell");
@@ -916,7 +924,7 @@ var UpdatePage = (function () {
     };
     UpdatePage.prototype.startNtlm = function () {
         this.killNtlm();
-        this.wsh.Run(("\"" + env.pathes.tools + "cntlm\\cntlm.exe\" -c \"" + this.ntlmIni + "\" -s -a " + this.form.ntlmAuth + " -l " + this.form.ntlmPort + " ") +
+        this.wsh.Run("\"" + env.pathes.tools + "cntlm\\cntlm.exe\" -c \"" + this.ntlmIni + "\" -s -a " + this.form.ntlmAuth + " -l " + this.form.ntlmPort + " " +
             (this.form.proxyPass.length ? "-p \"" + this.form.proxyPass + "\"" : '') + (" -u \"" + this.form.proxyUser + "\" " + this.form.proxyAddress), 0, 1);
     };
     UpdatePage.prototype.killNtlm = function () {
@@ -950,7 +958,7 @@ var UpdatePage = (function () {
             var cmd = this.pathToFossil + command;
             if (visible)
                 cmd += this.pathToFecho;
-            td.AddLine(cmd + ' >> "' + this.pathToOut + '"');
+            td.AddLine(cmd + (" >> \"" + this.pathToOut + "\""));
             td.Write(this.pathToCmd, "cp866");
             this.wsh.Run(this.pathToCmd, visible ? 1 : 0, 1);
             if (ntlmStarted)
@@ -1037,7 +1045,7 @@ var UpdatePage = (function () {
                 var res = JSON.parse(this.runFossilLocal("json timeline checkin --tag trunk --limit 20 --files 1", false, false));
                 this.fillRepoRow(this.localRepoRow, res);
                 var dt = new Date(res.payload.timeline[0].timestamp * 1000);
-                function a2(p) { return (p < 10 ? '0' : '') + p; }
+                var a2 = function (p) { return p < 10 ? '0' : '' + p; };
                 return '' + dt.getFullYear() + '-' + a2(dt.getMonth() + 1) + '-' + a2(dt.getDate()) + '%20' + a2(dt.getHours()) + ':' + a2(dt.getMinutes()) + ':' + a2(dt.getSeconds());
             }
             else {
@@ -1132,7 +1140,7 @@ var UpdatePage = (function () {
         td.AddLine("set CYGWIN=nodosfilewarning");
         td.AddLine("echo \u041F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C: " + this.form.proxyUser);
         td.AddLine("<nul set /p strt=Введите пароль: ");
-        td.AddLine(("\"" + env.pathes.tools + "cntlm\\cntlm.exe\" -c \"" + this.ntlmIni + "\" -I -M " + this.form.remoteRepoURL + " -u \"" + this.form.proxyUser + "\" " + this.form.proxyAddress) +
+        td.AddLine("\"" + env.pathes.tools + "cntlm\\cntlm.exe\" -c \"" + this.ntlmIni + "\" -I -M " + this.form.remoteRepoURL + " -u \"" + this.form.proxyUser + "\" " + this.form.proxyAddress +
             (" " + this.pathToFecho + " >> \"" + this.pathToOut + "\""));
         //td.AddLine("pause");
         td.Write(this.pathToCmd, "cp866");
@@ -1237,7 +1245,7 @@ var UpdatePage = (function () {
         }
     };
     return UpdatePage;
-})();
+}());
 var HelpPage = (function () {
     function HelpPage() {
     }
@@ -1342,7 +1350,7 @@ var HelpPage = (function () {
         catch (e) { }
     };
     return HelpPage;
-})();
+}());
 ;
 var AboutPage = (function () {
     function AboutPage() {
@@ -1366,7 +1374,7 @@ var AboutPage = (function () {
         RunApp("https://snegopat.ru");
     };
     return AboutPage;
-})();
+}());
 // Функция вызывается основным загрузчиком после загрузки стартовых аддинов
 function restoreWindowState() {
     // Восстановим состояние окна

@@ -1,4 +1,5 @@
-﻿//engine: JScript
+﻿"use strict";
+//engine: JScript
 //uname: repo
 //dname: Репозитарий аддинов
 //debug: no
@@ -6,6 +7,7 @@
 //author: orefkov
 //help: inplace
 //addin: global
+exports.__esModule = true;
 /*@
 Скрипт организует работу с репозитариями аддинов снегопата. Снегопат поддерживает работу
 с двумя репозитариями аддинов - официальный репозитарий, в котором размещаются официальные
@@ -182,7 +184,7 @@ var RepoSystem = (function () {
         return res;
     };
     return RepoSystem;
-})();
+}());
 ;
 var Reposytory = (function () {
     function Reposytory() {
@@ -215,7 +217,7 @@ var Reposytory = (function () {
         return this.addinsByLoadStr[ls.toLowerCase()];
     };
     return Reposytory;
-})();
+}());
 ;
 var repo;
 function getRepo() {

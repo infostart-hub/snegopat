@@ -19,13 +19,12 @@ type StyleTableRow = {Name: string, Underline: number, StyleName:string, StyleDe
 type StyleTable = {Get(idx:number): StyleTableRow, Add(): StyleTableRow, Получить(idx:number): StyleTableRow} & ValueTable;
 type StylesTableBox = {ТекущаяСтрока: StyleTableRow} & TableBox;
 type SetupFormControls = {НадписьМеню: string, Styles: StylesTableBox} & Controls;
-type SetupForm = {Styles: StyleTable, ЭлементыФормы: SetupFormControls} & Form;
+type SetupForm = {Styles: StyleTable, ЭлементыФормы: SetupFormControls, foldComment:any, foldCond:any, foldLoop:any, foldMultiString:any, foldPreproc:any, foldProc:any, foldTry:any} & Form;
 
 global.connectGlobals(SelfScript)
 
-var pflScintillaStyles = "Scintilla/Styles";
-var pflScintillaSettings = "Scintilla/Settings";
-
+var pflScintillaStyles = "Scintilla/Styles/";
+var pflScintillaSettings = "Scintilla/Settings/";
 
 class SetupFormObject {
     private static one: SetupFormObject;
@@ -50,16 +49,13 @@ class SetupFormObject {
 		  row.StyleDescr = styleNames[styleName];
 		  this.fillStylesRow(row);
 		}
-
-		/* var settings = profileRoot.getValue(pflScintillaSettings);
-		if (settings){
-			for(var values=new Enumerator(settings); !values.atEnd(); values.moveNext()) {
-				try{
-					var structItem = values.item();
-					this.form[structItem.key] = structItem.value;
-				}catch(e){}
-			}
-		} */
+		this.form.foldComment = profileRoot.getValue(pflScintillaSettings + "foldComment");
+		this.form.foldCond = profileRoot.getValue(pflScintillaSettings + "foldCond");
+		this.form.foldLoop = profileRoot.getValue(pflScintillaSettings + "foldLoop");
+		this.form.foldMultiString = profileRoot.getValue(pflScintillaSettings + "foldMultiString");
+		this.form.foldPreproc = profileRoot.getValue(pflScintillaSettings + "foldPreproc");
+		this.form.foldProc = profileRoot.getValue(pflScintillaSettings + "foldProc");
+		this.form.foldTry = profileRoot.getValue(pflScintillaSettings + "foldTry");
 	}
 
 	fillStylesRow(row){
@@ -86,22 +82,24 @@ class SetupFormObject {
 		for(var i=0;i<this.form.Styles.Количество();i++){
 			var row = this.form.Styles.Получить(i);
 			var style = v8New("Структура","Font,FontColor,BgColor",row.Font,row.FontColor,row.BgColor);
-			profileRoot.createValue(pflScintillaStyles + "/" + row.StyleName, style, pflSnegopat);
-			profileRoot.setValue(pflScintillaStyles + "/" + row.StyleName, style);
-		}
+            profileRoot.createValue(pflScintillaStyles + row.StyleName, style, pflSnegopat);
+            profileRoot.setValue(pflScintillaStyles + row.StyleName, style);
+        }
+        profileRoot.createValue(pflScintillaSettings + "foldComment", false, pflSnegopat);
+        profileRoot.createValue(pflScintillaSettings + "foldCond", false, pflSnegopat);
+        profileRoot.createValue(pflScintillaSettings + "foldLoop", false, pflSnegopat);
+        profileRoot.createValue(pflScintillaSettings + "foldMultiString", false, pflSnegopat);
+        profileRoot.createValue(pflScintillaSettings + "foldPreproc", false, pflSnegopat);
+        profileRoot.createValue(pflScintillaSettings + "foldProc", false, pflSnegopat);
+        profileRoot.createValue(pflScintillaSettings + "foldTry", false, pflSnegopat);
 
-		/* var settings = v8New("Структура");
-		for(var i=0;i<this.form.ЭлементыФормы.Количество();i++){
-			var elem = this.form.ЭлементыФормы.Получить(i);
-			if (elem.Name.indexOf("sett") == 0){
-				try{
-					var val = this.form[elem.Name];
-					settings.Insert(elem.Name,val);
-				}catch(e){}
-			}
-		}
-		profileRoot.createValue(pflScintillaSettings, settings, pflSnegopat);
-		profileRoot.setValue(pflScintillaSettings, settings); */
+        profileRoot.setValue(pflScintillaSettings + "foldComment", this.form.foldComment);
+        profileRoot.setValue(pflScintillaSettings + "foldCond", this.form.foldCond);
+        profileRoot.setValue(pflScintillaSettings + "foldLoop", this.form.foldLoop);
+        profileRoot.setValue(pflScintillaSettings + "foldMultiString", this.form.foldMultiString);
+        profileRoot.setValue(pflScintillaSettings + "foldPreproc", this.form.foldPreproc);
+        profileRoot.setValue(pflScintillaSettings + "foldProc", this.form.foldProc);
+        profileRoot.setValue(pflScintillaSettings + "foldTry", this.form.foldTry);
 		macros_getSettings();
 		this.form.Закрыть();
     };
@@ -110,7 +108,7 @@ class SetupFormObject {
 		var list = v8New("СписокЗначений");
 		list.Добавить(0,"Стандартная цветовая схема");
 		list.Добавить(1,"Схема №1");
-		var sel = this.form.ВыбратьИзМеню(list, this.form.ЭлементыФормы.НадписьМеню);
+		var sel = this.form.Выбрать�?зМеню(list, this.form.ЭлементыФормы.НадписьМеню);
 		if (sel) {
 			var colorSheme = getColorSheme(sel.Значение);
 			this.form.Styles.Очистить();
@@ -143,7 +141,7 @@ class SetupFormObject {
 		}
 	}
 
-	StylesFontПриИзменении(Элемент){
+	StylesFontПри�?зменении(Элемент){
 		if (this.form.ЭлементыФормы.Styles.ТекущаяСтрока.StyleName == "default"){
 			var currFont = Элемент.val.Значение;
 			if (Вопрос("Установить этот шрифт для остальных стилей?", РежимДиалогаВопрос.ДаНет, 0) == КодВозвратаДиалога.Нет)
@@ -156,7 +154,7 @@ class SetupFormObject {
 		}
 	}
 
-	StylesBgColorПриИзменении(Элемент) {
+	StylesBgColorПри�?зменении(Элемент) {
 		if (this.form.ЭлементыФормы.Styles.ТекущаяСтрока.StyleName == "default"){
 			var currColor = Элемент.val.Значение;
 			if (Вопрос("Установить этот цвет фона для остальных стилей?", РежимДиалогаВопрос.ДаНет, 0) == КодВозвратаДиалога.Нет)
@@ -176,7 +174,7 @@ function macros_setup() {
 }
 
 function loadStyleFromProfile(styleName){
-	return profileRoot.getValue(pflScintillaStyles + "/" + styleName);
+    return profileRoot.getValue(pflScintillaStyles + styleName);
 };
 
 function macros_getSettings() {
@@ -188,17 +186,13 @@ function macros_getSettings() {
 		scintilla_int.setStyle(styleName, style.Font.Name, style.Font.Size, style.Font.Bold, style.Font.Italic, style.Font.Underline,
 							   Color1CToColor(style.FontColor), Color1CToColor(style.BgColor));
 	}
-
-	/* var settings = profileRoot.getValue(pflScintillaSettings);
-	if (settings){ //структура
-		for(var values=new Enumerator(settings); !values.atEnd(); values.moveNext()) {
-			var structItem = values.item();
-			var val = structItem.value;
-			var typeName = toV8Value(val).typeName(1);
-			if (typeName == "Цвет") val = Color1CToColor(val);
-			scintilla_int[structItem.key] = val;
-		}
-	} */
+    scintilla_int.foldComment = profileRoot.getValue(pflScintillaSettings + "foldComment");
+    scintilla_int.foldCond = profileRoot.getValue(pflScintillaSettings + "foldCond");
+    scintilla_int.foldLoop = profileRoot.getValue(pflScintillaSettings + "foldLoop");
+    scintilla_int.foldMultiString = profileRoot.getValue(pflScintillaSettings + "foldMultiString");
+    scintilla_int.foldPreproc = profileRoot.getValue(pflScintillaSettings + "foldPreproc");
+    scintilla_int.foldProc = profileRoot.getValue(pflScintillaSettings + "foldProc");
+    scintilla_int.foldTry = profileRoot.getValue(pflScintillaSettings + "foldTry");
 }
 
 function getColorSheme(num){
@@ -271,7 +265,7 @@ var styleNames = {
 	"number" : "Число",
 	"string" : "Строка",
 	"date" : "Дата",
-	"identifier" : "Идентификатор",
+	"identifier" : "�?дентификатор",
 	"operator" : "Оператор",
 	"preprocessor" : "Препроцессор",
 	"label" : "Метка",

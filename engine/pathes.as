@@ -67,7 +67,7 @@ class Pathes {
 			//Print("exp=" + exp);
 			if (exp[0] != '%') {
 				path = exp;
-				Print("from env " + name + " set to " + path);
+				//Print("from env " + name + " set to " + path);
 			}
 		}
 		if (path.isEmpty()) {

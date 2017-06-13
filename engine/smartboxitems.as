@@ -97,14 +97,12 @@ enum imagesIdx {
     imgCtxVar,
 };
 
-class SmartBoxItem : SmartBoxItemBaseIface
-{
+class SmartBoxItem : SmartBoxItemBaseIface {
     SmartBoxItemData d;
     SmartBoxItemData& data() {
         return d;
     }
-    void textForTooltip(string& text)  // Получить тултип элемента
-    {
+    void textForTooltip(string& text) {  // Получить тултип элемента
         text = d.descr;
     }
     SmartBoxItem(const string& descr, imagesIdx img) {
