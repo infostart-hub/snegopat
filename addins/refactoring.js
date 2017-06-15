@@ -17,7 +17,7 @@ stdlib.require('TextWindow.js', SelfScript);
 stdlib.require('SettingsManagement.js', SelfScript);
 
 stdlib.require('SyntaxAnalysis.js', SelfScript);
-//Для отладки: stdlib.require(profileRoot.getValue("Snegopat/MainFolder") + 'user\\Libs\\SyntaxAnalysis.js', SelfScript); 
+//Для отладки: stdlib.require(profileRoot.getValue("Snegopat/MainFolder") + 'user\\Libs\\SyntaxAnalysis.js', SelfScript);
 
 global.connectGlobals(SelfScript);
 
@@ -30,12 +30,12 @@ SelfScript.self['macrosВыделить метод (extract method)'] = function
 }
 
 SelfScript.self['macrosВыделить переменную (extract variable)'] = function () {
-	
+
     refactor(ExtractVariableRefactoring);
 }
 
 SelfScript.self['macrosПереименовать переменную (rename variable)'] = function () {
-	
+
     refactor(RenameVariableRefactoring);
 }
 
@@ -60,17 +60,17 @@ SelfScript.self['macrosИз процедуры в функцию и обратн
 ////} Макросы
 
 function refactor(refactorerClass, withoutSelection) {
-    
+
     var tw = GetTextWindow();
     if (!tw) return;
-    
+
     var selText = tw.GetSelectedText();
-    if (!selText && !withoutSelection) 
+    if (!selText && !withoutSelection)
     {
         Message("Не выделен текст, к которому применяется рефакторинг!");
         return;
     }
-    
+
     var module = SyntaxAnalysis.AnalyseTextDocument(tw);
     var refactorer = new refactorerClass(module);
     refactorer.refactor(selText);
@@ -111,21 +111,21 @@ function MethodListForm(module) {
 
     this.form = loadScriptForm(SelfScript.fullPath.replace(/\.js$/, '.methodList.ssf'), this);
     this.SelectedMethod = undefined;
-    
+
     this.settings = SettingsManagement.CreateManager(SelfScript.uniqueName + "/MethodListForm", {
         'DoNotFilter': false, 'SortByName' : false
     });
-    
+
     this.settings.LoadSettings();
-        
+
     var methListForm = this;
     this.tcWatcher = new TextChangesWatcher(this.form.Controls.SearchText, 3, function(t){methListForm.fillMethodList(t)});
-    
+
     this.icons = {
         'Proc': this.form.Controls.picProc.Picture,
         'Func': this.form.Controls.picFunc.Picture
     }
-    
+
     this.fillMethodList();
 }
 
@@ -169,7 +169,7 @@ MethodListForm.prototype.OnOpen = function () {
 
     this.form.Controls.CmdBar.Buttons.SortByName.Check = this.form.SortByName;
     this.form.Controls.CmdBar.Buttons.DoNotFilter.Check = this.form.DoNotFilter;
-    
+
     this.loadedOnOpen = true;
     this.tcWatcher.start();
 }
@@ -186,20 +186,20 @@ MethodListForm.prototype.fillMethodList = function (newText) {
         if (this.loadedOnOpen)
             this.loadedOnOpen = false;
         else
-            this.form.Controls.MethodList.Value = this.originalMethodList.Copy();            
+            this.form.Controls.MethodList.Value = this.originalMethodList.Copy();
     }
-    else 
+    else
     {
         var a = newText.split(/\s+/);
         for (var i=0; i<a.length; i++)
             a[i] = StringUtils.addSlashes(a[i]);
-            
-        var re = new RegExp(a.join(".*?"), 'i');    
-        
+
+        var re = new RegExp(a.join(".*?"), 'i');
+
         if (this.form.DoNotFilter)
         {
             var currentRow = undefined;
-            
+
             var methList = this.originalMethodList.Copy();
             for (var rowNo = 0; rowNo < methList.Count(); rowNo++)
             {
@@ -210,7 +210,7 @@ MethodListForm.prototype.fillMethodList = function (newText) {
                     break;
                 }
             }
-            
+
             this.form.Controls.MethodList.Value = methList;
             if (currentRow)
                 this.form.Controls.MethodList.CurrentRow = currentRow;
@@ -218,7 +218,7 @@ MethodListForm.prototype.fillMethodList = function (newText) {
         else
         {
             var methList = this.form.Controls.MethodList.Value;
-            methList.Clear();    
+            methList.Clear();
             for (var rowNo = 0; rowNo < this.originalMethodList.Count(); rowNo++)
             {
                 var row = this.originalMethodList.Get(rowNo);
@@ -227,7 +227,7 @@ MethodListForm.prototype.fillMethodList = function (newText) {
             }
         }
     }
-    
+
     this.sortMethodList(this.form.SortByName);
 }
 
@@ -253,41 +253,41 @@ function CreateMethodStubRefactoring(module) {
 }
 
 CreateMethodStubRefactoring.prototype.refactor = function (selectedText) {
-    
+
     var methodName, methodSignature, matches;
-    
+
     methodName = this.textWindow.GetWordUnderCursor();
     if (!methodName)
         return;
-    
+
     var method_call_proc = new RegExp("(?:;\\s*|^\\s*)" + methodName + '(\\(.*?\\))');
     var method_call_func = new RegExp(methodName + "(\\(.*?\\))");
-    
+
     var line = this.textWindow.GetLine(this.textWindow.GetCaretPos().beginRow);
-    
+
     var matches = line.match(method_call_proc);
     var isProc = (matches != null);
-    
+
     if (!isProc)
     {
         matches = line.match(method_call_func);
         if (!matches)
             return;
     }
-    
+
     methodSignature = methodName + matches[1];
-    
-    var procTemplate = "\n"  
+
+    var procTemplate = "\n"
     + "Процедура ИмяМетода()\n"
-    + "\t//TODO: Добавьте исходный код процедуры.\n" 
+    + "\t//TODO: Добавьте исходный код процедуры.\n"
     + "КонецПроцедуры\n";
 
-    var funcTemplate = "\n" 
+    var funcTemplate = "\n"
     + "Функция ИмяМетода()\n"
-    + "\t//TODO: Добавьте исходный код функции.\n" 
+    + "\t//TODO: Добавьте исходный код функции.\n"
     + "\tВозврат Неопределено;\n"
     + "КонецФункции\n";
-    
+
     var stubCode = isProc ? procTemplate : funcTemplate;
     stubCode = stubCode.replace('ИмяМетода()', methodSignature);
     var curMethod = this.module.getActiveLineMethod();
@@ -303,7 +303,7 @@ CreateMethodStubRefactoring.prototype.refactor = function (selectedText) {
 ////
 function RenameVariableRefactoring(module) {
     this.module = module;
-    this.form = loadScriptForm(SelfScript.fullPath.replace(/\.js$/, '.extractVariable.ssf'), this);    
+    this.form = loadScriptForm(SelfScript.fullPath.replace(/\.js$/, '.extractVariable.ssf'), this);
     this.ReturnValue = this.form.Name;
 }
 
@@ -322,8 +322,8 @@ RenameVariableRefactoring.prototype.BtVarOKClick = function (Control) {
     {
         DoMessageBox("Имя метода должно быть правильным идентификатором!");
         return;
-    }    
-    
+    }
+
     this.form.Close(true);
 }
 
@@ -337,7 +337,7 @@ RenameVariableRefactoring.prototype.NameОкончаниеВводаТекста
     {
         DoMessageBox("Имя метода должно быть правильным идентификатором!");
         return;
-    }    
+    }
     Элемент.val.Значение = Текст.val;
     this.form.Close(true);
 }
@@ -354,7 +354,7 @@ function getRegExpVar(curVar)
 		curVar.replace(/\^/g, "\^");
 		curVar.replace(/\[/g, "\[");
 		curVar.replace(/\]/g, "\]");
-		
+
 	try{return new RegExp("[\\,(\\[\\s=\\+\\-\\/\\*]" + curVar + "(?![\\wА-Яа-я\"])", 'ig')}
 	catch(e){return new RegExp("NEVERFIND", '')}
 }
@@ -363,8 +363,8 @@ RenameVariableRefactoring.prototype.renameVariable = function(source) {
 
     var tw = this.module.textWindow;
     var sel = tw.GetSelection();
-		
-	
+
+
 	moduleVars = this.module.context.ModuleVars;
 	isModuleVar = false;
 	for(i=0;i<moduleVars.length;i++)
@@ -382,26 +382,26 @@ RenameVariableRefactoring.prototype.renameVariable = function(source) {
 	else
 	{
 		Method = this.module.getActiveLineMethod();
-		Lines = tw.GetLines(Method.StartLine, Method.EndLine);	
+		Lines = tw.GetLines(Method.StartLine, Method.EndLine);
 		StartLine = Method.StartLine - 1;
 	}
-	
+
 	var re = getRegExpVar(source)
 	for(i=0;i<Lines.length;i++)
 	{
 		line = Lines[i];
 
 			if(!line || line.match(/(^\s*[\|"\|])|(^\s*\/\/)/))
-				continue						
+				continue
 			while((Matches = re.exec(line)) != null)
 				{
 				line = line.substr(0,Matches.index + 1) + this.form.Name + line.substring(Matches.lastIndex);
 				tw.ReplaceLine(StartLine+i+1, line);
 				}
-		
+
 	}
 	//Заменим текст на переменную
-    tw.SetSelection(sel.beginRow, sel.beginCol, sel.endRow, sel.beginCol + this.form.Name.length);	
+    tw.SetSelection(sel.beginRow, sel.beginCol, sel.endRow, sel.beginCol + this.form.Name.length);
 }
 
 
@@ -410,7 +410,7 @@ RenameVariableRefactoring.prototype.renameVariable = function(source) {
 ////
 function ExtractVariableRefactoring(module) {
     this.module = module;
-    this.form = loadScriptForm(SelfScript.fullPath.replace(/\.js$/, '.extractVariable.ssf'), this);    
+    this.form = loadScriptForm(SelfScript.fullPath.replace(/\.js$/, '.extractVariable.ssf'), this);
     this.ReturnValue = this.form.Name;
 }
 
@@ -428,8 +428,8 @@ ExtractVariableRefactoring.prototype.BtVarOKClick = function (Control) {
     {
         DoMessageBox("Имя метода должно быть правильным идентификатором!");
         return;
-    }    
-    
+    }
+
     this.form.Close(true);
 }
 
@@ -443,7 +443,7 @@ ExtractVariableRefactoring.prototype.NameОкончаниеВводаТекст�
     {
         DoMessageBox("Имя метода должно быть правильным идентификатором!");
         return;
-    }    
+    }
     Элемент.val.Значение = Текст.val;
     this.form.Close(true);
 }
@@ -452,11 +452,11 @@ ExtractVariableRefactoring.prototype.extractVariable = function(source) {
 
     var tw = this.module.textWindow;
     var sel = tw.GetSelection();
-	
+
 	//Заменим текст на переменную
     tw.SetSelection(sel.beginRow, sel.beginCol, sel.endRow, sel.endCol);
-    tw.SetSelectedText(this.form.Name); 
-	
+    tw.SetSelectedText(this.form.Name);
+
 	//Добавим определение переменной строкой выше
 	var srcIndent = StringUtils.getIndent(tw.GetLine(sel.beginRow));
 	tw.InsertLine(sel.beginRow, srcIndent + this.form.Name + " = " + source + ";");
@@ -468,14 +468,14 @@ ExtractVariableRefactoring.prototype.extractVariable = function(source) {
 
 function ExtractMethodRefactoring(module) {
     this.module = module;
-    this.form = loadScriptForm(SelfScript.fullPath.replace(/\.js$/, '.extractMethod.ssf'), this);    
+    this.form = loadScriptForm(SelfScript.fullPath.replace(/\.js$/, '.extractMethod.ssf'), this);
     this.Params = this.form.Params;
     this.ReturnValue = this.form.ReturnValue;
     this.SignaturePreview = this.form.SignaturePreview;
 }
 
 ExtractMethodRefactoring.prototype.getVarRe = function (varName) {
-    return new RegExp("([^\\w\\dА-я\.]|^)" + varName + "([^\\w\\dА-я]|$)", 'i');
+    return new RegExp("([^\\w\\dА-я\.]|^)" + varName.replace(/[\(\)\+\*\?\{\}\[\]]/g, "\\$&") + "([^\\w\\dА-я]|$)", 'i');
 }
 
 function GetProcVars(selectedText){
@@ -491,18 +491,18 @@ function GetProcVars(selectedText){
 		for(i=0;i<VarArr1.length;i++)
 			VarArr.push(VarArr1[i])
 	}
-	
+
 	re = new RegExp('\\[(\\D.*)\\]', 'ig');
 	while((Matches = re.exec(selectedText)) != null) {
 		str1 = ""+Matches[1];
 		if(!str1)
 			continue
-		VarArr.push(str1);	
+		VarArr.push(str1);
 
 	}
-	
+
 	return VarArr;
-	
+
 }
 
 ExtractMethodRefactoring.prototype.refactor = function (selectedText) {
@@ -517,26 +517,26 @@ ExtractMethodRefactoring.prototype.refactor = function (selectedText) {
     // 1. Определить локальные переменные части кода метода выше выделяемого кода.
     // 2. Определить параметры метода, из которого выделяется код.
     var curMethod = this.module.getActiveLineMethod();
-    
+
     var codeBefore = this.module.textWindow.Range(curMethod.StartLine, 1, sel.beginRow-1).GetText();
     var contextBefore = this.getCodeContext(codeBefore);
 
-    // 3. Определить, какие 1+2 инициализируются в 0 (AutomaticVars), а какие используются 
-    this.fillParams(contextBefore.AutomaticVars, extVars, selectedText);    
-    this.fillParams(curMethod.Params, extVars, selectedText); 
+    // 3. Определить, какие 1+2 инициализируются в 0 (AutomaticVars), а какие используются
+    this.fillParams(contextBefore.AutomaticVars, extVars, selectedText);
+    this.fillParams(curMethod.Params, extVars, selectedText);
 
     //4. Добавим переменные, которые нашли внутри скобок () и []
 	procVars = GetProcVars(selectedText);
-	this.fillParams(procVars, extVars, selectedText); 
-		
+	this.fillParams(procVars, extVars, selectedText);
+
     // 5. Те переменные, которые используются в остальной части кода - возвращаемые значения.
 	if(sel.endRow < curMethod.EndLine){
 		var codeAfter = this.module.textWindow.Range(sel.endRow + 1, 1, curMethod.EndLine).GetText();
 		var contextAfter = this.getCodeContext(codeAfter);
-    
+
 		this.fillReturnValues(contextAfter.AutomaticVars, extVars, codeAfter);
      }
-	 
+
     if (this.form.DoModal())
         this.extractMethod(selectedText);
 }
@@ -592,8 +592,8 @@ ExtractMethodRefactoring.prototype.BtOKClick = function (Control) {
     {
         DoMessageBox("Имя метода должно быть правильным идентификатором!");
         return;
-    }    
-    
+    }
+
     this.form.Close(true);
 }
 
@@ -613,24 +613,24 @@ ExtractMethodRefactoring.prototype.extractMethod = function(source) {
         if (paramRow.IsParam)
             params.push((paramRow.IsVal ? 'Знач ' : '') + paramRow.Name);
     }
-    
+
     // Откорректируем отступ.
     var srcIndent = StringUtils.getIndent(source);
     source = StringUtils.shiftLeft(source, srcIndent);
     source = StringUtils.shiftRight(source, "\t");
-    
+
     // Сформируем исходный код определения выделенного метода.
     var newMethod = this.form.IsProc ? 'Процедура' : 'Функция';
     newMethod += ' ' + this.form.Name + '(' + params.join(', ') + ')';
     if (this.form.Exported)
-        newMethod += " Экспорт";   
-        
-    newMethod += "\n\n" + this.prepareSource(source) + "\n\n";  
-    
-    if (this.form.IsProc) 
+        newMethod += " Экспорт";
+
+    newMethod += "\n\n" + this.prepareSource(source) + "\n\n";
+
+    if (this.form.IsProc)
     {
-        newMethod += 'КонецПроцедуры';        
-        
+        newMethod += 'КонецПроцедуры';
+
     }
     else
     {
@@ -638,27 +638,27 @@ ExtractMethodRefactoring.prototype.extractMethod = function(source) {
         if (this.ReturnValue.Count() > 0) {
             retVal = this.ReturnValue.Get(0).Name;
         }
-        newMethod += "\tВозврат " + retVal + ";";    
-        newMethod += "\n\n" + 'КонецФункции';    
+        newMethod += "\tВозврат " + retVal + ";";
+        newMethod += "\n\n" + 'КонецФункции';
     }
 
     // Получим метод, внутри которого мы находимся.
     var curMethod = this.module.getActiveLineMethod();
-    
+
     // Добавим в модуль определение выделенного метода.
     tw.InsertLine(curMethod.EndLine + 2, "\n" + newMethod);
-        
-    // Заменим выделенный код на вызов нового метода.
-    var methCall = this.form.Name + '(' + params.join(', ').replace(new RegExp("Знач ",'g'),"") + ");\n"; 
 
-    
+    // Заменим выделенный код на вызов нового метода.
+    var methCall = this.form.Name + '(' + params.join(', ').replace(new RegExp("Знач ",'g'),"") + ");\n";
+
+
     if (!this.form.IsProc && this.ReturnValue.Count() > 0) {
         retVal = this.ReturnValue.Get(0).Name;
         methCall = retVal + ' = ' + methCall;
-    }    
-    
+    }
+
     tw.SetSelection(sel.beginRow, sel.beginCol, sel.endRow, sel.endCol);
-    tw.SetSelectedText(srcIndent + methCall);    
+    tw.SetSelectedText(srcIndent + methCall);
 }
 
 ExtractMethodRefactoring.prototype.prepareSource = function(source) {
@@ -666,7 +666,7 @@ ExtractMethodRefactoring.prototype.prepareSource = function(source) {
     var lines = StringUtils.toLines(source);
     if (lines.length < 2)
         return source;
-        
+
     var startIndex = 0;
     while (startIndex < lines.length && lines[startIndex].match(/^\s*$/))
         startIndex++;
@@ -674,10 +674,10 @@ ExtractMethodRefactoring.prototype.prepareSource = function(source) {
     var endIndex = lines.length - 1;
     while (endIndex > 0 && lines[endIndex].match(/^\s*$/))
         endIndex--;
-        
+
     if (startIndex <= endIndex)
         return StringUtils.fromLines(lines.splice(startIndex, endIndex - startIndex + 1));
-                        
+
     return source;
 }
 
