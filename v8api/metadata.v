@@ -269,10 +269,13 @@
 		+2
 		const Guid& moduleExpandType(const Guid& propId)
 		+1
-		// //Артур
-		// +1
-		// // +10 Артур завершение
+		// Семён
+		#if ver >= 8.3.9
+		+1
+		#endif
+		//
 		uint openModule(ITextManager@&, const Guid& propId, bool s, bool open, ITextEditor@& editor)
+		
 
 :iface IMDTypedObj {752BB41D-05DA-4FD1-A680-78DFB6C6EB1C}
 	:base IMDBaseObj

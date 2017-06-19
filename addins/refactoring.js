@@ -438,7 +438,7 @@ ExtractVariableRefactoring.prototype.BtVarCancelClick = function (Control) {
 }
 
 ExtractVariableRefactoring.prototype.NameОкончаниеВводаТекста = function (Элемент, Текст, Значение, СтандартнаяОбработка){
-	return
+    /*
     if (!Текст.val.match(/^[_\wА-я](?:[_\w\dА-я]*)$/))
     {
         DoMessageBox("Имя метода должно быть правильным идентификатором!");
@@ -446,6 +446,7 @@ ExtractVariableRefactoring.prototype.NameОкончаниеВводаТекст�
     }
     Элемент.val.Значение = Текст.val;
     this.form.Close(true);
+    */
 }
 
 ExtractVariableRefactoring.prototype.extractVariable = function(source) {
@@ -479,6 +480,7 @@ ExtractMethodRefactoring.prototype.getVarRe = function (varName) {
 }
 
 function GetProcVars(selectedText){
+    debugger
 
 	var VarArr = [];
 	var VarArr1 = [];
