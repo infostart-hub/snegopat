@@ -24,6 +24,8 @@ enum SciMarkers {
 	markBreakPointConditional,
 	markBreakPointDisabled,
 	markDebugArrow,
+	markModifiedLine,
+	markModifiedLineSaved
 	//maskCurrentLine = 1 << markCurrentLine,
 };
 
@@ -88,6 +90,13 @@ class BreakPointDef {
 	}
 };
 
+ScintillaEditor&& activeScintillaEditor() {
+	if (activeTextWnd is null) return null;
+	ScintillaEditor&& e = cast<ScintillaEditor>(activeTextWnd.editor);
+	if (e is null) return null;
+	return e;
+}
+
 class ScintillaDesignerEventsHandler {
 
 	ScintillaDesignerEventsHandler(){&&sciEventsHandlerDisp = createDispatchFromAS(&&this);}
@@ -98,24 +107,17 @@ class ScintillaDesignerEventsHandler {
 	bool afterDebugStep = false;
 	bool debugStopProcessed = false;
 
-	ScintillaEditor&& activeScintillaEditor() {
-		if (activeTextWnd is null) return null;
-		ScintillaEditor&& e = cast<ScintillaEditor>(activeTextWnd.editor);
-		if (e is null) return null;
-		return e;
-	}
-
 	void OnToggleBreakPoint(CmdHandlerParam& cmd, array<Variant>& params) {
 		if (cmd._isBefore){
 			commandCancelled = false;
 		} else {
 			if (commandCancelled == false) {
-				ScintillaEditor&& activeSciEditor = this.activeScintillaEditor(); if (activeSciEditor is null) return;
+				ScintillaEditor&& activeSciEditor = activeScintillaEditor(); if (activeSciEditor is null) return;
 				int curSciLine = activeSciEditor.swnd.currentLine();
 				CommandState&& st = getMainFrameCommandState(CommandID(Guid("{DE680E96-5826-4E22-834D-692E307A1D9C}"), 13), 0);
 				activeSciEditor.swnd.deleteAllBreakPointMarks(curSciLine);
 				if (st.cmdState.bEnable) { //команда "отключить точку останова" активна, значит на текущей строке есть точка 
-					activeSciEditor.swnd.addMarker(curSciLine, markBreakPoint);
+					activeSciEditor.swnd.markerAdd(curSciLine, markBreakPoint);
 					breakpoints.insert(activeSciEditor.breakPointKey + (curSciLine+1), BreakPointDef(curSciLine + 1, true, false));
 				} else { 
 					breakpoints.remove(activeSciEditor.breakPointKey + (curSciLine + 1));
@@ -139,7 +141,7 @@ class ScintillaDesignerEventsHandler {
 
 	void OnToggleBreakPointState(CmdHandlerParam& cmd, array<Variant>& params) {
 		if (!cmd._isBefore) {
-			ScintillaEditor&& activeSciEditor = this.activeScintillaEditor(); if (activeSciEditor is null) return;
+			ScintillaEditor&& activeSciEditor = activeScintillaEditor(); if (activeSciEditor is null) return;
 			int curSciLine = activeSciEditor.swnd.currentLine();
 			int newMarker = -1;
 			BreakPointDef&& bp = activeSciEditor.getBreakPointAtLine(curSciLine + 1); if (bp is null) return;
@@ -154,7 +156,7 @@ class ScintillaDesignerEventsHandler {
 
 			if (newMarker != -1) {
 				activeSciEditor.swnd.deleteAllBreakPointMarks(curSciLine);
-				activeSciEditor.swnd.addMarker(curSciLine, newMarker);
+				activeSciEditor.swnd.markerAdd(curSciLine, newMarker);
 				bp.isEnabled = (newMarker != markBreakPointDisabled);
 			}
 		}
@@ -183,13 +185,13 @@ class ScintillaDesignerEventsHandler {
 		} else {
 			oneDesigner._events.disconnect(dspWindows, "onDoModal", sciEventsHandlerDisp, "OnWindowsDoModal");
 			if (commandCancelled == false) {
-				ScintillaEditor&& activeSciEditor = this.activeScintillaEditor(); if (activeSciEditor is null) return;
+				ScintillaEditor&& activeSciEditor = activeScintillaEditor(); if (activeSciEditor is null) return;
 				int curSciLine = activeSciEditor.swnd.currentLine();
 				BreakPointDef&& bp = activeSciEditor.getBreakPointAtLine(curSciLine + 1); if (bp is null) return;
 				int newMarker = (breakPointConditionIsEmpty ? markBreakPoint : markBreakPointConditional);
 				if (!bp.isEnabled) newMarker = markBreakPointDisabled;
 				activeSciEditor.swnd.deleteAllBreakPointMarks(curSciLine);
-				activeSciEditor.swnd.addMarker(curSciLine, newMarker);
+				activeSciEditor.swnd.markerAdd(curSciLine, newMarker);
 				bp.isCondition = (newMarker == markBreakPointConditional);
 			}
 		}
@@ -197,13 +199,13 @@ class ScintillaDesignerEventsHandler {
 
 	void OnToggleBookmark(CmdHandlerParam& cmd, array<Variant>& params) {
 		if (!cmd._isBefore) {
-			ScintillaEditor&& activeSciEditor = this.activeScintillaEditor(); if (activeSciEditor is null) return;
+			ScintillaEditor&& activeSciEditor = activeScintillaEditor(); if (activeSciEditor is null) return;
 			int curSciLine = activeSciEditor.swnd.currentLine();
 			if ((activeSciEditor.swnd.markerGet(curSciLine) & (1 << markBookmark)) != 0) {
 				activeSciEditor.swnd.markerDelete(curSciLine, markBookmark);
 				bookmarks.remove(activeSciEditor.breakPointKey + (curSciLine + 1));
 			} else {
-				activeSciEditor.swnd.addMarker(curSciLine, markBookmark);
+				activeSciEditor.swnd.markerAdd(curSciLine, markBookmark);
 				bookmarks.insert(activeSciEditor.breakPointKey + (curSciLine + 1), curSciLine + 1);
 			}
 		}
@@ -224,7 +226,7 @@ class ScintillaDesignerEventsHandler {
 		if (!cmd._isBefore) {
 			afterDebugStep = true;
 			debugStopProcessed = false;
-			ScintillaEditor&& activeSciEditor = this.activeScintillaEditor(); if (activeSciEditor is null) return;
+			ScintillaEditor&& activeSciEditor = activeScintillaEditor(); if (activeSciEditor is null) return;
 			TextPosition tpCaret;
 			activeSciEditor.txtWnd.ted.getCaretPosition(tpCaret);
 			activeSciEditor.swnd.goToPos(activeSciEditor.getPosition(tpCaret));
@@ -240,20 +242,20 @@ class ScintillaDesignerEventsHandler {
 
 	void OnGotoDefinition(CmdHandlerParam& cmd, array<Variant>& params) {
 		if (!cmd._isBefore) {
-			ScintillaEditor&& activeSciEditor = this.activeScintillaEditor(); if (activeSciEditor is null) return;
+			ScintillaEditor&& activeSciEditor = activeScintillaEditor(); if (activeSciEditor is null) return;
 			if (activeSciEditor.swnd.currentPos() != activeSciEditor.swnd.anchorPos()) {
 				int selStartLine = activeSciEditor.swnd.lineFromPos(activeSciEditor.swnd.selectionStart());
 				int firstVisibleLine = activeSciEditor.swnd.firstVisibleLine();
 				if (selStartLine < firstVisibleLine) {
 					//скроллим редактор, чтобы первая строка выделения стала видимой
-					activeSciEditor._scicall(SCI_LINESCROLL,0, selStartLine - firstVisibleLine);
+					activeSciEditor.swnd.callSciMsg(SCI_LINESCROLL,0, selStartLine - firstVisibleLine);
 				}
 			}
 		}
 	}
 
 	void OnGlobalSearch(CmdHandlerParam& cmd, array<Variant>& params) {
-		ScintillaEditor&& activeSciEditor = this.activeScintillaEditor(); //команда вызвана хоткеем
+		ScintillaEditor&& activeSciEditor = activeScintillaEditor(); //команда вызвана хоткеем
 		if (activeSciEditor is null) &&activeSciEditor = lastActiveScintillaEditor; //команда вызвана кнопкой тулбара
 		if (activeSciEditor is null) return;
 
@@ -321,8 +323,8 @@ class ScintillaDesignerEventsHandler {
 				if (st2 !is null) {
 					if (st2.cmdState.bEnable == true) {
 						//доступна команда "Текущая строка", значит остановились в точке останова
-						ScintillaEditor&& activeSciEditor = this.activeScintillaEditor(); if (activeSciEditor is null) return;
-						activeSciEditor.swnd.addMarker(-1, markDebugArrow);
+						ScintillaEditor&& activeSciEditor = activeScintillaEditor(); if (activeSciEditor is null) return;
+						activeSciEditor.swnd.markerAdd(-1, markDebugArrow);
 						debugStopProcessed = true;
 					}
 				}
@@ -332,33 +334,71 @@ class ScintillaDesignerEventsHandler {
 		if (afterDebugStep) {
 			//Message("шагнули");
 			clearDebugArrowInAllScintillaEditors(); //могли перейти в другой модуль
-			ScintillaEditor&& activeSciEditor = this.activeScintillaEditor(); if (activeSciEditor is null) return;
+			ScintillaEditor&& activeSciEditor = activeScintillaEditor(); if (activeSciEditor is null) return;
 			TextPosition tpCaret;
 			activeSciEditor.txtWnd.ted.getCaretPosition(tpCaret);
 			activeSciEditor.swnd.goToPos(activeSciEditor.getPosition(tpCaret));
-			activeSciEditor.swnd.addMarker(-1, markDebugArrow);
+			activeSciEditor.swnd.markerAdd(-1, markDebugArrow);
 		}
 		
 		afterDebugStep = false;
 		debugMode = st.cmdState.bEnable;
 	}
 
-	void OnFoldUnfoldAll(CmdHandlerParam& cmd, array<Variant>& params) {
+	void OnFoldUnfold(CmdHandlerParam& cmd, array<Variant>& params) {
 		if (!cmd._isBefore) {
-			ScintillaEditor&& activeSciEditor = this.activeScintillaEditor(); if (activeSciEditor is null) return;
-			if (cmd._cmdNumber == 105) { //свернуть все
+			ScintillaEditor&& activeSciEditor = activeScintillaEditor(); 
+			if (activeSciEditor is null) return;
+
+			switch (cmd._cmdNumber) {
+			case 105: //свернуть все
 				activeSciEditor.foldUnfoldAll(true);
-			} else if (cmd._cmdNumber == 106) { //развернуть все
+				break;
+			case 106: //развернуть все
 				activeSciEditor.foldUnfoldAll(false);
+				break;
+			case 103: //свернуть группу
+				activeSciEditor.foldUnfoldCurrent(true);
+				break;
+			case 104: //развернуть группу
+				activeSciEditor.foldUnfoldCurrent(false);
+				break;
+			case 102: //свернуть группу с вложенными
+				activeSciEditor.foldUnfoldCurrent(true, true);
+				break;
+			case 101: //развернуть группу с вложенными
+				activeSciEditor.foldUnfoldCurrent(false, true);
+				break;
 			}
 		}
-	
 	}
 
-	
+	//void OnMetaDataEvent(array<Variant>& params) {
+		//IV8MetaDataEvent&& mde = cast<IUnknown>(params[0].getDispatch()); //не работает
+		//IV8MetaDataEvent&& mde = params[0].getDispatch();
+	//}
+	//void OnSave(CmdHandlerParam& cmd, array<Variant>& params) {
+	//	if (!cmd._isBefore) {
+	//	}
+	//}
 
+	void OnMetaDataEvent(IV8MetaDataEvent&& mde) {//вызывается из скрипта через ScintillaSetup::callOnMetaDataEvent
+		if (mde._kind == mdeAfterSave) {
+			IV8MDObject&& savedObj = mde._obj; //это корневой объект сохраняемых метаданных (или конфигурации или внешней обработки)
+			//перебираем открытые текстовые редакторы и меняем маркеры модифицированных строк только в окнах сохраняемого объекта
+			for (uint i = 0; i < openedSciEditors.length; i++) {
+				ScintillaEditor&& ed = openedSciEditors[i];
+				IV8MDObject&& textWndObject = ed.txtWnd.getComWrapper().get_mdObj();
+				if (textWndObject !is null) {
+					IV8MDObject&& textWndRootObject = textWndObject.get_container().get_rootObject();
+					if (savedObj.isSame(textWndRootObject)) {
+						ed.swnd.changeModifiedLineMarkers();
+					}
+				}
+			}
+		}
+	}
 };
-
 
 class ScintillaInfo : EditorInfo {
 	string name() override {
@@ -430,10 +470,17 @@ class ScintillaInfo : EditorInfo {
 		oneDesigner._events.addCommandHandler("{00000000-0000-0000-0000-000000000000}", 68, sciEventsHandlerDisp, "OnGlobalSearch"); //глобальный поиск
 		oneDesigner._events.addCommandHandler("{00000000-0000-0000-0000-000000000000}", 69, sciEventsHandlerDisp, "OnGlobalSearch"); //глобальная замена
 
-		oneDesigner._events.addCommandHandler("{00000000-0000-0000-0000-000000000000}", 105, sciEventsHandlerDisp, "OnFoldUnfoldAll"); //свернуть все
-		oneDesigner._events.addCommandHandler("{00000000-0000-0000-0000-000000000000}", 106, sciEventsHandlerDisp, "OnFoldUnfoldAll"); //развернуть все
+		oneDesigner._events.addCommandHandler("{00000000-0000-0000-0000-000000000000}", 105, sciEventsHandlerDisp, "OnFoldUnfold"); //свернуть все
+		oneDesigner._events.addCommandHandler("{00000000-0000-0000-0000-000000000000}", 106, sciEventsHandlerDisp, "OnFoldUnfold"); //развернуть все
+		oneDesigner._events.addCommandHandler("{00000000-0000-0000-0000-000000000000}", 103, sciEventsHandlerDisp, "OnFoldUnfold"); //свернуть группу
+		oneDesigner._events.addCommandHandler("{00000000-0000-0000-0000-000000000000}", 104, sciEventsHandlerDisp, "OnFoldUnfold"); //развернуть группу
+		oneDesigner._events.addCommandHandler("{00000000-0000-0000-0000-000000000000}", 102, sciEventsHandlerDisp, "OnFoldUnfold"); //свернуть группу с вложенными
+		oneDesigner._events.addCommandHandler("{00000000-0000-0000-0000-000000000000}", 101, sciEventsHandlerDisp, "OnFoldUnfold"); //развернуть группу с вложенными
+
+		//oneDesigner._events.addCommandHandler("{00000000-0000-0000-0000-000000000000}", 4, sciEventsHandlerDisp, "OnSave"); //сохранить
 
 		oneDesigner._events.connect(oneDesigner._me(), "onIdle", sciEventsHandlerDisp, "OnIdle");
+		//oneDesigner._events.connect(createDispatchFromAS(&&oneDesigner._metadata), "MetaDataEvent", sciEventsHandlerDisp, "OnMetaDataEvent");
 	}
 
 	void loadBreakPointsFromProfile() {
@@ -556,11 +603,13 @@ class ScintillaWindow {
 	void destroy() {
 		DestroyWindow(hEditor);
 	}
+	LRESULT callSciMsg(uint msg, WPARAM w = 0, LPARAM l = 0) {
+		return sciFunc(editor_ptr, msg, w, l);
+	}
 
 	int length() const {
 		return sciFunc(editor_ptr, SCI_GETLENGTH, 0, 0);
 	}
-
 	uint textHeight(int line = 0) const {
 		return sciFunc(editor_ptr, SCI_TEXTHEIGHT, 0, 0);
 	}
@@ -718,7 +767,7 @@ class ScintillaWindow {
 	void deleteMarkHandle(int_ptr markHandle) {
 		sciFunc(editor_ptr, SCI_MARKERDELETEHANDLE, markHandle, 0);
 	}
-	int_ptr addMarker(int line, int marker) {
+	int_ptr markerAdd(int line, int marker) {
 		if (line == -1) line = currentLine();
 		return sciFunc(editor_ptr, SCI_MARKERADD, line, marker);
 	}
@@ -743,14 +792,25 @@ class ScintillaWindow {
 	void foldSetFlag(int flag) {
 		sciFunc(editor_ptr, SCI_SETFOLDFLAGS, flag, 0);
 	}
-	void toggleFold(int line) {
-		sciFunc(editor_ptr, SCI_TOGGLEFOLD, line, 0);
+	void toggleFold(int line = -1, bool withChilds = false) {
+		//sciFunc(editor_ptr, SCI_TOGGLEFOLD, line, 0);
+		if (line == -1) line = currentLine();
+		bool expanded = foldIsExpanded(line);
+		if (expanded) {
+			sciFunc(editor_ptr, SCI_FOLDLINE, line, SC_FOLDACTION_CONTRACT);
+			if (withChilds) 
+				sciFunc(editor_ptr, SCI_FOLDCHILDREN, line, SC_FOLDACTION_CONTRACT);
+		} else {
+			sciFunc(editor_ptr, SCI_FOLDLINE, line, SC_FOLDACTION_EXPAND);
+			if (withChilds) 
+				sciFunc(editor_ptr, SCI_FOLDCHILDREN, line, SC_FOLDACTION_EXPAND);
+		}
 	}
 	void foldExpandSet(int line, int expanded) {
 		sciFunc(editor_ptr, SCI_SETFOLDEXPANDED, line, expanded);
 	}
-	int foldIsExpanded(int line) {
-		return sciFunc(editor_ptr, SCI_GETFOLDEXPANDED, line, 0);
+	bool foldIsExpanded(int line) {
+		return sciFunc(editor_ptr, SCI_GETFOLDEXPANDED, line, 0) != 0;
 	}
 	void marginSetClickable(int margin, int clickable) {
 		sciFunc(editor_ptr, SCI_SETMARGINSENSITIVEN, margin, clickable);
@@ -876,6 +936,18 @@ class ScintillaWindow {
 		if (line == -1) line = currentLine();
 		sciFunc(editor_ptr, SCI_ENSUREVISIBLE, line, 0);
 		
+	}
+	void changeModifiedLineMarkers() {
+		int currLine = sciFunc(editor_ptr, SCI_MARKERNEXT, 0, (1 << markModifiedLine));
+		if (currLine > -1) {
+			int prevLine = -1;
+			while (currLine > prevLine) {
+				markerDelete(currLine, markModifiedLine);
+				markerAdd(currLine, markModifiedLineSaved);
+				prevLine = currLine;
+				currLine = sciFunc(editor_ptr, SCI_MARKERNEXT, prevLine + 1, (1 << markModifiedLine));
+			}
+		}
 	}
 };
 
@@ -1028,6 +1100,34 @@ class ScintillaSetup {
 		style.fore = color;
 		style.back = bgColor;
 	}
+	void callOnMetaDataEvent(IV8MetaDataEvent&& mde) {
+		oneSciEventsHandler.OnMetaDataEvent(mde);
+	}
+	void callOnFoldUnfold(bool fold) {
+		CmdHandlerParam cmd(Command(CommandID(Guid("{00000000-0000-0000-0000-000000000000}"), fold ? 103 : 104),0));
+		cmd._isBefore = false;
+		oneSciEventsHandler.OnFoldUnfold(cmd, array<Variant>(0));
+	}
+	void callToggleFold(bool withChilds = false) {
+		ScintillaEditor&& activeScintillaEditor = ::activeScintillaEditor();
+		if (activeScintillaEditor is null) return;
+		activeScintillaEditor.toggleFold(-1, withChilds);
+	}
+	void callResetModifiedLineStates() {
+		ScintillaEditor&& activeScintillaEditor = ::activeScintillaEditor();
+		if (activeScintillaEditor is null) return;
+		activeScintillaEditor.resetModifiedLineStates();
+	}
+	void callLineScroll(int cnt) {
+		ScintillaEditor&& activeScintillaEditor = ::activeScintillaEditor();
+		if (activeScintillaEditor is null) return;
+		activeScintillaEditor.swnd.callSciMsg(SCI_LINESCROLL,0,cnt);
+	}
+	void callGotoModifiedLine(int direction = 1) {
+		ScintillaEditor&& activeScintillaEditor = ::activeScintillaEditor();
+		if (activeScintillaEditor is null) return;
+		activeScintillaEditor.gotoModifiedLine(direction);
+	}
 
 	void _apply(ScintillaWindow& swnd) {
 		NoCaseMap<int> fonts;
@@ -1044,8 +1144,8 @@ class ScintillaSetup {
 		highlightCurrentLine = (clrCurrentLine != styleByNum(STYLE_DEFAULT).back);
 		
 		swnd.setStyleEolFilled(stString, 1);
-		//sciFunc(swnd.editor_ptr, SCI_SETVIEWEOL, 1, 0);
-		sciFunc(swnd.editor_ptr, SCI_SETEOLMODE, SC_EOL_LF, 0);
+		//swnd.callSciMsg(SCI_SETVIEWEOL, 1);
+		swnd.callSciMsg(SCI_SETEOLMODE, SC_EOL_LF);
 		
 		swnd.setCaretWidth(caretWidth);
 		_setupMarks(swnd);
@@ -1062,10 +1162,10 @@ class ScintillaSetup {
 		swnd.indStyleSet(indSelectedWordHighlight, INDIC_ROUNDBOX);
 		swnd.indForeSet(indSelectedWordHighlight, clrSelectedWordHighlight);
 		swnd.indAlphaSet(indSelectedWordHighlight, 125); // SC_ALPHA_OPAQUE/2
-		sciFunc(swnd.editor_ptr, SCI_SETENDATLASTLINE, 0, 0);
+		swnd.callSciMsg(SCI_SETENDATLASTLINE);
 		if (highlightCurrentLine) {
-			sciFunc(swnd.editor_ptr, SCI_SETCARETLINEVISIBLE, 1,0);
-			sciFunc(swnd.editor_ptr, SCI_SETCARETLINEBACK, clrCurrentLine,0);
+			swnd.callSciMsg(SCI_SETCARETLINEVISIBLE, 1);
+			swnd.callSciMsg(SCI_SETCARETLINEBACK, clrCurrentLine);
 		}
 	}
 	void Preview(bool msg) {
@@ -1095,6 +1195,10 @@ class ScintillaSetup {
 		swnd.setMarginMask(smMarks, uint(-1), uint(SC_MASK_FOLDERS) /*| maskCurrentLine*/);
 		swnd.marginSetClickable(smMarks, 1);
 		swnd.markerDefinePixMaps();
+		swnd.defineMarker(markModifiedLine, SC_MARK_LEFTRECT);
+		swnd.setMarkerBack(markModifiedLine, rgb(255, 255, 0));
+		swnd.defineMarker(markModifiedLineSaved, SC_MARK_LEFTRECT);
+		swnd.setMarkerBack(markModifiedLineSaved, rgb(108, 226, 108));
 	}
 	void _setupLineNumbers(ScintillaWindow& swnd) {
 		swnd.setMarginType(smLineNumbers, SC_MARGIN_NUMBER);
@@ -1133,7 +1237,7 @@ class ScintillaSetup {
 		swnd.defineMarker(SC_MARKNUM_FOLDERMIDTAIL, SC_MARK_TCORNER);
 
 		int foldMarksLineColor = rgb(128, 128, 128); // styleByNum(STYLE_LINENUMBER).fore;
-		int foldMakrsBackColor = styleByNum(STYLE_DEFAULT).back; //sciFunc(swnd.editor_ptr, SCI_GETMARGINBACKN, smFolding, 0);
+		int foldMakrsBackColor = styleByNum(STYLE_DEFAULT).back; //swnd.callSciMsg(SCI_GETMARGINBACKN, smFolding);
 		swnd.setMarkerFore(SC_MARKNUM_FOLDEROPEN, foldMakrsBackColor);
 		swnd.setMarkerBack(SC_MARKNUM_FOLDEROPEN, foldMarksLineColor);
 		swnd.setMarkerFore(SC_MARKNUM_FOLDER, foldMakrsBackColor);
@@ -1171,23 +1275,29 @@ class ScintillaDocument : TextEditorDocument, TextModifiedReceiver {
 		//Message("Set text " + tpstr(tpStart) + " " + tpstr(tpEnd) + " '" + newText + "'");
 		if (inTextModified)
 			return;
+		//Message("onTextModified");
 		ScintillaEditor&& editor = firstEditor();
 		ScintillaWindow&& swnd = editor.swnd;
 		inTextModified = true;
 		editor.inReflection = true;
 		int posStart = editor.getPosition(tpStart);
+		int posEnd = posStart;
 		utf8string ustr = newText.toUtf8();
 		if (tpStart == tpEnd) {
 			swnd.insertText(posStart, ustr.ptr);
 		} else {
-			int posEnd = editor.getPosition(tpEnd);
+			posEnd = editor.getPosition(tpEnd);
 			swnd.setAnchorPos(posStart);
 			swnd.setCurrentPos(posEnd);
 			swnd.replaceSel(ustr.ptr);
 		}
-		posStart += ustr.length;
-		swnd.goToPos(posStart);
-		SetCaretPos(swnd.xFromPos(posStart), swnd.yFromPos(posStart));
+		posEnd = posStart + ustr.length;
+		swnd.goToPos(posEnd);
+		SetCaretPos(swnd.xFromPos(posEnd), swnd.yFromPos(posEnd));
+		for (int i = swnd.lineFromPos(posStart); i <= swnd.lineFromPos(posEnd); i++) {
+			swnd.markerDelete(i, markModifiedLineSaved);
+			swnd.markerAdd(i, markModifiedLine);
+		}
 		inTextModified = false;
 	}
 	ScintillaEditor&& firstEditor() {
@@ -1224,10 +1334,6 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 	ScintillaEditor(ScintillaDocument&& o) {
 		&&owner = o;
 	}
-
-	LRESULT _scicall(uint msg, WPARAM w = 0, LPARAM l = 0) {
-		return sciFunc(swnd.editor_ptr, msg, w, l);
-	}
 	void attach(TextWnd&& tw) override {
 		TextEditorWindow::attach(tw);
 		
@@ -1244,7 +1350,9 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 		breakPointKey = getBreakPointKey();
 		initWindowSettings();
 		stylishText(swnd.length());
-		&&wnd = attachWndToFunction(swnd.hEditor, WndFunc(this.ScnWndProc), array<uint> = {WM_SETFOCUS, WM_KILLFOCUS, WM_CHAR, WM_KEYDOWN, WM_SYSKEYDOWN, WM_RBUTTONDOWN});
+		if (txtWnd.iwnd.get_readOnly())
+			swnd.callSciMsg(SCI_SETREADONLY, 1);
+		&&wnd = attachWndToFunction(swnd.hEditor, WndFunc(this.wndProcScn), array<uint> = {WM_SETFOCUS, WM_KILLFOCUS, WM_CHAR, WM_KEYDOWN, WM_SYSKEYDOWN, WM_RBUTTONDOWN, WM_LBUTTONDOWN});
 		editorsManager._subscribeToSelChange(tw.ted, this);
 		openedSciEditors.insertLast(&&this);
 		initialFolding();
@@ -1361,7 +1469,7 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 		}
 	}
 
-	LRESULT ScnWndProc(uint msg, WPARAM w, LPARAM l) {
+	LRESULT wndProcScn(uint msg, WPARAM w, LPARAM l) {
 		switch (msg) {
 		case WM_SETFOCUS:
 			//Message("scintilla WM_SETFOCUS: activeTextWnd = txtWnd");
@@ -1385,8 +1493,7 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 
 			break;
 		}
-		case WM_CHAR:
-		{
+		case WM_CHAR: {
 			if ((w == VK_RETURN || w == VK_SPACE) && inReflection) 
 				return 0;
 			
@@ -1397,11 +1504,39 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 			return res;
 		}
 		case WM_KEYDOWN:
+			if ((w == VK_RIGHT) || (w == VK_LEFT)) {
+				//если курсор в начале строки - развернем блок, если нажата стрелка вправо или свернем, если нажата стрелка влево
+				int line = swnd.currentLine();
+				if (swnd.posFromLine(line) == swnd.currentPos()){
+					if ((swnd.foldLevel(line) & SC_FOLDLEVELHEADERFLAG) != 0) {
+						bool expanded = swnd.foldIsExpanded(line);
+						if ((!expanded && (w == VK_RIGHT)) || (expanded && (w == VK_LEFT))) {
+							swnd.toggleFold(line);
+							return 0;
+						}
+					}
+				}
+			}
+
 		case WM_SYSKEYDOWN:
 			if (checkForSubst(w) || txtWnd.onKeyDown(w, l))
 				return 0;
 			break;
+		case WM_LBUTTONDOWN:
+			if ((w & 0x0008) > 0) { //0x0008 = MK_CONTROL
+				wnd.doDefault();
+				SendMessage(swnd.hEditor,0x0202,w,l); //отпускаем мышь, 0x0202 = WM_LBUTTONUP 
+				TextPosition tp; 
+				calcPosition(swnd.currentPos(), tp);
+				txtWnd.ted.setCaretPosition(tp);
+				CommandID cmdGotoDef(Guid("{6B7291BF-BCD2-41AF-BAC7-414D47CC6E6A}"), 83);
+				getMainFrameCommandState(cmdGotoDef);
+				sendCommandToMainFrame(cmdGotoDef); //перейти к определению (F12)
+				return 0;
+			}
+			break;
 		}
+
 		return wnd.doDefault();
 	}
 	bool checkForSubst(WPARAM w) {
@@ -1581,12 +1716,12 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 
 	void highlightPairBracket(){
 		int curPos = swnd.currentPos();
-		int matchPos = _scicall(SCI_BRACEMATCH, curPos-1);
+		int matchPos = swnd.callSciMsg(SCI_BRACEMATCH, curPos-1);
 		if (matchPos >= 0) {
 			//Message("found " + curPos + " - " + matchPos);
-			_scicall(SCI_BRACEHIGHLIGHT, curPos-1, matchPos);
+			swnd.callSciMsg(SCI_BRACEHIGHLIGHT, curPos-1, matchPos);
 		} else
-			_scicall(SCI_BRACEHIGHLIGHT, uint(-1), uint(-1));
+			swnd.callSciMsg(SCI_BRACEHIGHLIGHT, uint(-1), uint(-1));
 	}
 
 	string getBreakPointKey() {
@@ -1617,11 +1752,11 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 			if (it.key.find(breakPointKey) == 0){
 				BreakPointDef&& bpDef = it.value;
 				if (!bpDef.isEnabled)
-					swnd.addMarker(bpDef.line - 1, markBreakPointDisabled);
+					swnd.markerAdd(bpDef.line - 1, markBreakPointDisabled);
 				else if (bpDef.isCondition)
-					swnd.addMarker(bpDef.line - 1, markBreakPointConditional);
+					swnd.markerAdd(bpDef.line - 1, markBreakPointConditional);
 				else
-					swnd.addMarker(bpDef.line - 1, markBreakPoint);
+					swnd.markerAdd(bpDef.line - 1, markBreakPoint);
 			}
 		}
 	}
@@ -1631,7 +1766,7 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 		swnd.markerDeleteAll(markBookmark);
 		for (auto it = bookmarks.begin(); it++;) {
 			if (it.key.find(breakPointKey) == 0) {
-				swnd.addMarker(it.value - 1, markBookmark);
+				swnd.markerAdd(it.value - 1, markBookmark);
 			}
 		}
 	}
@@ -1649,10 +1784,8 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 			stylishText(scn.position);
 			break;
 		case SCN_UPDATEUI:
-			if ((scn.updated & SC_UPDATE_SELECTION) != 0) {
+			if ((scn.updated & SC_UPDATE_SELECTION) != 0) 
 				updateSelectionInParent();
-				//updateCurrentLineMarker();
-			}
 			highlightSelectedWord();
 			highlightPairBracket();
 			break;
@@ -1664,7 +1797,8 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 			if (scn.margin == smFolding) {
 				//int level = swnd.foldLevel(swnd.lineFromPos(scn.position));
 				//Message("Level is " + (level & SC_FOLDLEVELNUMBERMASK) + ((level & SC_FOLDLEVELHEADERFLAG) != 0 ? " header" : ""));
-				toggleFold(swnd.lineFromPos(scn.position));
+				bool ctrlPressed = (scn.modifiers & SCMOD_CTRL) != 0; 
+				toggleFold(swnd.lineFromPos(scn.position), ctrlPressed);
 			} else if (scn.margin == smMarks) {
 				swnd.setCurrentPos(scn.position);
 				swnd.setAnchorPos(scn.position);
@@ -1673,17 +1807,22 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 				txtWnd.ted.setCaretPosition(tp);
 				sendCommandToMainFrame(CommandID(Guid("{DE680E96-5826-4E22-834D-692E307A1D9C}"), 11)); //toggle breakpoint
 			}
+			break;
+		case SCN_MARGINRIGHTCLICK:
+			//Message("SCN_MARGINRIGHTCLICK");
+			break;
 		}
 		return 0;
 	}
-	void toggleFold(int line) {
-		swnd.toggleFold(line);
+	void toggleFold(int line = -1, bool withChilds = false) {
+		if (line == -1) line = swnd.currentLine();
+		swnd.toggleFold(line, withChilds);
 
 		if (sciSetup.highlightFoldHeader) {
-			int expanded = swnd.foldIsExpanded(line);
+			bool expanded = swnd.foldIsExpanded(line);
 			int posStart = swnd.posFromLine(line), posEnd = posStart + swnd.lineLength(line);
 			swnd.indCurrentSet(indFolding);
-			if (expanded == 0) {
+			if (expanded) {
 				while (posStart < posEnd && swnd.charAt(posStart) <= ' ')
 					posStart++;
 				posEnd--;
@@ -1694,7 +1833,6 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 				swnd.indClearRange(posStart, posEnd - posStart);
 			}
 		}
-
 	}
 	void updateSelectionInParent() {
 		//Message("updateSelectionInParent 1");
@@ -1718,6 +1856,7 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 	void updateTextInParent(SCNotification& scn) {
 		//Message(((scn.modificationType & SC_MOD_INSERTTEXT) != 0 ? "insert in " : "delete at ") + scn.position + " length=" + scn.length + " linesAdded=" + scn.linesAdded);
 		if (GetFocus() == swnd.hEditor && !owner.inTextModified) {	// Обрабатываем уведомление только от окна в фокусе
+			//Message("updateTextInParent");
 			owner.inTextModified = true;
 			inReflection = true;
 			TextManager&& tm = txtWnd.textDoc.tm;
@@ -1747,6 +1886,10 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 			}
 			ed.setSelectionText(text);
 			ed.setCaretPosition(tpStart);
+			for (uint i = tpStart.line; i <= tpEnd.line; i++) {
+				swnd.markerDelete(i-1, markModifiedLineSaved);
+				swnd.markerAdd(i-1, markModifiedLine);
+			}
 			owner.inTextModified = false;
 			inReflection = false;
 			swnd.ensureLineVisible();
@@ -1940,31 +2083,20 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 			}
 		}
 	}
-	//void updateCurrentLineMarker() {
-	//	if (sciSetup.highlightCurrentLine) {
-	//		int cl = swnd.lineFromPos(swnd.currentPos());
-	//		if (curLineMarkerHandle != 0) {
-	//			int oldLine = swnd.lineFromMarkHandle(curLineMarkerHandle);
-	//			if (oldLine == cl)
-	//				return;
-	//			swnd.deleteMarkHandle(curLineMarkerHandle);
-	//		}
-	//		curLineMarkerHandle = swnd.addMarker(cl, markCurrentLine);
-	//	}
-	//}
 
 	void initialFolding() {
 		int lineCount = swnd.getLineCount();
 		for (int line = 0; line < lineCount; line++){
 			int level = swnd.foldLevel(line);
 			if ((level & SC_FOLDLEVELHEADERFLAG) != 0){
-				bool stateComment = ((swnd.getLineState(line) & LS_COMMENTLINE) != 0);
-				bool stateProc = ((swnd.getLineState(line) & LS_METHOD) != 0);
-				bool stateCond = ((swnd.getLineState(line) & LS_CONDITION) != 0);
-				bool stateLoop = ((swnd.getLineState(line) & LS_LOOP) != 0);
-				bool stateMultiString = ((swnd.getLineState(line) & LS_MULTILINESTRING) != 0);
-				bool stateTry = ((swnd.getLineState(line) & LS_TRY) != 0);
-				bool statePreproc = ((swnd.getLineState(line) & LS_PREPROC) != 0);
+				int lineState = swnd.getLineState(line);
+				bool stateComment = ((lineState & LS_COMMENTLINE) != 0);
+				bool stateProc =    ((lineState & LS_METHOD) != 0);
+				bool stateCond =    ((lineState & LS_CONDITION) != 0);
+				bool stateLoop =    ((lineState & LS_LOOP) != 0);
+				bool stateMultiString = ((lineState & LS_MULTILINESTRING) != 0);
+				bool stateTry =     ((lineState & LS_TRY) != 0);
+				bool statePreproc = ((lineState & LS_PREPROC) != 0);
 
 				if (sciSetup.foldComment && stateComment) swnd.toggleFold(line);
 				if (sciSetup.foldProc && stateProc) swnd.toggleFold(line);
@@ -1976,14 +2108,41 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 			}
 		}
 	}
-
 	void foldUnfoldAll(bool fold){
 		if (fold) 
 			initialFolding();
 		else 
-			sciFunc(swnd.editor_ptr, SCI_FOLDALL, SC_FOLDACTION_EXPAND, 0);
-		
+			swnd.callSciMsg(SCI_FOLDALL, SC_FOLDACTION_EXPAND);
 	}
+	void foldUnfoldCurrent(bool fold, bool withChilds = false) {
+		int line = swnd.currentLine();
+		bool expanded = swnd.foldIsExpanded(line);
+		if ((expanded && fold) || (!expanded && !fold))
+			swnd.toggleFold(line, withChilds);
+	}
+	void resetModifiedLineStates() {
+		swnd.markerDeleteAll(markModifiedLine);
+		swnd.markerDeleteAll(markModifiedLineSaved);
+	}
+	void gotoModifiedLine(int direction = 1) {
+		direction = direction<0 ? -1 : 1;
+		int maskAllModified = (1 << markModifiedLine) | (1 << markModifiedLineSaved);
+		int msgDirection = direction==1 ? SCI_MARKERNEXT : SCI_MARKERPREVIOUS;
+		int currLine = swnd.callSciMsg(msgDirection, swnd.currentLine() + direction, maskAllModified);
+		if (currLine > -1) {
+			int prevLine = -1;
+			while (currLine > prevLine) {
+				if (swnd.markerGet(currLine - direction) & maskAllModified == 0) {
+					swnd.ensureLineVisible(currLine);
+					swnd.goToPos(swnd.posFromLine(currLine));
+					break;
+				}
+				prevLine = currLine;
+				currLine = swnd.callSciMsg(msgDirection, prevLine + direction, maskAllModified);
+			}
+		}
+	}
+
 };
 
 class FoldingProcessor {
@@ -3595,6 +3754,7 @@ enum SciEnums {
 	SCN_FOCUSIN = 2028,
 	SCN_FOCUSOUT = 2029,
 	SCN_AUTOCCOMPLETED = 2030,
+	SCN_MARGINRIGHTCLICK = 2031,
 
 	SCLEX_CONTAINER = 0,
 	SCLEX_NULL = 1,

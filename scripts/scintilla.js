@@ -1,7 +1,7 @@
 ﻿"use strict";
 //engine: JScript
 //uname: scintilla
-//dname: Настройка редактора Scintilla
+//dname: Редактор Scintilla
 //debug: yes
 //descr: Скрипт для настройки редактора Scintilla
 //author: orefkov
@@ -10,6 +10,7 @@
 //addin: scintilla_int
 exports.__esModule = true;
 global.connectGlobals(SelfScript);
+events.connect(metadata, "MetaDataEvent", SelfScript.self, "OnMetaDataEvent");
 var pflScintillaStyles = "Scintilla/Styles/";
 var pflScintillaSettings = "Scintilla/Settings/";
 var SetupFormObject = (function () {
@@ -228,6 +229,34 @@ function getColorSheme(num) {
             return {};
     }
 }
+function OnMetaDataEvent(mde) {
+	scintilla_int.callOnMetaDataEvent(mde);
+}
+
+//{ МАКРОСЫ 
+SelfScript.self['macrosСвернуть/развернуть текущий блок'] = function() {
+	scintilla_int.callToggleFold();
+}
+SelfScript.self['macrosСвернуть/развернуть текущий блок с вложенными'] = function() {
+	scintilla_int.callToggleFold(true);
+}
+SelfScript.self['macrosСбросить маркеры модифицированности строк'] = function() {
+	scintilla_int.callResetModifiedLineStates();
+}
+SelfScript.self['macrosПрокрутка на строку вниз'] = function() {
+	scintilla_int.callLineScroll(1);
+}
+SelfScript.self['macrosПрокрутка на строку вверх'] = function() {
+	scintilla_int.callLineScroll(-1);
+}
+SelfScript.self['macrosПерейти к следующей модифицированной строке'] = function() {
+	scintilla_int.callGotoModifiedLine(1);
+}
+SelfScript.self['macrosПерейти к предыдущей модифицированной строке'] = function() {
+	scintilla_int.callGotoModifiedLine(-1);
+}
+//}
+
 function ColorToColor1C(clr) {
     return v8New("Цвет", clr & 255, clr >> 8 & 255, clr >> 16);
 }
