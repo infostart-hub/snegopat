@@ -2128,18 +2128,16 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
 		direction = direction<0 ? -1 : 1;
 		int maskAllModified = (1 << markModifiedLine) | (1 << markModifiedLineSaved);
 		int msgDirection = direction==1 ? SCI_MARKERNEXT : SCI_MARKERPREVIOUS;
-		int currLine = swnd.callSciMsg(msgDirection, swnd.currentLine() + direction, maskAllModified);
-		if (currLine > -1) {
-			int prevLine = -1;
-			while (currLine > prevLine) {
-				if (swnd.markerGet(currLine - direction) & maskAllModified == 0) {
-					swnd.ensureLineVisible(currLine);
-					swnd.goToPos(swnd.posFromLine(currLine));
-					break;
-				}
-				prevLine = currLine;
-				currLine = swnd.callSciMsg(msgDirection, prevLine + direction, maskAllModified);
+		int currLine = swnd.currentLine();
+		int nextLine = swnd.callSciMsg(msgDirection, currLine + direction, maskAllModified);
+		while (direction>0 ? (nextLine > currLine) : ((nextLine > -1) && (nextLine < currLine))) {
+			if (swnd.markerGet(nextLine - 1) & maskAllModified == 0) { //предыдущая строка не модифицирована, значит начало блока
+				swnd.ensureLineVisible(nextLine);
+				swnd.goToPos(swnd.posFromLine(nextLine));
+				break;
 			}
+			currLine = nextLine;
+			nextLine = swnd.callSciMsg(msgDirection, currLine + direction, maskAllModified);
 		}
 	}
 
