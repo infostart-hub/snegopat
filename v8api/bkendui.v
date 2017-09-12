@@ -161,7 +161,7 @@
     {
         return currentProcess().getService(IID_IBkEndUI);
     }
-   ---
+    ---
     void Message(const string& text, MessageMarker mm=mNone)
     {
         getBkEndUI().doMsgLine(v8string(text), mm);
@@ -170,4 +170,4 @@
     {
         return getBkEndUI().messageBox(text, type, timeout, caption.isEmpty() ? 0 : caption.cstr);
     }
-   ---
+    ---

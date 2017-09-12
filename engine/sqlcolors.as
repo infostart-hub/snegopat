@@ -407,7 +407,6 @@ void processGetColorInfo(Vector& items, Vector& res) {
     }
 }
 
-
 bool TxtExt_hasCustomBackground(ITextExtBackColors& pThis, int nLineNo, SyntaxItemInfos& items) {
     trTxtExt_hasBG.swap();
     bool res = pThis.hasCustomBackground(nLineNo, items);
@@ -423,8 +422,7 @@ void TxtExt_getColorInfo(ITextExtBackColors& pThis, COLORREF currentBGColor, Syn
 }
 
 // Класс для обработки запросов о цвете фона
-class MyTextExtBackColors
-{
+class MyTextExtBackColors {
     // Определить, нужно ли будет менять фон слов в строке
     bool hasCustomBackground(int nLineNo, SyntaxItemInfos& items) {
         return processHasCustomBackground(items.infos);
@@ -434,7 +432,6 @@ class MyTextExtBackColors
         processGetColorInfo(items.infos, res);
     }
 };
-
 
 funcdef uint IUnk_QI(IUnknown&, const Guid&, IUnknown&&&);
 uint TextExtModule_QI(IUnknown& pThis, const Guid& g, IUnknown&&& res) {

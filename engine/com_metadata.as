@@ -146,6 +146,47 @@ class IV8MDContainer {
             return uicfgmngr.identifier();
         return string();
     }
+	//metadata.current.saveToFile("e:\\test.cf")
+	bool saveToFile(const string& path) {
+		IV8DataFile&& tempFile = oneDesigner._v8files.createTempFile();
+		if (tempFile is null)
+			return false;
+		IV8DataFile&& file = oneDesigner._v8files.open("file://" + path, FileOpenModes(fomTruncate | fomIn | fomOut));
+		if (file is null)
+			return false;
+		IConfigMngr&& cfgMgr = container.getConfigMngr();
+	#if test > 0
+		{
+			IConfigMngr&& test = cfgMgr.unk;
+			if (test is null) {
+				doLog("Not IConfigMngr");
+				return false;
+			}
+		}
+		dumpVtable(&&cfgMgr);
+	#endif
+		IInfoBaseService&& ibservice = currentProcess().getService(IID_IInfoBaseService);
+		IConfigMngr&& copyMgr;
+		ibservice.connectConfig(copyMgr, tempFile.file, 1, 0);
+		if (copyMgr !is null) {
+		#if test > 0
+			{
+				IConfigMngr&& test = copyMgr.unk;
+				if (test is null) {
+					doLog("Not copy IConfigMngr");
+					return false;
+				}
+			}
+			dumpVtable(&&copyMgr, "_copy");
+		#endif
+			cfgMgr.extractConfig(copyMgr);
+			&&copyMgr = null;
+			tempFile.seek(0, fsBegin);
+			copy_file(file.file, tempFile.file, -1);
+			return true;
+		}
+		return false;
+	}
 };
 
 UintMap<IV8MDContainer&&> contFind;
@@ -558,8 +599,8 @@ class IV8MDObject {
                             if (textEditor !is null) {
                                 TextDoc&& tdoc = textDocStorage.find(textMan);
                                 if (tdoc !is null) {
-                                   TextWnd&& wnd = tdoc.findWnd(textEditor);
-                                   if (wnd !is null)
+                                    TextWnd&& wnd = tdoc.findWnd(textEditor);
+                                    if (wnd !is null)
                                         return wnd.getComWrapper();
                                 }
                             }
@@ -732,28 +773,28 @@ bool loadObject(IV8DataFile&& file, IUnknown&& obj) {
 }
 
 class IObjectProperties {
-    int get_count() {
-        return 0;
-    }
-    string propName(int idx) {
-        return "";
-    }
-    Variant getValue(Variant idx) {
-        return Variant();
-    }
-    void setValue(Variant idx, Variant val) {
-    }
-    void activateProperty(Variant idx) {
-    }
+	int get_count() {
+		return 0;
+	}
+	string propName(int idx) {
+		return "";
+	}
+	Variant getValue(Variant idx) {
+		return Variant();
+	}
+	void setValue(Variant idx, Variant val) {
+	}
+	void activateProperty(Variant idx) {
+	}
 };
 
 IMDContainer&& getIBMDCont() {
     //return getDefaultInfoBase().getConfigMgr().getMDCont();
     
     IInfoBaseService&& ibs = currentProcess().getService(IID_IInfoBaseService);
-    dumpVtable(&&ibs);
+    //dumpVtable(&&ibs);
     IInfoBase&& ib = getDefaultInfoBase();
-    dumpVtable(&&ib);
+    //dumpVtable(&&ib);
     IConfigMngr&& mng = ib.getConfigMgr();
     
     //+ mike_a
@@ -764,7 +805,6 @@ IMDContainer&& getIBMDCont() {
     IMDContainer&& mdcont = mng.getMDCont();
     //dumpVtable(&&mdcont);
     return mdcont;
-    
 }
 
 IMDContainer&& editedMetaDataCont() {
@@ -830,19 +870,19 @@ void trapOpenConfig(IMDEditService& pService, IConfigMngrUI& mngr, IMDContainer&
 enum MetaDataEvents {
     //[helpstring("Добавление")]
     mdeAdd = 0,
-    //[helpstring("Изменение свойства")]    
+    //[helpstring("Изменение свойства")]	
     mdeChangeProp,
-    //[helpstring("Удаление")]          
+    //[helpstring("Удаление")]			
     mdeDelete,
-    //[helpstring("Изменение объекта")] 
+    //[helpstring("Изменение объекта")]	
     mdeChange,
-    //[helpstring("Перед сохранением")] 
+    //[helpstring("Перед сохранением")]	
     mdeSave,
-    //[helpstring("Закрытие UI")]           
+    //[helpstring("Закрытие UI")]			
     mdeClose,
-    //[helpstring("После сохранения")]  
+    //[helpstring("После сохранения")]	
     mdeAfterSave,
-    //[helpstring("Открытие UI")]           
+    //[helpstring("Открытие UI")]			
     mdeOpen,
 };
 
@@ -944,7 +984,7 @@ Variant image2pict(IUnknown&& img) {
 }
 
 IMDContainer&& getMasterContainer(IMDContainer&& cont) {
-    //dumpVtable(&&cont);
+	//dumpVtable(&&cont);
     for (IMDContainer&& master = cont.masterContainer(); master !is null; &&master = cont.masterContainer())
         &&cont = master;
     return cont;

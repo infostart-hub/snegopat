@@ -44,6 +44,7 @@
 #else
 	void var2val(const Variant&, Value&, int=0, bool=false)|?variant_to_value@core@@YAXAAUtagVARIANT@@AAVGenericValue@1@H_N@Z
 #endif
+	int64 copy_file(IFile&, IFile&, int64)|?copy_file@core@@YA_KPAVIFile@1@0_K@Z
 
 :global
 :dlls

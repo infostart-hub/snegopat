@@ -16,6 +16,8 @@
 
 :service IInfoBaseService {F7399BD5-100E-4D0A-A5CE-F97810ACFEE9}
 	:virt
+		+1
+		uint connectConfig(IConfigMngr@& res, IFile@ file, int mode, int t=0)
 		12
 	  #if ver < 8.3.4
 		uint getDefault(IInfoBase@&)
@@ -122,6 +124,16 @@
 		IMDObject@+ objById(const Guid& objId)
 		+4
 		IMDObject@+ objByTypeId(const Guid& typeId)
+
+	  #if ver < 8.3.6
+		50
+	  #elif ver <8.3.7.1759
+	    54
+	  #else
+		55
+	  #endif
+		IConfigMngr@+ getConfigMngr()
+	  
 	  #if ver < 8.3.6
 		52
 	  #elif ver <8.3.7.1759
@@ -167,6 +179,15 @@
 	    83
 	  #endif
 		IMDContainer@+ getMDCont(int i = 0)
+
+	  #if ver < 8.3.9
+		+24
+	  #elif ver < 8.3.10
+		41
+	  #else
+	    42
+	  #endif
+		void extractConfig(IConfigMngr& target)
 
 :iface IConfigMngrUIOwner {FE226A57-F6F0-455f-9CDC-F916AC901CC2}
 	:virt
@@ -275,7 +296,6 @@
 		#endif
 		//
 		uint openModule(ITextManager@&, const Guid& propId, bool s, bool open, ITextEditor@& editor)
-		
 
 :iface IMDTypedObj {752BB41D-05DA-4FD1-A680-78DFB6C6EB1C}
 	:base IMDBaseObj
