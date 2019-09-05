@@ -38,8 +38,10 @@
 
   #if ver < 8.3.4
 	save int doModal2(IFramedView& pView, int i1, int i2, int i3, int i4, int i5, int i6, int i7)
-  #else
+  #elif ver < 8.3.11
 	save int doModal2(IFramedView& pView, int i1, int i2, int i3, int i4, int i5, int i6, int i7, int i8)
+  #else
+	save int doModal2(IFramedView& pView, int i1, int i2, int i3, int i4, int i5, int i6, int i7)
   #endif
 ////////////////////////////////////////////////////////
 // Модальное состояние
@@ -47,10 +49,8 @@
 
 ////////////////////////////////////////////////////////
 // Сообщить
-     // Артур
-	#if ver >= 8.3.10
-	    52
-        // Артур
+	#if ver >= 8.3.10.1877
+		52
 	#elif ver >= 8.3.9
 	    50
 	#elif ver >= 8.3.7
@@ -70,7 +70,7 @@
     #else
         43
     #endif
-    save int doMsgLine(const v8string& text, MessageMarker marker=mNone, const Guid&in g=IID_NULL, int i1=0, IUnknown@ pUnkObject=null, const V8Picture&in customMarker=V8Picture())
+    save int doMsgLine(const v8string&in text, MessageMarker marker=mNone, const Guid&in g=IID_NULL, int i1=0, IUnknown@ pUnkObject=null, const V8Picture&in customMarker=V8Picture())
 		+21
 	save bool GetFileName(SelectFileName& data, int timeout, HWND parent)
 
@@ -87,7 +87,7 @@
 :iface MyMessageHandler {AA7D47D7-FBFB-489E-ACF0-5F90A7AE4744}
 	:virt
 		void process()
-
+#if ver < 8.3.11
 :struct mbp
 :props
     int i1
@@ -104,6 +104,20 @@
         obj.c1 = 2;
     }
     ---
+#else
+:struct mbp
+:props
+    int i1
+    int i2
+    int p1
+:meths
+    void ctor()
+    {
+        obj.i1 = obj.p1 = obj.self + 8;
+        obj.i2 = 0;
+    }
+    ---
+#endif
 
 :enum MsgBoxStyles
     0		mbOK

@@ -1,5 +1,5 @@
-﻿#if ver < 8.2.19 | (ver > 8.3.0 & ver < 8.3.4)
-#error Unsupported version of 1C
+﻿#if ver < 8.2.19 | (ver > 8.3.0 & ver < 8.3.4) | ver > 8.3.10
+#err Unsupported version of 1C - Эта версия 1С не поддерживается!
 #endif
 
 :guid IID_NULL {00000000-0000-0000-0000-000000000000}
@@ -38,7 +38,12 @@
 #endif
     SCOM_Process@ currentProcess()|?current_process@core@@YAPAVSCOM_Process@1@XZ
 	void val2var(const Value&, Variant&)|?value_to_variant_val@core@@YAXABVGenericValue@1@AAUtagVARIANT@@@Z
+#if ver < 8.3.11
 	v8string load_module_wstring(uint charNameModule, uint charResID)|?load_module_wstring@core@@YA?AV?$basic_string@_WV?$char_traits@_W@stlp_std@@V?$allocator@_W@2@@stlp_std@@PBD0@Z
+#else
+	v8string load_module_wstring(uint charNameModule, uint charResID)|?load_module_wstring@core@@YA?AV?$basic_string@_SU?$fix_char_traits@_S@stdx@@V?$allocator@_S@std@@@stdx@@PBD0@Z
+#endif
+
 #if ver < 8.3.6
 	void var2val(const Variant&, Value&, int i=0)|?variant_to_value@core@@YAXAAUtagVARIANT@@AAVGenericValue@1@H@Z
 #else
@@ -52,10 +57,14 @@
 	stl82.dll
 	uint malloc(uint)|?__stl_new@stlp_std@@YAPAXI@Z
 	void free(uint)|?__stl_delete@stlp_std@@YAXPAX@Z
-#else
+#elif ver < 8.3.11
 	nuke83.dll
 	uint malloc(uint)|?alloc@details@nuke@@YAPAXI@Z
 	void free(uint)|?free@details@nuke@@YAXPAX@Z
+#else
+	ucrtbase.dll
+	uint malloc(uint)|malloc
+	void free(uint)|free
 #endif
 
 :iface IGlobalContext {151C4C40-37A4-48EA-990C-14B584EF8A6C}

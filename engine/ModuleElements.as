@@ -255,58 +255,58 @@ class CommonModuleItem : SmartBoxInsertableItem {
 namespace Delimeters {
 
 enum Types {
-	parenthesis,
-	parenthesisWithBackSpace,
-	squareBracket,
-	quote,
-	date,
-	question,
-	lastType,
+    parenthesis,
+    parenthesisWithBackSpace,
+    squareBracket,
+    quote,
+    date,
+    question,
+    lastType,
 };
 
 class Item : SmartBoxInsertableItem {
-	string tt;
-	string ins;
-	bool noActivate;
-	bool needSemicolon;
+    string tt;
+    string ins;
+    bool noActivate;
+    bool needSemicolon;
 
-	Item(const string& name, const string& t, const string& i, bool na = false, bool ns = false) {
-		super(name, imgParenthesis);
-		d.hotOrder = uint(-1);
-		tt = t;
-		ins = i;
-		noActivate = na;
-		needSemicolon = ns;
-	}
+    Item(const string& name, const string& t, const string& i, bool na = false, bool ns = false) {
+        super(name, imgParenthesis);
+        d.hotOrder = uint(-1);
+        tt = t;
+        ins = i;
+        noActivate = na;
+        needSemicolon = ns;
+    }
 
-	void textForTooltip(string& text) {
-		text = tt;
-	}
-	void textForInsert(string&out text) {
-		text = ins;
-		if (needSemicolon && getIntelliSite().isLineTailEmpty())
-			text += ";";
-	}
-	void afterInsert(TextWnd&& editor) {
-		if (!noActivate)
-			showV8Assist();
-	}
+    void textForTooltip(string& text) {
+        text = tt;
+    }
+    void textForInsert(string&out text) {
+        text = ins;
+        if (needSemicolon && getIntelliSite().isLineTailEmpty())
+            text += ";";
+    }
+    void afterInsert(TextWnd&& editor) {
+        if (!noActivate)
+            showV8Assist();
+    }
 };
 
 array<Item&&>&& items;
 
 Item&& getDelimeter(Types type) {
-	if (items is null) {
-		&&items = array<Item&&> = {
-			Item("(...)",	"Вставить скобки", "(¦)"),
-			Item("(...)",	"Вставить скобки", "\x8(\"¦)"),
-			Item("[...]",	"Вставить квадратные скобки", "[¦]"),
-			Item("\"...\"", "Вставить кавычки", "\"¦\""),
-			Item("'...'",	"Вставить дату", "'¦'"),
-			Item("(, , )",	"Вставить после знака вопроса", "(¦, , )", true, true)
-		};
-	}
-	return items[type];
+    if (items is null) {
+        &&items = array<Item&&> = {
+            Item("(...)",	"Вставить скобки", "(¦)"),
+            Item("(...)",	"Вставить скобки", "\x8(\"¦)"),
+            Item("[...]",	"Вставить квадратные скобки", "[¦]"),
+            Item("\"...\"", "Вставить кавычки", "\"¦\""),
+            Item("'...'",	"Вставить дату", "'¦'"),
+            Item("(, , )",	"Вставить после знака вопроса", "(¦, , )", true, true)
+        };
+    }
+    return items[type];
 }
 
 }//namespace Delimeters

@@ -15,7 +15,12 @@
 	void dtor()
 	{
 		if(obj.start != 0) {
-			free(obj.start);
+			uint f = obj.start;
+		  #if ver >= 8.3.11
+			if (obj.allocked - f >= 0x1000)
+				f = mem::dword[f - 4];
+		  #endif
+			free(f);
 		}
 	}
 	---
@@ -27,7 +32,17 @@
 	uint allock(uint count, uint size)
 	{
 		uint s = count * size;
-		obj.start = malloc(s);
+		uint m;
+		#if ver >= 8.3.11
+		if (s >= 0x1000) {
+			m = malloc(s + 35);
+			uint km = (m + 35) & ~31;
+			mem::dword[km - 4] = m;
+			m = km;
+		} else
+		#endif
+			m = malloc(s);
+		obj.start = m;
 		obj.allocked = obj.end = obj.start + s;
 		return obj.start;
 	}

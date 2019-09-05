@@ -100,7 +100,8 @@ class ValueTableQueryResultProcessor : QueryResultProcessor {
                 if (!is_name_symbol(title[idx]))
                     title[idx] = '_';
             }
-            info.name1 = info.name2 = title;
+            info.name1 = title;
+            info.name2 = title;
             pIValueTable.addColumn(unk, info, newId);
             &&unk = null;
         }
@@ -337,10 +338,10 @@ class SqliteQuery {
             setComException(stringFromAddress(sqlite3_errmsg16(sqlite3_db_handle(_stmt))));
         return var;
     }
-	void close() {
-		sqlite3_finalize(_stmt);
-		_stmt = 0;
-	}
+    void close() {
+        sqlite3_finalize(_stmt);
+        _stmt = 0;
+    }
 };
 
 /*

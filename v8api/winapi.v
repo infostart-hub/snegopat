@@ -268,6 +268,8 @@
 	stdcall void DebugBreak()|DebugBreak
 	stdcall int_ptr GetModuleHandle(int_ptr lpModuleName)|GetModuleHandleW
 	stdcall DWORD GetLastError()|GetLastError
+	stdcall int_ptr InterlockedIncrement(int_ptr)|InterlockedIncrement
+	stdcall int_ptr InterlockedDecrement(int_ptr)|InterlockedDecrement
 
 
 :struct LOGFONT

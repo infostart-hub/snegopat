@@ -13,15 +13,15 @@ class Develop {
         V8Dumper d;
         d.dump();
     }
-	void dumpSnegApiToDts() {
-		dumpSnegApi();
-	}
+    void dumpSnegApiToDts() {
+        dumpSnegApi();
+    }
 };
 
 class V8Dumper {
     string content;
     NoCaseMap<string> typeGuidToNames;
-	NoCaseSet allNames;
+    NoCaseSet allNames;
     array<string> newNames;
 
     void dump() {
@@ -46,12 +46,12 @@ class V8Dumper {
             currentProcess().createByClsid(Guid(it.key), IID_IContext, ctx);
             dumpContextDef(ctx.staticContextDef(), "", "");
         }
-		// Переберём все типы
-		Vector vec;
-		SCOM_Process&& proc = currentProcess();
-		proc.getCategoryClasses(vec, IID_IType);
-		for (GuidRef&& ptr = toGuid(vec.start); ptr < vec.end; &&ptr = ptr + 1)
-			getGuidTypeName(ptr.ref);
+        // Переберём все типы
+        Vector vec;
+        SCOM_Process&& proc = currentProcess();
+        proc.getCategoryClasses(vec, IID_IType);
+        for (GuidRef&& ptr = toGuid(vec.start); ptr < vec.end; &&ptr = ptr + 1)
+            getGuidTypeName(ptr.ref);
         // Теперь создадим специализации для v8new
         dumpV8New();
         utf8string str = content.toUtf8();
@@ -59,11 +59,11 @@ class V8Dumper {
         dumpSnegApi();
     }
     void dumpContextDef(IContextDef&& ctx, const string& name0, const string& name1) {
-		if (!name1.isEmpty() && !allNames.insert(name0))
-			return;
-		if (!name1.isEmpty() && name1 != name0 && !allNames.insert(name1))
-			return;
-		NoCaseSet propNames;
+        if (!name1.isEmpty() && !allNames.insert(name0))
+            return;
+        if (!name1.isEmpty() && name1 != name0 && !allNames.insert(name1))
+            return;
+        NoCaseSet propNames;
         // Попробуем получить имена
         string prefixVar, prefixFunc;
         array<string> lines;
@@ -92,17 +92,17 @@ class V8Dumper {
                     cvi.done();
                 }
                 lines.insertLast(prefixVar + prop0 + typeName + ";");
-				propNames.insert(prop0);
-				if (!prop1.isEmpty() && prop1 != prop0) {
-					lines.insertLast(prefixVar + prop1 + typeName + ";");
-					propNames.insert(prop1);
-				}
+                propNames.insert(prop0);
+                if (!prop1.isEmpty() && prop1 != prop0) {
+                    lines.insertLast(prefixVar + prop1 + typeName + ";");
+                    propNames.insert(prop1);
+                }
             }
             // Переберём методы
             for (uint idx = 0, m = ctx.methsCount(); idx < m; idx++) {
                 string meth0(ctx.methName(idx, 0)), meth1(ctx.methName(idx, 1)), typeName;
-				if (propNames.contains(meth0) || propNames.contains(meth1))
-					continue;
+                if (propNames.contains(meth0) || propNames.contains(meth1))
+                    continue;
                 if (ctx.hasRetVal(idx)) {
                     if (extCtx !is null) {
                         ContextValueInfo cvi;
@@ -185,35 +185,35 @@ class V8Dumper {
                     name1 += "Упр";
                 typeName = name0;
                 typeGuidToNames.insert(strGuid, typeName);
-				IContextDef&& ctx = cast<IUnknown>(type);
-				if (ctx is null) {
-					IValue&& val;
-					type.createValue(val);
-					if (val !is null) {
-						&&ctx = cast<IUnknown>(val);
-						if (ctx is null) {
-							IContext&& cont = cast<IUnknown>(val);
-							if (cont !is null) {
-								&&ctx = cont.staticContextDef();
-								if (ctx is null)
-									&&ctx = cont;
-							}
-						}
-					}
-				}
-				if (string(",CommonModule,MngSrvDataCompositionAreaTemplateField,ConfigurationMetadataObject,DataCompositionAppearanceTemplateLib,GraphicalSchemaItemSwitchCases,UnknownObject,CommandGroup,Action,").find("," + name0 + ",") >= 0)
-					&&ctx = null;
+                IContextDef&& ctx = cast<IUnknown>(type);
+                if (ctx is null) {
+                    IValue&& val;
+                    type.createValue(val);
+                    if (val !is null) {
+                        &&ctx = cast<IUnknown>(val);
+                        if (ctx is null) {
+                            IContext&& cont = cast<IUnknown>(val);
+                            if (cont !is null) {
+                                &&ctx = cont.staticContextDef();
+                                if (ctx is null)
+                                    &&ctx = cont;
+                            }
+                        }
+                    }
+                }
+                if (string(",CommonModule,MngSrvDataCompositionAreaTemplateField,ConfigurationMetadataObject,DataCompositionAppearanceTemplateLib,GraphicalSchemaItemSwitchCases,UnknownObject,CommandGroup,Action,").find("," + name0 + ",") >= 0)
+                    &&ctx = null;
                 // Проверим, можно ли создать объект этого типа в Новый
                 bool creatable = false;
-				if (ctx !is null) {
-					for (uint k = 0; k < 10; k++) {
-						if (type.hasCtor(k)) {
-							creatable = true;
-							break;
-						}
-					}
-				}
-				if (creatable) {
+                if (ctx !is null) {
+                    for (uint k = 0; k < 10; k++) {
+                        if (type.hasCtor(k)) {
+                            creatable = true;
+                            break;
+                        }
+                    }
+                }
+                if (creatable) {
                     newNames.insertLast(name0);
                     newNames.insertLast(name1);
                 } else

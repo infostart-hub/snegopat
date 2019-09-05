@@ -7,10 +7,10 @@ Packet ScriptInit("ScriptInit", initScripts, piOnMainWindow);
 
 bool initScripts() {
     //debugger();
-	IWindow&& w = cast<IUnknown>(mainFrame);
-	string nameOfInstance = getDefaultInfoBase().connectString();
-	//dumpVtable(getDefaultInfoBase());
-	//Print(nameOfInstance);
+    IWindow&& w = cast<IUnknown>(mainFrame);
+    string nameOfInstance = getDefaultInfoBase().connectString();
+    //dumpVtable(getDefaultInfoBase());
+    //Print(nameOfInstance);
     initActiveScriptSubsystem(w.hwnd(), nameOfInstance);
     return true;
 }
@@ -19,7 +19,7 @@ bool initScripts() {
 class AddinScript : Addin, ScriptSite {
     protected ActiveScript script;
     protected SelfScript selfScript;
-	private uint errorsCount = 0;
+    private uint errorsCount = 0;
     AddinScript(const string& u, const string& d, const string& f) {
         uName = u;
         dName = d;
@@ -51,12 +51,12 @@ class AddinScript : Addin, ScriptSite {
         return script.getObject();
     }
     bool onScriptError(const ScriptError& err) {
-		errorsCount++;
-		if (errorsCount > 5) {
-			Message("Скрипт " + uName + " совершил пять ошибок и будет прерван", mInfo);
-			script.abort();
-			return false;
-		}
+        errorsCount++;
+        if (errorsCount > 5) {
+            Message("Скрипт " + uName + " совершил пять ошибок и будет прерван", mInfo);
+            script.abort();
+            return false;
+        }
         string msg = "Ошибка выполнения скрипта" +
             "\nСкрипт: " + uName +
             "\nФайл: " + fPath +
@@ -110,7 +110,7 @@ class ScriptLoader : AddinLoader {
         }
         v8string textOfFile;
         readTextFile(textOfFile, fullPath);
-        string source = textOfFile.str;
+        string source = textOfFile;
         if (source.isEmpty()) {
             oneAddinMgr._lastAddinError = "Не удалось получить текст файла " + fullPath;
             return null;
@@ -118,12 +118,12 @@ class ScriptLoader : AddinLoader {
         array<array<string>&&> tags;
         uint firstLine = 0;
         extractTags(tags, source, firstLine);
-		// Теперь надо получить уникальное имя и т.п.
+        // Теперь надо получить уникальное имя и т.п.
         string uName = fullPath.extract(extractFileNameRex), dName, engine;
         array<array<any>&&> connectedAddins;
         bool noDebug = false;
 
-        for (uint it = 0; it < tags.length(); it++) {
+        for (uint it = 0; it < tags.length; it++) {
             string tag = tags[it][0], val = tags[it][1];
 
             if (tag == "engine")
@@ -177,11 +177,11 @@ class ScriptLoader : AddinLoader {
         &&ads.__loader = this;
         ActiveScript&& script = ads._script();
         //noDebug = false;
-		if (engine == "JScript" && firstLine > 0) {
-			source.replace("(this && this.__extends) ||", "");
-			source.insert(0, "var exports=SelfScript.self;var require=function(s){return builtin_require(s);};\n");
-			firstLine--;
-		}
+        if (engine == "JScript" && firstLine > 0) {
+            source.replace("(this && this.__extends) ||", "");
+            source.insert(0, "var exports=SelfScript.self;var require=function(s){return builtin_require(s);};\n");
+            firstLine--;
+        }
         if (script.prepare(engine, source, firstLine, noDebug ? "" : uName, ads) != 0)
             return null;
         ads._connectSelf();
@@ -243,8 +243,8 @@ bool unloadIdleHandlerSet = false;
 
 void extractTags(array<array<string>&&>& tags, string& sources, uint& firstLineIdx) {
     uint startPos = 0;
-	if (sources.length > 13 && sources.substr(0, 14) == "\"use strict\";\n")
-		startPos = 14;
+    if (sources.length > 13 && sources.substr(0, 14) == "\"use strict\";\n")
+        startPos = 14;
     for (;;) {
         auto match = scriptTagsRex.match(sources, 1, startPos);
         if (match.matches == 0 || match.begin(0, 0) != startPos)

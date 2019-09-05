@@ -48,16 +48,16 @@ enum UseLangFlags{ useLangEng = 1, useLangRus = 2 };
 uint useLangs = useLangRus;
 
 OptionsEntry oeUseLangs("UseLangs", function(v){v = uint(useLangRus); },
-	function(v) {Numeric n; v.getNumeric(n); useLangs = n; },
-	function(v){Numeric n; v.getNumeric(n); useLangs = n; return false; });
+    function(v) {Numeric n; v.getNumeric(n); useLangs = n; },
+    function(v){Numeric n; v.getNumeric(n); useLangs = n; return false; });
 
 OptionsEntry oeListWidth("ListWidth", function(v){v = 250; },
-	function(v){Numeric n; v.getNumeric(n); boxWidth = n; },
-	function(v){Numeric n; v.getNumeric(n); boxWidth = n; return false; });
+    function(v){Numeric n; v.getNumeric(n); boxWidth = n; },
+    function(v){Numeric n; v.getNumeric(n); boxWidth = n; return false; });
 
 OptionsEntry oeAllowMultyFilter("AllowFilterInSmartList", function(v){v = true; },
-	function(v){v.getBoolean(allowMultyFilter); },
-	function(v){v.getBoolean(allowMultyFilter); return false; });
+    function(v){v.getBoolean(allowMultyFilter); },
+    function(v){v.getBoolean(allowMultyFilter); return false; });
 
 funcdef void AfterSelect(bool bCancel);
 
@@ -88,7 +88,7 @@ class IntelliSite : SmartBoxSite {
     bool bInHide;
     bool bAllowMultyFilter;
     array<string>&& hotItems;
-	ToolTipWindow templateToolTip;
+    ToolTipWindow templateToolTip;
 
     IntelliSite() {
         clearAllItems();
@@ -182,7 +182,7 @@ class IntelliSite : SmartBoxSite {
         }
         if (!currentItemSelected)
             smartBox.navigate(boxIsUnderLine ? navFirst : navLast);
-		textWnd.editor.createCaret(fontSize.cy);
+        textWnd.editor.createCaret(fontSize.cy);
         bCaretCreated = true;
         SetCaretPos(xCaret, yCaret);
         textWnd.editor.showCaret();
@@ -196,20 +196,20 @@ class IntelliSite : SmartBoxSite {
     private void readSettings() {
         boxWidth = getBoxWidth();
         bAllowMultyFilter = isAllowMultyFilter();
-		textWnd.editor.getFontSize(fontSize);
+        textWnd.editor.getFontSize(fontSize);
     }
 
     // Метод фильтрует существующие элементы, создавая массив с удовлетворяющему фильтру элементами
     array<SmartBoxItem&&>&& filter() {
-		if (smartBox.hwnd != 0)
-			testForTemplate();
+        if (smartBox.hwnd != 0)
+            testForTemplate();
         array<SmartBoxItem&&> result;
 
         if (posInBuffer == 0) {
             // Добавляем все элементы
-            for (uint g = 0, gm = itemsGroup.length(); g < gm; g++) {
+            for (uint g = 0, gm = itemsGroup.length; g < gm; g++) {
                 array<SmartBoxItem&&>&& group = itemsGroup[g];
-                for (uint i = 0, im = group.length(); i < im; i++) {
+                for (uint i = 0, im = group.length; i < im; i++) {
                     SmartBoxItem&& item = group[i];
                     if (!item.d.exclude)
                         result.insertLast(item);
@@ -223,9 +223,9 @@ class IntelliSite : SmartBoxSite {
             else
                 cmp.setPattern(pattern, cmBeginWithOtherLangs);
             pattern.makeUpper();
-            for (uint g = 0, gm = itemsGroup.length(); g < gm; g++) {
+            for (uint g = 0, gm = itemsGroup.length; g < gm; g++) {
                 array<SmartBoxItem&&>&& group = itemsGroup[g];
-                for (uint i = 0, im = group.length(); i < im; i++) {
+                for (uint i = 0, im = group.length; i < im; i++) {
                     SmartBoxItem&& item = group[i];
                     if (!item.d.exclude && (cmp.match(item.d.key) || compareUcaseLetters(item.d.descr, pattern)))
                         result.insertLast(item);
@@ -238,14 +238,14 @@ class IntelliSite : SmartBoxSite {
 
     // Реализация интерфейса взаимодействия со списком
     void onDoSelect(SmartBoxItemBaseIface&& pSelected) {
-		bool shiftPressed = (GetKeyState(VK_SHIFT) & 0x8000) > 0;
-		if (templateToolTip.hwnd != 0 && shiftPressed) {
-			ICommandTarget&& cmd = textWnd.ted.unk;
-			hide();
-			if (cmd !is null)
-				cmd.onExecute(Command(CommandID(cmdGroupTxtEdt, 61), 0));
-			return;
-		}
+        bool shiftPressed = (GetKeyState(VK_SHIFT) & 0x8000) > 0;
+        if (templateToolTip.hwnd != 0 && shiftPressed) {
+            ICommandTarget&& cmd = textWnd.ted.unk;
+            hide();
+            if (cmd !is null)
+                cmd.onExecute(Command(CommandID(cmdGroupTxtEdt, 61), 0));
+            return;
+        }
 
         SmartBoxInsertableItem&& ins = cast<SmartBoxInsertableItem>(pSelected);
         if (ins !is null) {
@@ -257,17 +257,17 @@ class IntelliSite : SmartBoxSite {
             ins.updateInsertPosition(textWnd, tpStart, tpEnd, notIndent);
             string text;
             ins.textForInsert(text);
-			while ('\x8' == text[0]) {
-				if (tpStart.col > 1)
-					tpStart.col--;
-				text.remove(0);
-			}
-			if ((GetKeyState(VK_CONTROL) & 0x8000) > 0) {
-				if (text[text.length - 1] != ';')
-					text += ";";
-				text += "\n";
-				notIndent = false;
-			}
+            while ('\x8' == text[0]) {
+                if (tpStart.col > 1)
+                    tpStart.col--;
+                text.remove(0);
+            }
+            if ((GetKeyState(VK_CONTROL) & 0x8000) > 0) {
+                if (text[text.length - 1] != ';')
+                    text += ";";
+                text += "\n";
+                notIndent = false;
+            }
 
             editor.setSelection(tpStart, tpEnd, false, false);
             insertInSelection(editor, textWnd.textDoc.tm, textWnd.textDoc.itm, text, true, !notIndent);
@@ -288,7 +288,7 @@ class IntelliSite : SmartBoxSite {
             if (posInBuffer == 0)
                 hideAndSend(WM_KEYDOWN, wParam, lParam);
             else {
-				int c = (GetKeyState(VK_CONTROL) & 0x8000) > 0 ? posInBuffer : 1;
+                int c = (GetKeyState(VK_CONTROL) & 0x8000) > 0 ? posInBuffer : 1;
                 TextPosition tpStart = caretPos;
                 tpStart.col -= c;
                 editor.setSelection(tpStart, caretPos, false, false);
@@ -355,7 +355,7 @@ class IntelliSite : SmartBoxSite {
         hide();
         return true;
     }
-	void hide(SmartBoxInsertableItem&& insert = null) {
+    void hide(SmartBoxInsertableItem&& insert = null) {
         if (bInHide)
             return;
         bInHide = true;
@@ -365,8 +365,8 @@ class IntelliSite : SmartBoxSite {
         }
         DestroyWindow(smartBox.hwnd);
         smartBox.setItems(array<SmartBoxItem&&>());
-		if (templateToolTip.hwnd != 0)
-			templateToolTip.destroy();
+        if (templateToolTip.hwnd != 0)
+            templateToolTip.destroy();
         ITextParserCache&& cache = cast<IUnknown>(textWnd.textDoc.itm);
         if (cache !is null)
             cache.clearCache();
@@ -387,25 +387,25 @@ class IntelliSite : SmartBoxSite {
         // Уведомим текстовый процессор о закрытии списка
         tw.textDoc.tp.itemInserted(tw, insert);
     }
-	private void hideAndSend(uint msg, uint wParam, uint lParam) {
+    private void hideAndSend(uint msg, uint wParam, uint lParam) {
         HWND hWnd = textWnd.hWnd;
         hide();
         SendMessage(hWnd, msg, wParam, lParam);
     }
-	private void moveCaret(int step, int removeSymbols) {
+    private void moveCaret(int step, int removeSymbols) {
         caretPos.col += step;
-		if (step != 0) {
-			string sm;
-			if (step < 0)
-				sm = buffer.substr(posInBuffer + step, -step);
-			else
-				sm = buffer.substr(posInBuffer, step);
-			posInBuffer += step;
-			xCaret += (step < 0 ? -1 : 1) * textWnd.editor.getTextWidth(sm, fontSize);
-			SetCaretPos(xCaret, yCaret);
-		}
-		if (removeSymbols != 0)
-			buffer.remove(posInBuffer, removeSymbols);
+        if (step != 0) {
+            string sm;
+            if (step < 0)
+                sm = buffer.substr(posInBuffer + step, -step);
+            else
+                sm = buffer.substr(posInBuffer, step);
+            posInBuffer += step;
+            xCaret += (step < 0 ? -1 : 1) * textWnd.editor.getTextWidth(sm, fontSize);
+            SetCaretPos(xCaret, yCaret);
+        }
+        if (removeSymbols != 0)
+            buffer.remove(posInBuffer, removeSymbols);
         array<SmartBoxItem&&>&& items = filter();
         int itemsCount = items.length;
         if (itemsCount == 0) {
@@ -427,74 +427,74 @@ class IntelliSite : SmartBoxSite {
             editor.updateView();
         }
     }
-	private void setHotOrderForItems() {
+    private void setHotOrderForItems() {
         for (uint i = 0, im = itemsGroup.length; i < im; i++) {
             array<SmartBoxItem&&>&& group = itemsGroup[i];
             for (uint k = 0, km = group.length; k < km; k++) {
                 SmartBoxItem&& item = group[k];
-				if (item.d.hotOrder != uint(-1))
-					item.d.hotOrder = hotItems.find(item.d.key) + 1;
+                if (item.d.hotOrder != uint(-1))
+                    item.d.hotOrder = hotItems.find(item.d.key) + 1;
             }
         }
     }
-	private void updateHotOrder(SmartBoxItem&& item) {
+    private void updateHotOrder(SmartBoxItem&& item) {
         if (item.d.hotOrder > 0 && item.d.hotOrder != uint(-1))
             hotItems.removeAt(item.d.hotOrder - 1);
         hotItems.insertLast(item.d.key);
         if (hotItems.length > maxHotOrderItems())
             hotItems.removeAt(0);
     }
-	private void loadHotOrder() {
+    private void loadHotOrder() {
         IProfileFolder&& root = getProfileRoot();
         v8string data;
         root.getString(hotOrderDataPath, data);
         &&hotItems = data.str.split("\n");
     }
-	private void saveHotOrder() {
+    private void saveHotOrder() {
         IProfileFolder&& root = getProfileRoot();
         //Value val;
-        //if (root.getValue(v8string(hotOrderDataPath), val))
+        //if (root.getValue(hotOrderDataPath, val))
         //    root.deleteValue(hotOrderDataPath);
         root.createAndSetValue(hotOrderDataPath, gpflBaseUser, Value(v8string(join(hotItems, "\n"))));
     }
-	bool isLineTailEmpty() {
-		return getTextLine(textWnd.textDoc.tm, caretPos.line).substr(caretPos.col - 1).replace(indentRex, "").isEmpty();
-	}
+    bool isLineTailEmpty() {
+        return getTextLine(textWnd.textDoc.tm, caretPos.line).substr(caretPos.col - 1).replace(indentRex, "").isEmpty();
+    }
 
-	private void testForTemplate() {
-		ITemplateProcessor&& tp;
-		getTxtEdtService().getTemplateProcessor(tp);
-		v8string line;
-		string cline = getTextLine(textWnd.textDoc.tm, caretPos.line).substr(0, caretPos.col - 1);
+    private void testForTemplate() {
+        ITemplateProcessor&& tp;
+        getTxtEdtService().getTemplateProcessor(tp);
+        v8string line;
+        string cline = getTextLine(textWnd.textDoc.tm, caretPos.line).substr(0, caretPos.col - 1);
 
-		if (tp.needSubstitute(v8string(cline), textWnd.textDoc.tm, line)) {
-			if (templateToolTip.hwnd == 0)
-				templateToolTip.create(smartBox.hwnd);
-			Rect rcScreen;
-			screenGeometry(textWnd.hWnd, rcScreen);
-			int leftWidth = boxCornerPosition.x - rcScreen.left;
-			int rightWidth = rcScreen.right - (boxCornerPosition.x + boxWidth);
+        if (tp.needSubstitute(cline, textWnd.textDoc.tm, line)) {
+            if (templateToolTip.hwnd == 0)
+                templateToolTip.create(smartBox.hwnd);
+            Rect rcScreen;
+            screenGeometry(textWnd.hWnd, rcScreen);
+            int leftWidth = boxCornerPosition.x - rcScreen.left;
+            int rightWidth = rcScreen.right - (boxCornerPosition.x + boxWidth);
 
-			uint width = leftWidth > rightWidth ? leftWidth : rightWidth, height = 0;
-			string text = "  Шаблоны:\n" + line.str + "\n  Shift+Enter или пробел для выбора";
-			templateToolTip.setText(text, 0, width, height);
-			Point pt;
-			pt.x = xCaret;
-			pt.y = yCaret - 3 - height;
-			ClientToScreen(textWnd.hWnd, pt);
-			if (int(width) > rightWidth)
-				pt.x -= width;
-			// Проверим на пересечение с окном списка
-			if (!boxIsUnderLine) {
-				if (uint(rightWidth) > width + 4) // окно влезет справа от списка
-					pt.x = boxCornerPosition.x + boxWidth + 4;
-				else
-					pt.x = boxCornerPosition.x - width - 4;
-			}
-			SetWindowPos(templateToolTip.hwnd, uint(HWND_TOPMOST), pt.x, pt.y, width, height, SWP_NOACTIVATE | SWP_SHOWWINDOW);
-		} else if (templateToolTip.hwnd != 0)
-			templateToolTip.destroy();
-	}
+            uint width = leftWidth > rightWidth ? leftWidth : rightWidth, height = 0;
+            string text = "  Шаблоны:\n" + line.str + "\n  Shift+Enter или пробел для выбора";
+            templateToolTip.setText(text, 0, width, height);
+            Point pt;
+            pt.x = xCaret;
+            pt.y = yCaret - 3 - height;
+            ClientToScreen(textWnd.hWnd, pt);
+            if (int(width) > rightWidth)
+                pt.x -= width;
+            // Проверим на пересечение с окном списка
+            if (!boxIsUnderLine) {
+                if (uint(rightWidth) > width + 4) // окно влезет справа от списка
+                    pt.x = boxCornerPosition.x + boxWidth + 4;
+                else
+                    pt.x = boxCornerPosition.x - width - 4;
+            }
+            SetWindowPos(templateToolTip.hwnd, uint(HWND_TOPMOST), pt.x, pt.y, width, height, SWP_NOACTIVATE | SWP_SHOWWINDOW);
+        } else if (templateToolTip.hwnd != 0)
+            templateToolTip.destroy();
+    }
 };
 
 // Реализация вставляемого элемента метода

@@ -1,6 +1,6 @@
 //engine: JScript
 //uname: scintilla
-//dname: Настройка редактора Scintilla
+//dname: Редактор Scintilla
 //debug: yes
 //descr: Скрипт для настройки редактора Scintilla
 //author: orefkov
@@ -22,6 +22,7 @@ type SetupFormControls = {НадписьМеню: string, Styles: StylesTableBox
 type SetupForm = {Styles: StyleTable, ЭлементыФормы: SetupFormControls, foldComment:any, foldCond:any, foldLoop:any, foldMultiString:any, foldPreproc:any, foldProc:any, foldTry:any} & Form;
 
 global.connectGlobals(SelfScript)
+events.connect(metadata, "MetaDataEvent", SelfScript.self, "OnMetaDataEvent");
 
 var pflScintillaStyles = "Scintilla/Styles/";
 var pflScintillaSettings = "Scintilla/Settings/";
@@ -108,7 +109,7 @@ class SetupFormObject {
 		var list = v8New("СписокЗначений");
 		list.Добавить(0,"Стандартная цветовая схема");
 		list.Добавить(1,"Схема №1");
-		var sel = this.form.Выбрать�?зМеню(list, this.form.ЭлементыФормы.НадписьМеню);
+		var sel = this.form.ВыбратьИзМеню(list, this.form.ЭлементыФормы.НадписьМеню);
 		if (sel) {
 			var colorSheme = getColorSheme(sel.Значение);
 			this.form.Styles.Очистить();
@@ -141,7 +142,7 @@ class SetupFormObject {
 		}
 	}
 
-	StylesFontПри�?зменении(Элемент){
+	StylesFontПриИзменении(Элемент){
 		if (this.form.ЭлементыФормы.Styles.ТекущаяСтрока.StyleName == "default"){
 			var currFont = Элемент.val.Значение;
 			if (Вопрос("Установить этот шрифт для остальных стилей?", РежимДиалогаВопрос.ДаНет, 0) == КодВозвратаДиалога.Нет)
@@ -154,7 +155,14 @@ class SetupFormObject {
 		}
 	}
 
-	StylesBgColorПри�?зменении(Элемент) {
+	StylesBgColorПриИзменении(Элемент) {
+		if (toV8Value(Элемент.val.Значение).typeName(1) == "Цвет"){
+			var valClr = Элемент.val.Значение;
+			if ((valClr.Зеленый < 0) && (valClr.Красный < 0) && (valClr.Синий < 0)){
+				Предупреждение("Встроенный тип 1С \"Цвет\" не поддерживается. Измените любую из составляющих цвета, чтобы он превратился в тип RGB");
+				return;
+			}
+		}
 		if (this.form.ЭлементыФормы.Styles.ТекущаяСтрока.StyleName == "default"){
 			var currColor = Элемент.val.Значение;
 			if (Вопрос("Установить этот цвет фона для остальных стилей?", РежимДиалогаВопрос.ДаНет, 0) == КодВозвратаДиалога.Нет)
@@ -164,6 +172,16 @@ class SetupFormObject {
 				var row = this.form.Styles.Получить(i);
 				row.BgColor = currColor;
 				if (row.StyleName == "directive") break;
+			}
+		}
+	}
+
+	StylesFontColorПриИзменении(Элемент) {
+		if (toV8Value(Элемент.val.Значение).typeName(1) == "Цвет") {
+			var valClr = Элемент.val.Значение;
+			if ((valClr.Зеленый < 0) && (valClr.Красный < 0) && (valClr.Синий < 0)) {
+				Предупреждение("Встроенный тип 1С \"Цвет\" не поддерживается. Измените любую из составляющих цвета, чтобы он превратился в тип RGB");
+				return;
 			}
 		}
 	}
@@ -246,6 +264,34 @@ function getColorSheme(num){
 	}
 }
 
+function OnMetaDataEvent(mde) {
+	scintilla_int.callOnMetaDataEvent(mde);
+}
+
+//{ МАКРОСЫ 
+SelfScript.self['macrosСвернуть/развернуть текущий блок'] = function() {
+	scintilla_int.callToggleFold();
+}
+SelfScript.self['macrosСвернуть/развернуть текущий блок с вложенными'] = function() {
+	scintilla_int.callToggleFold(true);
+}
+SelfScript.self['macrosСбросить маркеры модифицированности строк'] = function() {
+	scintilla_int.callResetModifiedLineStates();
+}
+SelfScript.self['macrosПрокрутка на строку вниз'] = function() {
+	scintilla_int.callLineScroll(1);
+}
+SelfScript.self['macrosПрокрутка на строку вверх'] = function() {
+	scintilla_int.callLineScroll(-1);
+}
+SelfScript.self['macrosПерейти к следующей модифицированной строке'] = function() {
+	scintilla_int.callGotoModifiedLine(1);
+}
+SelfScript.self['macrosПерейти к предыдущей модифицированной строке'] = function() {
+	scintilla_int.callGotoModifiedLine(-1);
+}
+//}
+
 function ColorToColor1C(clr){
 	return v8New("Цвет",clr & 255,clr >> 8 & 255,clr >> 16);
 }
@@ -257,7 +303,6 @@ function Color1CToColor(clr){
 function rgb(r, g, b) {
 	return r | (g << 8) | (b << 16);
 }
-
 var styleNames = {
 	"default" : "Базовый стиль",
 	"keyword" : "Ключевое слово",
@@ -265,7 +310,7 @@ var styleNames = {
 	"number" : "Число",
 	"string" : "Строка",
 	"date" : "Дата",
-	"identifier" : "�?дентификатор",
+	"identifier" : "Идентификатор",
 	"operator" : "Оператор",
 	"preprocessor" : "Препроцессор",
 	"label" : "Метка",

@@ -22,7 +22,7 @@
  
 Либо в шапке скрипта пропишите
     
-	//addin: global
+    //addin: global
  
 а в первых строках кода
 
@@ -53,7 +53,7 @@ AddinGlobal addGlobal;
 class GlobalAddinObject {
     GlobalAddinObject() {
         fillArrayOfContextes();
-		//oneDesigner._develop.dumpV8typesToDts();
+        //oneDesigner._develop.dumpV8typesToDts();
     }
     // небольшой косячок: раньше этим вызовом мог в-принципе воспользоваться любой IDispatch, имеющий
     // метод addNamedItem, а теперь только исключительно объект SelfScript. Если возникнет нужда,
@@ -170,8 +170,8 @@ class GlobalAddinObject {
         // CryptoCertificateStorePlacement / РасположениеХранилищаСертификатовКриптографии
         addGC("{D041F9A0-476B-4558-8EFC-D895DC695E72}");
         /*@
-		{D041F9A0-476B-4558-8EFC-D895DC695E72}
-		0x15B58DC0 c:\Program Files\1cv82\8.2.11.236\bin\frame.dll
+        {D041F9A0-476B-4558-8EFC-D895DC695E72}
+        0x15B58DC0 c:\Program Files\1cv82\8.2.11.236\bin\frame.dll
          Методы
          Свойства
          +ButtonPictureLocation / ПоложениеКартинкиКнопки
@@ -198,11 +198,11 @@ class GlobalAddinObject {
          DragAllowedActions / ДопустимыеДействияПеретаскивания
          DragAction / ДействиеПеретаскивания
          +QuestionDialogMode / РежимДиалогаВопрос
-		@*/
+        @*/
         addGC("{22A21030-E1D6-46A0-9465-F0A5427BE011}");
         /*@
-		{22A21030-E1D6-46A0-9465-F0A5427BE011}
-		0x14AB63B0 c:\Program Files\1cv82\8.2.11.236\bin\ext.dll
+        {22A21030-E1D6-46A0-9465-F0A5427BE011}
+        0x14AB63B0 c:\Program Files\1cv82\8.2.11.236\bin\ext.dll
         // Методы
         // +NumberInWords / ЧислоПрописью
         // PeriodPresentation / ПредставлениеПериода
@@ -230,11 +230,11 @@ class GlobalAddinObject {
         // ZIPSubDirProcessingMode / РежимОбработкиПодкаталоговZIP
         // ZIPRestoreFilePathsMode / РежимВосстановленияПутейФайловZIP
         // CryptoTools / СредстваКриптографии
-		@*/
+        @*/
         addGC("{B8542F1F-3296-45EF-9891-59DAFA57B67C}");
-		/*@
+        /*@
         // {B8542F1F-3296-45EF-9891-59DAFA57B67C}
-		0x666FD440 c:\Program Files\1cv82\8.2.11.236\bin\mngbase.dll
+        0x666FD440 c:\Program Files\1cv82\8.2.11.236\bin\mngbase.dll
         // Методы
         // ValueToFormData / ЗначениеВДанныеФормы
         // FormDataToValue / ДанныеФормыВЗначение
@@ -251,12 +251,12 @@ class GlobalAddinObject {
         // GetObjectAndFormAttributeConformity / ПолучитьСоответствиеОбъектаИРеквизитаФормы
         // GetURLsPresentations / ПолучитьПредставленияНавигационныхСсылок
         // Свойства
-		@*/
+        @*/
 
         addGC("{38406666-F954-489E-BB5B-B0E6C0C81AFB}");
-		/*@
+        /*@
         // {38406666-F954-489E-BB5B-B0E6C0C81AFB}
-		0x3269BE10 c:\Program Files\1cv82\8.2.11.236\bin\frntend.dll
+        0x3269BE10 c:\Program Files\1cv82\8.2.11.236\bin\frntend.dll
         // Методы
         // +DoMessageBox / Предупреждение
         // +DoQueryBox / Вопрос
@@ -308,7 +308,7 @@ class GlobalAddinObject {
         // PeriodVariant / ВариантПериода
         // PeriodSettingsVariant / ВариантНастройкиПериода
         // NewRowShowCheckVariant / ВариантПроверкиОтображенияНовойСтроки
-		@*/
+        @*/
 
         //allgc.push(globalContext("{F8EE2CA3-E705-4C3A-A2A3-A691AABF5976}"))
         // {F8EE2CA3-E705-4C3A-A2A3-A691AABF5976} - 0x28182380 c:\Program Files\1cv82\8.2.11.236\bin\backbas.dll
@@ -317,15 +317,15 @@ class GlobalAddinObject {
 
 
         addGC("{2482FC4E-012A-4E97-88A1-77DE6EC8DEA2}");
-		/*@
+        /*@
         // {2482FC4E-012A-4E97-88A1-77DE6EC8DEA2}
-		0x15425F28 c:\Program Files\1cv82\8.2.11.236\bin\extui.dll
+        0x15425F28 c:\Program Files\1cv82\8.2.11.236\bin\extui.dll
         // Методы
         // InstallCryptoExtension / УстановитьРасширениеРаботыСКриптографией
         // AttachCryptoExtension / ПодключитьРасширениеРаботыСКриптографией
         // Свойства
         // +FileDialogMode / РежимДиалогаВыбораФайла
-		@*/
+        @*/
 
 
         //allgc.push(globalContext("{ACDDDD96-BBBC-4793-8D2E-E0A76C613F75}"))
@@ -363,9 +363,9 @@ class GlobalAddinObject {
 
 
         addGC("{593796CF-D334-4E0C-963A-8F67DE0625A6}");
-		/*@
+        /*@
         // {593796CF-D334-4E0C-963A-8F67DE0625A6}
-		0x1FC17360 c:\Program Files\1cv82\8.2.11.236\bin\xml2.dll
+        0x1FC17360 c:\Program Files\1cv82\8.2.11.236\bin\xml2.dll
         // Методы
         // XMLString / XMLСтрока
         // XMLValue / XMLЗначение
@@ -411,12 +411,12 @@ class GlobalAddinObject {
         // XSContentModel / МодельСодержимогоXS
         // XMLCanonicalizationType / ТипКаноническогоXML
         // DOMXPathResultType / ТипРезультатаDOMXPath
-		@*/
+        @*/
 
         addGC("{1373BA1B-0DCB-47DA-8A46-D9CF64F3DECA}");
-		/*@
+        /*@
         // {1373BA1B-0DCB-47DA-8A46-D9CF64F3DECA}
-		0x63A942A8 c:\Program Files\1cv82\8.2.11.236\bin\mngcore.dll
+        0x63A942A8 c:\Program Files\1cv82\8.2.11.236\bin\mngcore.dll
         // Методы
         // CopyFormData / КопироватьДанныеФормы
         // IsTempStorageURL / ЭтоАдресВременногоХранилища
@@ -466,7 +466,7 @@ class GlobalAddinObject {
         // CommandParameterUseMode / РежимИспользованияПараметраКоманды
         // AdditionalShowMode / ДополнительныйРежимОтображения
         // ButtonRepresentation / ОтображениеКнопки
-		@*/
+        @*/
 
         //allgc.push(globalContext("{1AAA6685-50B5-4501-B9EF-BD7707B6A52E}"))
         // {1AAA6685-50B5-4501-B9EF-BD7707B6A52E} - 0x27A758B0 c:\Program Files\1cv82\8.2.11.236\bin\fmtd.dll
@@ -521,9 +521,9 @@ class GlobalAddinObject {
 
 
         addGC("{C96430EF-26D9-4B53-87C7-05036A39E73C}");
-		/*@
+        /*@
         // {C96430EF-26D9-4B53-87C7-05036A39E73C}
-		0x1022CB40 c:\Program Files\1cv82\8.2.11.236\bin\core82.dll
+        0x1022CB40 c:\Program Files\1cv82\8.2.11.236\bin\core82.dll
         // Методы
         // FillPropertyValues / ЗаполнитьЗначенияСвойств
         // Base64Value / Base64Значение
@@ -558,7 +558,7 @@ class GlobalAddinObject {
         // PlatformType / ТипПлатформы
         // SizeChangeMode / РежимИзмененияРазмера
         // Key / Клавиша
-		@*/
+        @*/
 
         //allgc.push(globalContext("{1BBF90ED-E363-42AD-9112-C8C0D6DBE8F3}"))
         // {1BBF90ED-E363-42AD-9112-C8C0D6DBE8F3} - 0x56FBDAB8 c:\Program Files\1cv82\8.2.11.236\bin\bp.dll
@@ -569,9 +569,9 @@ class GlobalAddinObject {
 
 
         addGC("{4A993AB7-2F75-43CF-B34A-0AD9FFAEE7E3}");
-		/*@
+        /*@
         {4A993AB7-2F75-43CF-B34A-0AD9FFAEE7E3}
-		0x3101ECA0 c:\Program Files\1cv82\8.2.11.236\bin\backend.dll
+        0x3101ECA0 c:\Program Files\1cv82\8.2.11.236\bin\backend.dll
         // Методы
         // BeginTransaction / НачатьТранзакцию
         // CommitTransaction / ЗафиксироватьТранзакцию
@@ -708,7 +708,7 @@ class GlobalAddinObject {
         // ReportsVariantsStorage / ХранилищеВариантовОтчетов
         // FormDataSettingsStorage / ХранилищеНастроекДанныхФорм
         // StandardCommandsGroup / СтандартнаяГруппаКоманд
-		@*/
+        @*/
 
         //allgc.push(globalContext("{C1DB9C38-CBED-4A55-BB0C-7A891C804310}"))
         // {C1DB9C38-CBED-4A55-BB0C-7A891C804310} - 0x27D687A8 c:\Program Files\1cv82\8.2.11.236\bin\addin.dll
@@ -744,9 +744,9 @@ class GlobalAddinObject {
         // ExternalDataProcessors / ВнешниеОбработки
         // ExternalReports / ВнешниеОтчеты
         addGC("{C6B82646-54E9-4151-97A2-704D2DD57E9F}");
-		/*@
+        /*@
         {C6B82646-54E9-4151-97A2-704D2DD57E9F}
-		0x22F0BB70 c:\Program Files\1cv82\8.2.11.236\bin\xdto.dll
+        0x22F0BB70 c:\Program Files\1cv82\8.2.11.236\bin\xdto.dll
         // Методы
         // ImportXDTOModel / ИмпортМоделиXDTO
         // CreateXDTOFactory / СоздатьФабрикуXDTO
@@ -755,17 +755,17 @@ class GlobalAddinObject {
         // XDTOFacetType / ВидФасетаXDTO
         // XDTOFactory / ФабрикаXDTO
         // XDTOSerializer / СериализаторXDTO
-		@*/
+        @*/
 
 
         addGC("{F9DB1621-C863-11D5-A3C1-0050BAE0A776}");
-		/*@
+        /*@
         {F9DB1621-C863-11D5-A3C1-0050BAE0A776}
-		0x3E3089A8 c:\Program Files\1cv82\8.2.11.236\bin\basicui.dll
+        0x3E3089A8 c:\Program Files\1cv82\8.2.11.236\bin\basicui.dll
         // Методы
         // Свойства
         // FileCompareMethod / СпособСравненияФайлов
-		@*/
+        @*/
 
 
         //allgc.push(globalContext("{6EE0CC38-4E22-4F31-B0F1-851DE29B9B1A}"))
@@ -776,9 +776,9 @@ class GlobalAddinObject {
 
 
         addGC("{5ABA21A1-5571-4FE5-885C-44928B6CCA88}");
-		/*@
+        /*@
         {5ABA21A1-5571-4FE5-885C-44928B6CCA88}
-		0x6AD158D0 c:\Program Files\1cv82\8.2.11.236\bin\mngui.dll
+        0x6AD158D0 c:\Program Files\1cv82\8.2.11.236\bin\mngui.dll
         // Методы
         // GetApplicationCaption / ПолучитьЗаголовокПриложения
         // SetApplicationCaption / УстановитьЗаголовокПриложения
@@ -805,7 +805,7 @@ class GlobalAddinObject {
         // InstallAddIn / УстановитьВнешнююКомпоненту
         // RequestUserPermission / ЗапроситьРазрешениеПользователя
         // Свойства
-		@*/
+        @*/
 
 
         //allgc.push(globalContext("{B5F7310D-24ED-4F88-B424-AABAF5E30A9C}"))

@@ -31,43 +31,43 @@ ITextExtColors&& sqlColors;
 // Использовать пользовательские группировки
 bool usersGrouping;
 OptionsEntry oeEnableCustomGrouping("EnableCustomGrouping", function(v) {v = true; },
-	function(v){v.getBoolean(usersGrouping); },
-	function(v){v.getBoolean(usersGrouping); initGroupingAndColoring(); return false; });
+    function(v){v.getBoolean(usersGrouping); },
+    function(v){v.getBoolean(usersGrouping); initGroupingAndColoring(); return false; });
 
 // Раскрашивать мульти-строки в цвета запросов.
 bool colorizedMultyLines;
 OptionsEntry oeQueryColors("QueryColors", function(v) {v = true; },
-	function(v){v.getBoolean(colorizedMultyLines); },
-	function(v){v.getBoolean(colorizedMultyLines); initGroupingAndColoring(); return false; });
+    function(v){v.getBoolean(colorizedMultyLines); },
+    function(v){v.getBoolean(colorizedMultyLines); initGroupingAndColoring(); return false; });
 
 // Менять фон для мульти-строк при раскраске в цвета запроса.
 bool enableBkColorForMultyLine;
 OptionsEntry oeEnableBkColorForMultyLine("EnableBkColorForMultyLine", function(v) {v = true; },
-	function(v){v.getBoolean(enableBkColorForMultyLine); },
-	function(v){v.getBoolean(enableBkColorForMultyLine); initGroupingAndColoring(); return false; });
+    function(v){v.getBoolean(enableBkColorForMultyLine); },
+    function(v){v.getBoolean(enableBkColorForMultyLine); initGroupingAndColoring(); return false; });
 
 // Цвет фона для мульти-строк при смене фона при их раскраске в цвета запроса.
 uint colorBgForMultyLine = 0xE0E0E0;
 OptionsEntry oeMultiLineBackground("MultiLineBackground", &&defvalBgColorForMultyLine,
-	function(v){colorFromV8(v, colorBgForMultyLine); },
-	function(v){colorFromV8(v, colorBgForMultyLine); return false; });
+    function(v){colorFromV8(v, colorBgForMultyLine); },
+    function(v){colorFromV8(v, colorBgForMultyLine); return false; });
 
 void defvalBgColorForMultyLine(Value& val) {
-	IV8Color&& clr;
-	currentProcess().createByClsid(V8Color, IID_IV8Color, clr);
-	Color c(0xE0, 0xE0, 0xE0);
-	clr.setColor(c);
-	&&val.pValue = cast<IUnknown>(clr);
+    IV8Color&& clr;
+    currentProcess().createByClsid(V8Color, IID_IV8Color, clr);
+    Color c(0xE0, 0xE0, 0xE0);
+    clr.setColor(c);
+    &&val.pValue = cast<IUnknown>(clr);
 }
 
 void colorFromV8(const Value& val, uint&out res) {
-	IV8Color&& color = cast<IUnknown>(val.pValue);
-	if (color !is null) {
-		Color clr;
-		color.getColor(clr);
-		if (clr.kind == 0)
-			res = clr.value.id;
-	}
+    IV8Color&& color = cast<IUnknown>(val.pValue);
+    if (color !is null) {
+        Color clr;
+        color.getColor(clr);
+        if (clr.kind == 0)
+            res = clr.value.id;
+    }
 }
 
 // Цвет символа |
@@ -79,77 +79,77 @@ int bgColorTrapType = 0;
 
 // Инициализация перехвата
 bool initGroupingAndColoring() {
-	getEventService().notify(eTxtEdtOptionChanged);
-	if (!usersGrouping && !colorizedMultyLines) {
-		// Не нужны ни группировки, ни раскраска запросов
-		// Поверим, если перехваты уже установлены, снимем их
-		if (trITextExtColors_getColors.state == trapEnabled)
-			trITextExtColors_getColors.swap();
-		if (trTextExtModule_QI.state == trapEnabled)
-			trTextExtModule_QI.swap();
-		if (trTxtExt_hasBG.state == trapEnabled)
-			trTxtExt_hasBG.swap();
-		if (trTxtExt_getBG.state == trapEnabled)
-			trTxtExt_getBG.swap();
-		return true;
-	}
-	// Хотя бы одна из опций "группировка" или "раскраска" активна.
-	// значит, надо по-любому устанавливать/восстанавливать перехват на парсинг строки
+    getEventService().notify(eTxtEdtOptionChanged);
+    if (!usersGrouping && !colorizedMultyLines) {
+        // Не нужны ни группировки, ни раскраска запросов
+        // Поверим, если перехваты уже установлены, снимем их
+        if (trITextExtColors_getColors.state == trapEnabled)
+            trITextExtColors_getColors.swap();
+        if (trTextExtModule_QI.state == trapEnabled)
+            trTextExtModule_QI.swap();
+        if (trTxtExt_hasBG.state == trapEnabled)
+            trTxtExt_hasBG.swap();
+        if (trTxtExt_getBG.state == trapEnabled)
+            trTxtExt_getBG.swap();
+        return true;
+    }
+    // Хотя бы одна из опций "группировка" или "раскраска" активна.
+    // значит, надо по-любому устанавливать/восстанавливать перехват на парсинг строки
     // Создаем текстовое расширение "Встроенный язык"
     IUnknown&& ext;
-	if (trITextExtColors_getColors.state == trapNotActive) {
-		currentProcess().createByClsid(gTextExtModule, IID_IUnknown, ext);
-		// Получаем его интерфейс для синтакс-разбора строки
-		ITextExtColors&& colorsExt = ext;
-		if (colorsExt !is null) {
-			// Ставим перехват на функцию разбора строки
-			trITextExtColors_getColors.setTrap(colorsExt, ITextExtColors_getColors, ITextExtColors_getColorsTrap);
-			// Создаем текстовое расширение "Язык запросов" 
-			currentProcess().createByClsid(CLSID_TextExtSQL, IID_ITextExtColors, sqlColors);
-		} else {
-			doLog("Not have colorsExt in initGroupingAndColoring");
-		}
-	} else if (trITextExtColors_getColors.state == trapDisabled)
-		trITextExtColors_getColors.swap();
-	// Если включена раскраска строк в цвета запросов, надо разобраться с фоном
-	if (colorizedMultyLines) {
-		if (enableBkColorForMultyLine) {
-			// Надо устанавливать или восстанавливать перехват на получение фона строки
-			// Для начала выясним, какой тип перехвата нужно делать
-			if (bgColorTrapType == 0) {	// Еще не выясняли, надо узнать
-				if (ext is null)
-					currentProcess().createByClsid(gTextExtModule, IID_IUnknown, ext);
-				ITextExtBackColors&& bgHandler = ext;
-				if (bgHandler is null) {
-					&&myBGHandler = AStoIUnknown(MyTextExtBackColors(), IID_ITextExtBackColors);
-					// Ставим перехват на QueryInterface расширения "Встроенный язык"
-					ITextExtention&& tExt = ext;
-					trTextExtModule_QI.setTrap(tExt, 0, TextExtModule_QI);
-					bgColorTrapType = 1;
-				} else {
-					trTxtExt_hasBG.setTrap(bgHandler, ITextExtBackColors_hasCustomBackground, TxtExt_hasCustomBackground);
-					trTxtExt_getBG.setTrap(bgHandler, ITextExtBackColors_getColorInfo, TxtExt_getColorInfo);
-					bgColorTrapType = 2;
-				}
-			} else if (bgColorTrapType == 1) {
-				if (trTextExtModule_QI.state != trapEnabled)
-					trTextExtModule_QI.swap();
-			} else if (bgColorTrapType == 2) {
-				if (trTxtExt_getBG.state != trapEnabled) {
-					trTxtExt_getBG.swap();
-					trTxtExt_hasBG.swap();
-				}
-			}
-		} else {
-			// Надо отключить перехваты на фон строки
-			if (trTextExtModule_QI.state == trapEnabled)
-				trTextExtModule_QI.swap();
-			if (trTxtExt_hasBG.state == trapEnabled)
-				trTxtExt_hasBG.swap();
-			if (trTxtExt_getBG.state == trapEnabled)
-				trTxtExt_getBG.swap();
-		}
-	}
+    if (trITextExtColors_getColors.state == trapNotActive) {
+        currentProcess().createByClsid(gTextExtModule, IID_IUnknown, ext);
+        // Получаем его интерфейс для синтакс-разбора строки
+        ITextExtColors&& colorsExt = ext;
+        if (colorsExt !is null) {
+            // Ставим перехват на функцию разбора строки
+            trITextExtColors_getColors.setTrap(colorsExt, ITextExtColors_getColors, ITextExtColors_getColorsTrap);
+            // Создаем текстовое расширение "Язык запросов" 
+            currentProcess().createByClsid(CLSID_TextExtSQL, IID_ITextExtColors, sqlColors);
+        } else {
+            doLog("Not have colorsExt in initGroupingAndColoring");
+        }
+    } else if (trITextExtColors_getColors.state == trapDisabled)
+        trITextExtColors_getColors.swap();
+    // Если включена раскраска строк в цвета запросов, надо разобраться с фоном
+    if (colorizedMultyLines) {
+        if (enableBkColorForMultyLine) {
+            // Надо устанавливать или восстанавливать перехват на получение фона строки
+            // Для начала выясним, какой тип перехвата нужно делать
+            if (bgColorTrapType == 0) {	// Еще не выясняли, надо узнать
+                if (ext is null)
+                    currentProcess().createByClsid(gTextExtModule, IID_IUnknown, ext);
+                ITextExtBackColors&& bgHandler = ext;
+                if (bgHandler is null) {
+                    &&myBGHandler = AStoIUnknown(MyTextExtBackColors(), IID_ITextExtBackColors);
+                    // Ставим перехват на QueryInterface расширения "Встроенный язык"
+                    ITextExtention&& tExt = ext;
+                    trTextExtModule_QI.setTrap(tExt, 0, TextExtModule_QI);
+                    bgColorTrapType = 1;
+                } else {
+                    trTxtExt_hasBG.setTrap(bgHandler, ITextExtBackColors_hasCustomBackground, TxtExt_hasCustomBackground);
+                    trTxtExt_getBG.setTrap(bgHandler, ITextExtBackColors_getColorInfo, TxtExt_getColorInfo);
+                    bgColorTrapType = 2;
+                }
+            } else if (bgColorTrapType == 1) {
+                if (trTextExtModule_QI.state != trapEnabled)
+                    trTextExtModule_QI.swap();
+            } else if (bgColorTrapType == 2) {
+                if (trTxtExt_getBG.state != trapEnabled) {
+                    trTxtExt_getBG.swap();
+                    trTxtExt_hasBG.swap();
+                }
+            }
+        } else {
+            // Надо отключить перехваты на фон строки
+            if (trTextExtModule_QI.state == trapEnabled)
+                trTextExtModule_QI.swap();
+            if (trTxtExt_hasBG.state == trapEnabled)
+                trTxtExt_hasBG.swap();
+            if (trTxtExt_getBG.state == trapEnabled)
+                trTxtExt_getBG.swap();
+        }
+    }
     return true;
 }
 
@@ -165,19 +165,19 @@ void printSyntaxInfos(const string& text, Vector& infos) {
 // Обработчик перехваченной функции синтакс-разбора строки
 funcdef void TE_gc(ITextExtColors&, const v8string&, Vector&);
 void ITextExtColors_getColorsTrap(ITextExtColors& pThis, const v8string& sourceLine, Vector& infos) {
-	// Вызовем штатную процедуру
-	TE_gc&& orig;
-	trITextExtColors_getColors.getOriginal(&&orig);
-	orig(pThis, sourceLine, infos);
-	//printSyntaxInfos(sourceLine.str, infos);
-	// На нет и суда нет
-	if (infos.end == infos.start)
-		return;
-	// Проверим на группирующие комментарии
-	string srcLine = sourceLine.str;
-	SyntaxItemInfoRef&& sInfo = toSyntaxItemInfo(infos.start);
-	if (usersGrouping && checkForGroupingRemark(srcLine, infos))
-		return;
+    // Вызовем штатную процедуру
+    TE_gc&& orig;
+    trITextExtColors_getColors.getOriginal(&&orig);
+    orig(pThis, sourceLine, infos);
+    //printSyntaxInfos(sourceLine.str, infos);
+    // На нет и суда нет
+    if (infos.end == infos.start)
+        return;
+    // Проверим на группирующие комментарии
+    string srcLine = sourceLine.str;
+    SyntaxItemInfoRef&& sInfo = toSyntaxItemInfo(infos.start);
+    if (usersGrouping && checkForGroupingRemark(srcLine, infos))
+        return;
     if (!colorizedMultyLines)
         return;
     // Дополнительно парсить языком запросов будем, если первый токен - строковая константа, начинающаяся с |,
@@ -191,7 +191,7 @@ void ITextExtColors_getColorsTrap(ITextExtColors& pThis, const v8string& sourceL
     // Теперь все полученные блоки нужно слить в один вектор
     free(infos.start);
     uint pWrite = infos.allock(newCount, SyntaxItemInfo_size);
-    for (uint idx = 0, m = newBlocks.length(); idx < m; idx++) {
+    for (uint idx = 0, m = newBlocks.length; idx < m; idx++) {
         SQLBlockInfo&& pBlock = newBlocks[idx];
         uint size = pBlock.tokens.size();
         if (size != 0) {
@@ -265,10 +265,10 @@ array<SQLBlockInfo&&>&& parseQuoteLexemAsSQL(const string& srcLine, Vector& toke
                 if (srcLine[toSyntaxItemInfo(tokens.start).ref.start] != '|') {
                     isBlock = groupBlockBegin;
                     blockKind = groupBlockKind;
-					if (sInfo.ref.len == 1 ||
-						srcLine.substr(sInfo.ref.start + 1, sInfo.ref.len - 1).trim().isEmpty()) {
-						needChangeBG = false;
-					}
+                    if (sInfo.ref.len == 1 ||
+                        srcLine.substr(sInfo.ref.start + 1, sInfo.ref.len - 1).trim().isEmpty()) {
+                        needChangeBG = false;
+                    }
                 }
             }
             if (withoutBegin && !withoutEnd && !isLineEndWithOpenQuote(srcLine)) {

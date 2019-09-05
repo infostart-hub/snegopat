@@ -30,21 +30,33 @@
 // Чистый и красивый интерфейс
 class Designer {
     // Менеджер аддинов
-    AddinMgr&&      _addins;
-    ProfileStore    _profileRoot(getProfileRoot());
-    Snegopat        _snegopat;
-    IHotKeys        _hotkeys;
-    IEventConnector _events;
-    IV8Windows      _windows;
-    IV8MetaData     _metadata(0);
-    V8Files         _v8files;
-    Develop         _develop;
-    EnvironmentData _env;
-	CommandService	_cmdService;
+    AddinMgr&&			_addins;
+    ProfileStore&&		_profileRoot;
+    Snegopat&&			_snegopat;
+    IHotKeys&&			_hotkeys;
+    IEventConnector&&	_events;
+    IV8Windows&&		_windows;
+    IV8MetaData&&		_metadata;
+    V8Files&&			_v8files;
+    Develop&&			_develop;
+    EnvironmentData&&	_env;
+    CommandService&&	_cmdService;
     //IV8Debugger     _v8debug;
     
     Designer() {
-		//dumpVtable(&&getBkEndUI());
+        //Print("designer ctor");
+        &&oneDesigner = this;
+        &&_profileRoot = ProfileStore(getProfileRoot());
+        &&_snegopat = Snegopat();
+        &&_hotkeys = IHotKeys();
+        &&_events = IEventConnector();
+        &&_windows = IV8Windows();
+        &&_metadata = IV8MetaData(0);
+        &&_v8files = V8Files();
+        &&_develop = Develop();
+        &&_env = EnvironmentData();
+        &&_cmdService = CommandService();
+        //dumpVtable(&&getBkEndUI());
         // Инициализирем всякую всячину
         setTrapOnComExportCount();
         fillTypeNames();
@@ -114,7 +126,7 @@ class Designer {
             &&h = AStoIUnknown(&&ho, IID_MyMessageHandler);
             g = IID_MyMessageHandler;
         }
-        getBkEndUI().doMsgLine(v8string(text), marker, g, 0, h, pict);
+        getBkEndUI().doMsgLine(text, marker, g, 0, h, pict);
     }
     // Предупреждение
     MsgBoxAnswers MessageBox(const string& text, MsgBoxStyles style = mbOK, const string& caption = "", uint timeout = 0) {
@@ -178,16 +190,16 @@ class Designer {
     void saveProfile() {
         getProfileService().flush();
     }
-	void snPrint(const string& msg) {
-		Print(msg);
-	}
-	void snLog(const string& msg) {
-		doLog(msg);
-	}
-	
-	EditorsManager&& get_editorsManager() {
-		return editorsManager;
-	}
+    void snPrint(const string& msg) {
+        Print(msg);
+    }
+    void snLog(const string& msg) {
+        doLog(msg);
+    }
+    
+    EditorsManager&& get_editorsManager() {
+        return editorsManager;
+    }
 
     // Это из скриптов не вызвать
     IUnknown&& _createValue(const string& name, ValueParamsVector&& params = ValueParamsVector()) {
@@ -215,24 +227,24 @@ class Designer {
         return res;
     }
 
-	Variant builtin_require(string addinFile) {
-		Variant res;
-		// Так как вызов этого require вставляется автоматически TypeScript'ом, то название аддина является
-		// файлом, и он может быть относительным и содержать различные папки и прочее. Также в конечном
-		// счёте название файла может не совпадать с уникальным именем аддина. Поэтому нам надо перебрать
-		// все аддины и найти нужный.
-		string fileName = "\\" + addinFile.extract(extractFileNameRex), ext = fileName.extract(extractFileExtRex);
-		if (ext.isEmpty())
-			fileName += ".js";
-		for (uint i = 0, k = _addins.get_count(); i < k; i++) {
-			Addin&& a = _addins.byIdx(i);
-			if (a.get_fullPath().substr(-fileName.length).compareNoCase(fileName) == 0) {
-				res.setDispatch(a.object());
-				break;
-			}
-		}
-		return res;
-	}
+    Variant builtin_require(string addinFile) {
+        Variant res;
+        // Так как вызов этого require вставляется автоматически TypeScript'ом, то название аддина является
+        // файлом, и он может быть относительным и содержать различные папки и прочее. Также в конечном
+        // счёте название файла может не совпадать с уникальным именем аддина. Поэтому нам надо перебрать
+        // все аддины и найти нужный.
+        string fileName = "\\" + addinFile.extract(extractFileNameRex), ext = fileName.extract(extractFileExtRex);
+        if (ext.isEmpty())
+            fileName += ".js";
+        for (uint i = 0, k = _addins.get_count(); i < k; i++) {
+            Addin&& a = _addins.byIdx(i);
+            if (a.get_fullPath().substr(-fileName.length).compareNoCase(fileName) == 0) {
+                res.setDispatch(a.object());
+                break;
+            }
+        }
+        return res;
+    }
 
     NoCaseMap<Guid> __mapTypeNames;
     NoCaseMap<Variant> __globalContextes;
@@ -255,7 +267,6 @@ class Designer {
                 if (bHasCtor) {
                     for (uint alias = 0; alias < 2; alias++) {
                         string typeName(type.getTypeString(alias));
-                        //Message(typeName);
                         if (!typeName.isEmpty())
                             __mapTypeNames.tryInsert(typeName, ptr.ref);
                     }
@@ -468,7 +479,7 @@ void VectorV8StringPushBack(Vector& v, const v8string&in str) {
         v.end = v.start + oldSize;
         v.allocked = v.start + newSize;
     }
-    tov8string(v.end).ref._ctor(str);
+    tov8string(v.end).ref.ctor1(str);
     v.end += v8string_size;
 }
 

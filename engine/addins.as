@@ -15,13 +15,13 @@ BuiltinAddin&& builtinAddinsList;
 AddinLoader&& loadersList;
 
 bool initAddins() {
-	if (oneDesigner !is null)
-		return true;
+    if (oneDesigner !is null)
+        return true;
     // Создаем корень SnegAPI, а он создаст менеджер аддинов
-    &&oneDesigner = Designer();
+    Designer();
     if (oneAddinMgr.loadAddin("script:" + pathes._core + "scripts\\main.js", oneAddinMgr._root.childs[0]) is null)
         Message(oneAddinMgr._lastAddinError);
-	return true;
+    return true;
 }
 
 // Класс, представляющий загруженный аддин.
@@ -53,8 +53,8 @@ class AddinLoader {
         &&loadersList = this;
     }
     string proto()                  { return "snegopat"; }
-	Addin&& load(const string& uri) { return null; }
-	bool run(Addin&& addin) { return true; }
+    Addin&& load(const string& uri) { return null; }
+    bool run(Addin&& addin) { return true; }
     bool canUnload(Addin&& addin)   { return false; }
     bool unload(Addin&& addin)      { return false; }
     string nameOfLoadCommand()      { return ""; }
@@ -108,10 +108,10 @@ class AddinMgr {
     private NoCaseMap<Addin&&> mapFullPath;
     // Корневая группа
     AddinGroup _root;
-	AddinGroup&& _libs;
-	AddinGroup&& _users;
-	AddinGroup&& _sys;
-	// При ошибке работы с аддинами описание ошибки писать сюда
+    AddinGroup&& _libs;
+    AddinGroup&& _users;
+    AddinGroup&& _sys;
+    // При ошибке работы с аддинами описание ошибки писать сюда
     string _lastAddinError;
 
     AddinMgr() {
@@ -124,10 +124,10 @@ class AddinMgr {
         }
         // Создаем группу для встроенных аддинов
         &&_sys= _root.addGroup("Служебные аддины");
-		// Для библиотек
-		&&_libs = _root.addGroup("Подгружаемые библиотеки");
-		// Для пользователей
-		&&_users = _root.addGroup("Пользовательские аддины");
+        // Для библиотек
+        &&_libs = _root.addGroup("Подгружаемые библиотеки");
+        // Для пользователей
+        &&_users = _root.addGroup("Пользовательские аддины");
         // Зарегистрируем все встроенные аддины
         for (BuiltinAddin&& ptr = builtinAddinsList; ptr !is null; &&ptr = ptr.next) {
             //Message("Load " + ptr.uniqueName);
@@ -166,7 +166,7 @@ class AddinMgr {
             _lastAddinError = "Не найден загрузчик '" + proto + "'";
             return null;
         }
-		path.replace("<addins>", pathes._addins).replace("<custom>", pathes._custom).replace("<core>", pathes._core);
+        path.replace("<addins>", pathes._addins).replace("<custom>", pathes._custom).replace("<core>", pathes._core);
         Addin&& addin = fndLdr.value.load(path);
         if (addin is null)
             return null;

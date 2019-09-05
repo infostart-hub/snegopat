@@ -173,8 +173,8 @@
 	void init()
 	{
 		obj.validFields = cfText;
-		obj.text._ctor();
-		obj.tooltip._ctor();
+		obj.text.ctor();
+		obj.tooltip.ctor();
 		ImageInfo__init(obj.image);
 		ImageInfo__init(obj.extImage);
 		obj.state = csNotChecked;

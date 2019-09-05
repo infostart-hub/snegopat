@@ -20,8 +20,8 @@ global.connectGlobals(SelfScript);
 import * as macroswnd   from "./macroswnd";
 import * as stdlib      from "./std";
 import * as stdcommands from "./commands";
-import * as hks         from "./hotkeys";
-import * as snegopatwnd from "./snegopatwnd";
+//import * as hks         from "./hotkeys";
+//import * as snegopatwnd from "./snegopatwnd";
 
 stdlib.createMacros(SelfScript.self, "ВыбратьИВыполнитьМакрос",
     "Выбрать макрос из списка и выполнить его", stdcommands.CDebug.Start.info.picture,
@@ -132,7 +132,7 @@ stdlib.createMacros(SelfScript.self, "ПоказатьВыпадающийСпи
     function () { return snegopat.showSmartBox(); },
     "Ctrl+Alt+Space");
 
-function replaceSelInTxtWnd(textBefore, textAfter, activateHint) {
+function replaceSelInTxtWnd(textBefore: any, textAfter: string, activateHint: any) {
     var txtWnd = snegopat.activeTextWindow()
     if (!txtWnd)
         return false

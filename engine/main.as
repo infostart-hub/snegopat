@@ -41,82 +41,82 @@ TrapVirtualStdCall trProfileOpen;
 // Для обеспечения портабельности файл лежит в каталоге снегопата, поэтому
 // этот каталог должен быть доступен для записи.
 void initSnegopatProfile() {
-	trProfileOpen.setTrap(getProfileService(), IProfileService_open, IProfileService_openTrap);
+    trProfileOpen.setTrap(getProfileService(), IProfileService_open, IProfileService_openTrap);
 }
 
 void IProfileService_openTrap(IProfileService& ps) {
-	trProfileOpen.swap();
-	IProfileSource&& snegopatProfileSource;
-	currentProcess().createByClsid(CLSID_FileProfileSrc, IID_IProfileSource, snegopatProfileSource);
+    trProfileOpen.swap();
+    IProfileSource&& snegopatProfileSource;
+    currentProcess().createByClsid(CLSID_FileProfileSrc, IID_IProfileSource, snegopatProfileSource);
 #if test = 1
-	dumpVtable(&&snegopatProfileSource);
-	dumpVtable(getProfileService());
-	dumpVtable(getProfileRoot());
+    dumpVtable(&&snegopatProfileSource);
+    dumpVtable(getProfileService());
+    dumpVtable(getProfileRoot());
 #endif
-	CreateDirectory(pathes._data.cstr, 0);
-	snegopatProfileSource.init("file://" + pathes._data + "snegopat.pfl");
-	getProfileService().attachSource(snegopatProfileSource, gpflSnegopat);
-	ps.open();
-	initAllOption();
-	// Инициализируем пакеты
-	initPackets(piOnMainEnter);
+    CreateDirectory(pathes._data.cstr, 0);
+    snegopatProfileSource.init("file://" + pathes._data + "snegopat.pfl");
+    getProfileService().attachSource(snegopatProfileSource, gpflSnegopat);
+    ps.open();
+    initAllOption();
+    // Инициализируем пакеты
+    initPackets(piOnMainEnter);
 }
 
 Packet pktTxtWork("TxtWork", setTextHooks, piOnMainEnter);
 bool enableTextWork;
 OptionsEntry oeEnableTextWork("EnableTextWork", function(v){v = true; },
-	function(v){v.getBoolean(enableTextWork); },
-	function(v){v.getBoolean(enableTextWork); setTextHooks(); if (enableTextWork) Message("Подсказка снегопата заработает только во вновь открытых окнах"); return false; });
+    function(v){v.getBoolean(enableTextWork); },
+    function(v){v.getBoolean(enableTextWork); setTextHooks(); if (enableTextWork) Message("Подсказка снегопата заработает только во вновь открытых окнах"); return false; });
 
 // Установка различных перехватов, связанных с текстовыми окнами/документами
 bool setTextHooks() {
-	if (!enableTextWork) {
-		disableAllTextTraps();
-		textDocStorage.disableTextWork();
-		return true;
-	}
+    if (!enableTextWork) {
+        disableAllTextTraps();
+        textDocStorage.disableTextWork();
+        return true;
+    }
     // Надо установить перехват на создании окон Text control и text view.
     // Объект TextCtrl можно создать прямо сейчас и установить перехват в его виртуальной таблице
-	if (trTxtEdtCtrl_createWnd.state == trapNotActive) {
-		IWindowView&& wnd;
-		currentProcess().createByClsid(CLSID_TxtEdtCtrl, IID_IWindowView, wnd);
-		if (wnd is null)
-			Print("Не удалось создать TxtEdtCtrl IWindowView");
-		else {
-			trTxtEdtCtrl_createWnd.setTrap(&&wnd, IWindowView_createWindow, TxtEdtCtrl_createWindow);
-			ICommandTarget&& tgt = wnd.unk;
-			if (tgt is null)
-				Print("Не удалось получить ICommandTarget из TxtEdtCtrl IWindowView");
-			else // Ставим перехват на получение окном текстового контрола команды
-				trTxtCtrCommand_onExecute.setTrap(&&tgt, ICommandTarget_onExecute, TxtCtrCommand_onExecute);
-		}
-		// Теперь установим перехват на назначение текстового расширения текстовому документу
-		IDocument&& doc;
-		currentProcess().createByClsid(CLSID_TxtEdtDoc, IID_IDocument, doc);
-		if (doc is null)
-			Print("Не удалось создать TxtEdtDoc IDocument");
-		else {
-			ITextManager_Operations&& to = doc.unk;
-			if (to is null)
-				Print("Не удалось получить ITextManager_Operations из TxtEdtDoc");
-			else
-				trTxtMgr_setExtender.setTrap(&&to, ITextManager_Operations_setExtenderCLSID, TxtMgrOper_setExtender);
-			// Далее устанавливаем перехват на TxtEdtDoc::createView
-			// он нужен только один раз, чтобы получить готовый объект TxtEdtView, т.к. создать его сейчас
-			// самостоятельно ещё рано, программа вылетит.
-			trTxtEdtDoc_createView.setTrap(&&doc, IDocument_createView, TxtDoc_createView);
-		}
-	} else if (trTxtEdtCtrl_createWnd.state == trapDisabled) {
-		trTxtEdtCtrl_createWnd.swap();
-		trTxtCtrCommand_onExecute.swap();
-		trTxtMgr_setExtender.swap();
-		if (trTxtEdtView_createWnd.state == trapDisabled)
-			trTxtEdtView_createWnd.swap();
-		else if (trTxtEdtView_createWnd.state == trapNotActive && trTxtEdtDoc_createView.state == trapDisabled)
-			trTxtEdtDoc_createView.swap();
-	}
-	textDocStorage.enableTextWork();
-	return true;
+    if (trTxtEdtCtrl_createWnd.state == trapNotActive) {
+        IWindowView&& wnd;
+        currentProcess().createByClsid(CLSID_TxtEdtCtrl, IID_IWindowView, wnd);
+        if (wnd is null)
+            Print("Не удалось создать TxtEdtCtrl IWindowView");
+        else {
+            trTxtEdtCtrl_createWnd.setTrap(&&wnd, IWindowView_createWindow, TxtEdtCtrl_createWindow);
+            ICommandTarget&& tgt = wnd.unk;
+            if (tgt is null)
+                Print("Не удалось получить ICommandTarget из TxtEdtCtrl IWindowView");
+            else // Ставим перехват на получение окном текстового контрола команды
+                trTxtCtrCommand_onExecute.setTrap(&&tgt, ICommandTarget_onExecute, TxtCtrCommand_onExecute);
+        }
+        // Теперь установим перехват на назначение текстового расширения текстовому документу
+        IDocument&& doc;
+        currentProcess().createByClsid(CLSID_TxtEdtDoc, IID_IDocument, doc);
+        if (doc is null)
+            Print("Не удалось создать TxtEdtDoc IDocument");
+        else {
+            ITextManager_Operations&& to = doc.unk;
+            if (to is null)
+                Print("Не удалось получить ITextManager_Operations из TxtEdtDoc");
+            else
+                trTxtMgr_setExtender.setTrap(&&to, ITextManager_Operations_setExtenderCLSID, TxtMgrOper_setExtender);
+            // Далее устанавливаем перехват на TxtEdtDoc::createView
+            // он нужен только один раз, чтобы получить готовый объект TxtEdtView, т.к. создать его сейчас
+            // самостоятельно ещё рано, программа вылетит.
+            trTxtEdtDoc_createView.setTrap(&&doc, IDocument_createView, TxtDoc_createView);
+        }
+    } else if (trTxtEdtCtrl_createWnd.state == trapDisabled) {
+        trTxtEdtCtrl_createWnd.swap();
+        trTxtCtrCommand_onExecute.swap();
+        trTxtMgr_setExtender.swap();
+        if (trTxtEdtView_createWnd.state == trapDisabled)
+            trTxtEdtView_createWnd.swap();
+        else if (trTxtEdtView_createWnd.state == trapNotActive && trTxtEdtDoc_createView.state == trapDisabled)
+            trTxtEdtDoc_createView.swap();
+    }
+    textDocStorage.enableTextWork();
+    return true;
 }
 
 uint TxtDoc_createView(IDocument& doc, uint pView) {
@@ -149,18 +149,18 @@ TrapVirtualStdCall trTxtCtrCommand_onExecute;
 TrapVirtualStdCall trTxtMgr_setExtender;
 
 void disableAllTextTraps() {
-	if (trTxtEdtDoc_createView.state == trapEnabled)
-		trTxtEdtDoc_createView.swap();
-	if (trTxtEdtView_createWnd.state == trapEnabled)
-		trTxtEdtView_createWnd.swap();
-	if (trTxtEdtCtrl_createWnd.state == trapEnabled)
-		trTxtEdtCtrl_createWnd.swap();
-	if (trTxtEdtCommand_onExecute.state == trapEnabled)
-		trTxtEdtCommand_onExecute.swap();
-	if (trTxtCtrCommand_onExecute.state == trapEnabled)
-		trTxtCtrCommand_onExecute.swap();
-	if (trTxtMgr_setExtender.state == trapEnabled)
-		trTxtMgr_setExtender.swap();
+    if (trTxtEdtDoc_createView.state == trapEnabled)
+        trTxtEdtDoc_createView.swap();
+    if (trTxtEdtView_createWnd.state == trapEnabled)
+        trTxtEdtView_createWnd.swap();
+    if (trTxtEdtCtrl_createWnd.state == trapEnabled)
+        trTxtEdtCtrl_createWnd.swap();
+    if (trTxtEdtCommand_onExecute.state == trapEnabled)
+        trTxtEdtCommand_onExecute.swap();
+    if (trTxtCtrCommand_onExecute.state == trapEnabled)
+        trTxtCtrCommand_onExecute.swap();
+    if (trTxtMgr_setExtender.state == trapEnabled)
+        trTxtMgr_setExtender.swap();
 }
 
 

@@ -165,9 +165,9 @@ class ITextWindow {
                 to.getExtenderCLSID(extGuid);
                 ITxtEdtExtender&& ext;
                 getTxtEdtService().getExtender(ext, wnd.textDoc.itm, extGuid);
-				if (ext !is null) {
-					return ext.getName();
-				}
+                if (ext !is null) {
+                    return ext.getName();
+                }
             }
         }
         return string();

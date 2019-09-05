@@ -52,7 +52,11 @@
 #endif
 	void ctor(int y=0, int m=0, int d=0)|??0Date@core@@QAE@HHH@Z
 	void ctor(int, int, int, int, int, int)|??0Date@core@@QAE@HHHHHH@Z
+#if ver < 8.3.11
 	v8string toString()const|?toString@Date@core@@QBE?AV?$basic_string@_WV?$char_traits@_W@stlp_std@@V?$allocator@_W@2@@stlp_std@@XZ
+#else
+	v8string toString()const|?toString@Date@core@@QBE?AV?$basic_string@_SU?$fix_char_traits@_S@stdx@@V?$allocator@_S@std@@@stdx@@XZ
+#endif
 
 // Число
 :class Numeric
@@ -100,7 +104,11 @@
 	Numeric round(int, int mode)const|?round@Numeric@core@@QBE?AV12@HW4NumericRoundMode@2@@Z
 	int sign()const|?sign@Numeric@core@@QBEHXZ
 	bool toInteger(int64&)const|?toInteger@Numeric@core@@QBE_NAA_J@Z
+#if ver < 8.3.11
 	v8string toString()const|?toString@Numeric@core@@QBE?AV?$basic_string@_WV?$char_traits@_W@stlp_std@@V?$allocator@_W@2@@stlp_std@@XZ
+#else
+	v8string toString()const|?toString@Numeric@core@@QBE?AV?$basic_string@_SU?$fix_char_traits@_S@stdx@@V?$allocator@_S@std@@@stdx@@XZ
+#endif
 :meths
 	void ctor()
 	{
@@ -126,7 +134,6 @@
 	core83.dll
 #endif
 	void ctor(const Value&in)|??0Value@core@@QAE@ABV01@@Z
-	void ctor(const v8string&in)|??0Value@core@@QAE@ABV?$basic_string@_WV?$char_traits@_W@stlp_std@@V?$allocator@_W@2@@stlp_std@@@Z
 	void ctor(const Date&in)|??0Value@core@@QAE@ABVDate@1@@Z
 	void ctor(const Numeric&in)|??0Value@core@@QAE@ABVNumeric@1@@Z
 	void ctor(int16)|??0Value@core@@QAE@F@Z
@@ -143,7 +150,6 @@
 	void dtor()|??1Value@core@@QAE@XZ
 	Value& opAssign(const Value&in)|??4Value@core@@QAEAAV01@ABV01@@Z
 	Type type()const|?type@Value@core@@QBE?AVType@2@XZ
-	void opAssign(const v8string&in)|?assign@GenericValue@core@@QAEXABV?$basic_string@_WV?$char_traits@_W@stlp_std@@V?$allocator@_W@2@@stlp_std@@@Z
 	void opAssign(const Date&)|?assign@GenericValue@core@@QAEXABVDate@2@@Z
 	void opAssign(const Numeric&)|?assign@GenericValue@core@@QAEXABVNumeric@2@@Z
 	void opAssign(int16)|?assign@GenericValue@core@@QAEXF@Z
@@ -152,28 +158,40 @@
 	void opAssign(uint)|?assign@GenericValue@core@@QAEXI@Z
 	void opAssign(double)|?assign@GenericValue@core@@QAEXN@Z
 	void opAssign(IUnknown@)|?assign@GenericValue@core@@QAEXPAUIUnknown@@@Z
-	void opAssign(const uint16&)|?assign@GenericValue@core@@QAEXPB_W@Z
 	void opAssign(int64)|?assign@GenericValue@core@@QAEX_J@Z
 	void opAssign(uint64)|?assign@GenericValue@core@@QAEX_K@Z
 	void opAssign(bool)|?assign@GenericValue@core@@QAEX_N@Z
 	void clear()|?clear@GenericValue@core@@QAEXXZ
-	bool opEquals(const v8string&in)const|?equals@GenericValue@core@@QBE_NABV?$basic_string@_WV?$char_traits@_W@stlp_std@@V?$allocator@_W@2@@stlp_std@@@Z
 	bool opEquals(const Date&)const|?equals@GenericValue@core@@QBE_NABVDate@2@@Z
 	bool opEquals(const Numeric&)const|?equals@GenericValue@core@@QBE_NABVNumeric@2@@Z
 	bool opEquals(int16)const|?equals@GenericValue@core@@QBE_NF@Z
 	bool opEquals(uint16)const|?equals@GenericValue@core@@QBE_NG@Z
 	bool opEquals(int)const|?equals@GenericValue@core@@QBE_NH@Z
 	bool opEquals(uint)const|?equals@GenericValue@core@@QBE_NI@Z
-	bool opEquals(const uint16&)const|?equals@GenericValue@core@@QBE_NPB_W@Z
 	bool opEquals(int64)const|?equals@GenericValue@core@@QBE_N_J@Z
 	bool opEquals(uint64)const|?equals@GenericValue@core@@QBE_N_K@Z
 	bool opEquals(bool)const|?equals@GenericValue@core@@QBE_N_N@Z
 	bool getBoolean(bool&)const|?getBoolean@GenericValue@core@@QBE_NAA_N@Z
 	bool getDate(Date&)const|?getDate@GenericValue@core@@QBE_NAAVDate@2@@Z
 	bool getNumeric(Numeric&)const|?getNumeric@GenericValue@core@@QBE_NAAVNumeric@2@@Z
+#if ver < 8.3.11
+	void ctor(const v8string&in)|??0Value@core@@QAE@ABV?$basic_string@_WV?$char_traits@_W@stlp_std@@V?$allocator@_W@2@@stlp_std@@@Z
+	void opAssign(const v8string&in)|?assign@GenericValue@core@@QAEXABV?$basic_string@_WV?$char_traits@_W@stlp_std@@V?$allocator@_W@2@@stlp_std@@@Z
+	void opAssign(const uint16&)|?assign@GenericValue@core@@QAEXPB_W@Z
+	bool opEquals(const v8string&in)const|?equals@GenericValue@core@@QBE_NABV?$basic_string@_WV?$char_traits@_W@stlp_std@@V?$allocator@_W@2@@stlp_std@@@Z
+	bool opEquals(const uint16&)const|?equals@GenericValue@core@@QBE_NPB_W@Z
 	bool getString(v8string&)const|?getString@GenericValue@core@@QBE_NAAV?$basic_string@_WV?$char_traits@_W@stlp_std@@V?$allocator@_W@2@@stlp_std@@@Z
-	//void serialize(IOutPersistenceStorage*)const|?serialize@GenericValue@core@@QBEXPAVIOutPersistenceStorage@2@@Z
 	void toString(v8string&)const|?toString@GenericValue@core@@QBEXAAV?$basic_string@_WV?$char_traits@_W@stlp_std@@V?$allocator@_W@2@@stlp_std@@@Z
+#else
+	void ctor(const v8string&in)|??0Value@core@@QAE@ABV?$basic_string@_SU?$fix_char_traits@_S@stdx@@V?$allocator@_S@std@@@stdx@@@Z
+	void opAssign(const v8string&in)|?assign@GenericValue@core@@QAEXABV?$basic_string@_SU?$fix_char_traits@_S@stdx@@V?$allocator@_S@std@@@stdx@@@Z
+	void opAssign(const uint16&)|?assign@GenericValue@core@@QAEXPB_S@Z
+	bool opEquals(const v8string&in)const|?equals@GenericValue@core@@QBE_NABV?$basic_string@_SU?$fix_char_traits@_S@stdx@@V?$allocator@_S@std@@@stdx@@@Z
+	bool opEquals(const uint16&)const|?equals@GenericValue@core@@QBE_NPB_S@Z
+	bool getString(v8string&)const|?toString@GenericValue@core@@QBEXAAV?$basic_string@_SU?$fix_char_traits@_S@stdx@@V?$allocator@_S@std@@@stdx@@@Z
+	void toString(v8string&)const|?toString@GenericValue@core@@QBEXAAV?$basic_string@_SU?$fix_char_traits@_S@stdx@@V?$allocator@_S@std@@@stdx@@@Z
+#endif
+
 
 // Type
 :class Type
@@ -189,12 +207,16 @@
 	void ctor()|??0Type@core@@QAE@PAVIType@1@@Z
 	void ctor(const Guid&in)|??0Type@core@@QAE@ABU_GUID@@@Z
 	void ctor(const Type&in)|??0Type@core@@QAE@ABV01@@Z
-	void ctor(const v8string&in)|??0Type@core@@QAE@ABV?$basic_string@_WV?$char_traits@_W@stlp_std@@V?$allocator@_W@2@@stlp_std@@@Z
 	void ctor(IType@)|??0Type@core@@QAE@PAVIType@1@@Z
 	void ctor(IType@, bool)|??0Type@core@@QAE@PAVIType@1@_N@Z
 	void ctor(int)|??0Type@core@@QAE@W4Code@01@@Z
 	void dtor()|??1Type@core@@QAE@XZ
 	Type& opAssign(const Type&in)|??4Type@core@@QAEAAV01@ABV01@@Z
+#if ver < 8.3.11
+	void ctor(const v8string&in)|??0Type@core@@QAE@ABV?$basic_string@_WV?$char_traits@_W@stlp_std@@V?$allocator@_W@2@@stlp_std@@@Z
+#else
+	void ctor(const v8string&in)|??0Type@core@@QAE@ABV?$basic_string@_SU?$fix_char_traits@_S@stdx@@V?$allocator@_S@std@@@stdx@@@Z
+#endif
 
 :global
 :dlls
@@ -203,6 +225,9 @@
 #else
 	core83.dll
 #endif
-	//void deserialize(IInPersistenceStorage*, GenericValue&)|?deserialize@GenericValue@core@@SAXPAVIInPersistenceStorage@2@AAV12@@Z
+#if ver < 8.3.11
 	void valueFromString(const v8string&in, Value&)|?fromString@GenericValue@core@@SAXABV?$basic_string@_WV?$char_traits@_W@stlp_std@@V?$allocator@_W@2@@stlp_std@@AAV12@@Z
+#else
+	void valueFromString(const v8string&in, Value&)|?fromString@GenericValue@core@@SAXABV?$basic_string@_SU?$fix_char_traits@_S@stdx@@V?$allocator@_S@std@@@stdx@@AAV12@@Z
+#endif
 	IValue@+ create_undefined_value()|?create_undefined_value@core@@YAPAVIValue@1@XZ

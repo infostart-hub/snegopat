@@ -51,7 +51,7 @@
 	Rect& intersect(const Rect&in)|?intersect@Rect@core@@QAEAAU12@ABU12@@Z
 	Rect& normalize()|?normalize@Rect@core@@QAEAAU12@XZ
 	Rect& offset(int, int)|?offset@Rect@core@@QAEAAU12@HH@Z
-	void swap(Rect&)|?swap@Rect@core@@QAEXAAU12@@Z
+	//void swap(Rect&)|?swap@Rect@core@@QAEXAAU12@@Z
 
 :global
 :dlls

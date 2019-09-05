@@ -101,7 +101,7 @@
 	//+1
 	#if ver<8.3.9
 	+1
-	#endif	
+	#endif
 	//7OH end
 	+1
 	void clearCache()
@@ -144,7 +144,7 @@
 :iface ITemplateProcessor {BE7E8365-EC19-4804-A04B-2CA31436BF21}
 :virt
 	11
-	bool needSubstitute(const v8string& strSrc, TextManager& tm, v8string&out res)
+	bool needSubstitute(const v8string&in strSrc, TextManager& tm, v8string&out res)
 	15
 	void processTemplate(const v8string&in templName, const v8string&in templStr, v8string&out result, uint&out nCaretStartOffset, const v8string&in indent)
 
@@ -197,6 +197,7 @@
 #else
     core83.dll
 #endif
+#if ver < 8.3.11
 	bool is_alnum(wchar_t)|?is_alnum@core@@YA_N_W@Z
 	bool is_alpha(wchar_t)|?is_alpha@core@@YA_N_W@Z
 	bool is_cntrl(wchar_t)|?is_cntrl@core@@YA_N_W@Z
@@ -212,6 +213,23 @@
 	bool is_valid_path(const v8string&in)|?is_valid_path@core@@YA_NABV?$basic_string@_WV?$char_traits@_W@stlp_std@@V?$allocator@_W@2@@stlp_std@@@Z
 	long hash(const v8string&in)|?hash@core@@YAJABV?$basic_string@_WV?$char_traits@_W@stlp_std@@V?$allocator@_W@2@@stlp_std@@@Z
 	long hash_nocase(const v8string&in)|?hash_nocase@core@@YAJABV?$basic_string@_WV?$char_traits@_W@stlp_std@@V?$allocator@_W@2@@stlp_std@@@Z
+#else
+	bool is_alnum(wchar_t)|?is_alnum@core@@YA_N_S@Z
+	bool is_alpha(wchar_t)|?is_alpha@core@@YA_N_S@Z
+	bool is_cntrl(wchar_t)|?is_cntrl@core@@YA_N_S@Z
+	bool is_digit(wchar_t)|?is_digit@core@@YA_N_S@Z
+	bool is_graph(wchar_t)|?is_graph@core@@YA_N_S@Z
+	bool is_lower(wchar_t)|?is_lower@core@@YA_N_S@Z
+	bool is_print(wchar_t)|?is_print@core@@YA_N_S@Z
+	bool is_punct(wchar_t)|?is_punct@core@@YA_N_S@Z
+	bool is_space(wchar_t)|?is_space@core@@YA_N_S@Z
+	bool is_title(wchar_t)|?is_title@core@@YA_N_S@Z
+	bool is_upper(wchar_t)|?is_upper@core@@YA_N_S@Z
+	bool is_valid_name(const v8string&in)|?is_valid_name@core@@YA_NABV?$basic_string@_SU?$fix_char_traits@_S@stdx@@V?$allocator@_S@std@@@stdx@@@Z
+	bool is_valid_path(const v8string&in)|?is_valid_path@core@@YA_NABV?$basic_string@_SU?$fix_char_traits@_S@stdx@@V?$allocator@_S@std@@@stdx@@@Z
+	long hash(const v8string&in)|?hash@core@@YAJABV?$basic_string@_SU?$fix_char_traits@_S@stdx@@V?$allocator@_S@std@@@stdx@@@Z
+	long hash_nocase(const v8string&in)|?hash_nocase@core@@YAJABV?$basic_string@_SU?$fix_char_traits@_S@stdx@@V?$allocator@_S@std@@@stdx@@@Z
+#endif
 :meths
 	ITxtEdtService@ getTxtEdtService()
 	{
@@ -255,6 +273,8 @@
 	0x290 ModuleTxtExtSettingsMap
   #elif ver < 8.3.10
 	0x294 ModuleTxtExtSettingsMap
-  #else
+  #elif ver < 8.3.11
 	0x2B0 ModuleTxtExtSettingsMap
+  #else
+	0x274 ModuleTxtExtSettingsMap
   #endif

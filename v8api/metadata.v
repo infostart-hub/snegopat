@@ -50,8 +50,10 @@
 		28
 	  #elif ver < 8.3.9
 		26
-	  #else
+	  #elif ver < 8.3.11
 	    27
+	  #else
+		26
 	  #endif
 		IMDContainer@+ getMDCont()
 		+1
@@ -290,11 +292,9 @@
 		+2
 		const Guid& moduleExpandType(const Guid& propId)
 		+1
-		// Семён
-		#if ver >= 8.3.9
-		+1
-		#endif
-		//
+		// //Артур
+		// +1
+		// // +10 Артур завершение
 		uint openModule(ITextManager@&, const Guid& propId, bool s, bool open, ITextEditor@& editor)
 
 :iface IMDTypedObj {752BB41D-05DA-4FD1-A680-78DFB6C6EB1C}
@@ -381,8 +381,8 @@
 	:meths
 		void dtor()
 		{
-			obj.name._dtor();
-			obj.str._dtor();
+			obj.name.dtor();
+			obj.str.dtor();
 			&&obj.image = null;
 		}
 		---

@@ -45,7 +45,7 @@
 	:meths
 		void dtor()
 		{
-			obj.name._dtor();
+			obj.name.dtor();
 		}
 		---
 

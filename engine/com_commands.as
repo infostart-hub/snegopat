@@ -38,56 +38,56 @@ class ICmdUpdateResult {
 
 ICmdUpdateResult&& getCommandState(const CommandID& cmd, int subCommand) {
     CommandState&& st = getMainFrameCommandState(cmd, subCommand);
-    return st !is null ? ICmdUpdateResult(st) : null;
+    return st !is null ? &&ICmdUpdateResult(st) : null;
 }
 
 ICmdUpdateResult&& getCommandStateRecv(const CommandID& cmd, int subCommand, ICommandReceiver&& recv) {
     CommandState&& st = getCommandState(cmd, subCommand, recv);
-    return st !is null ? ICmdUpdateResult(st) : null;
+    return st !is null ? &&ICmdUpdateResult(st) : null;
 }
 
 class CommandService {
-	
-	CommandDescription&& getCommandDescription(string groupUuid, uint number) {
-		ICommandService&& pCmdServ = currentProcess().getService(IID_ICommandService);
-		CommandID id(Guid(groupUuid), number);
-		ICmdDescription&& descr;
-		pCmdServ.commandDescription(descr, id);
-		if (descr !is null) {
-			CommandDescription cd;
-			&&cd.__cmdDescr = descr;
-			return cd;
-		}
-		return null;
-	}
-	/*
-	string groupPresentation(string groupID) {
-		ICommandService&& pCmdServ = currentProcess().getService(IID_ICommandService);
-		//dumpVtable(&&pCmdServ);
-		return pCmdServ.groupPresentation(Guid(groupID));
-	}*/
+    
+    CommandDescription&& getCommandDescription(string groupUuid, uint number) {
+        ICommandService&& pCmdServ = currentProcess().getService(IID_ICommandService);
+        CommandID id(Guid(groupUuid), number);
+        ICmdDescription&& descr;
+        pCmdServ.commandDescription(descr, id);
+        if (descr !is null) {
+            CommandDescription cd;
+            &&cd.__cmdDescr = descr;
+            return cd;
+        }
+        return null;
+    }
+    /*
+    string groupPresentation(string groupID) {
+        ICommandService&& pCmdServ = currentProcess().getService(IID_ICommandService);
+        //dumpVtable(&&pCmdServ);
+        return pCmdServ.groupPresentation(Guid(groupID));
+    }*/
 };
 
 class CommandDescription {
-	ICmdDescription&& __cmdDescr;
-	string get_group() const {
-		CommandID id;
-		__cmdDescr.id(id);
-		return id.group;
-	}
-	uint get_num() const {
-		CommandID id;
-		__cmdDescr.id(id);
-		return id.num;
-	}
-	string get_text() const { return __cmdDescr.text(); }
-	string get_accel() const { return __cmdDescr.accelText(); }
-	Variant get_picture() const {
-		IImage&& img;
-		__cmdDescr.image(img);
-		return image2pict(img);
-	}
-	string get_description() const { return __cmdDescr.description(); }
-	string get_tooltip() const { return __cmdDescr.tooltip(); }
-	string get_presentation() const { return __cmdDescr.presentation(); }
+    ICmdDescription&& __cmdDescr;
+    string get_group() const {
+        CommandID id;
+        __cmdDescr.id(id);
+        return id.group;
+    }
+    uint get_num() const {
+        CommandID id;
+        __cmdDescr.id(id);
+        return id.num;
+    }
+    string get_text() const { return __cmdDescr.text(); }
+    string get_accel() const { return __cmdDescr.accelText(); }
+    Variant get_picture() const {
+        IImage&& img;
+        __cmdDescr.image(img);
+        return image2pict(img);
+    }
+    string get_description() const { return __cmdDescr.description(); }
+    string get_tooltip() const { return __cmdDescr.tooltip(); }
+    string get_presentation() const { return __cmdDescr.presentation(); }
 };

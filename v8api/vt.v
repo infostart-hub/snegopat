@@ -115,18 +115,18 @@
 :meths
 	void ctor()
 	{
-		obj.name1._ctor();
-		obj.name2._ctor();
-		obj.title._ctor();
+		obj.name1.ctor();
+		obj.name2.ctor();
+		obj.title.ctor();
 		obj.type.ctor();
 		obj.width = 0;
 	}
 	---
 	void dtor()
 	{
-		obj.name1._dtor();
-		obj.name2._dtor();
-		obj.title._dtor();
+		obj.name1.dtor();
+		obj.name2.dtor();
+		obj.title.dtor();
 		obj.type.dtor();
 	}
 	---

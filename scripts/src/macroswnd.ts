@@ -142,7 +142,7 @@ export var MacrosWnd = (function(){
                     if (this.pattern || macroses.length == 1)
                         parentRows = rows;
                     else {
-                        // �?наче создается узел для аддина, и макросы добавляются в него, без добавления имени аддина
+                        // Иначе создается узел для аддина, и макросы добавляются в него, без добавления имени аддина
                         prefix = "";
                         var row = <MacrosTreeRow><any>rows.Добавить();
                         row.Addin = addin.displayName;
@@ -307,7 +307,7 @@ export var MacrosWnd = (function(){
             return row.Строки.Получить(0)
         for (; ;) {
             var parentRows = row.Parent ? row.Parent.Строки : row.Owner().Строки
-            var rowIdx = parentRows.�?ндекс(row)
+            var rowIdx = parentRows.Индекс(row)
             if (rowIdx < parentRows.Количество() - 1)
                 return parentRows.Получить(rowIdx + 1)
             row = row.Parent
@@ -319,7 +319,7 @@ export var MacrosWnd = (function(){
 
     function findPrevRowInTree(row, tree) {
         var parentRows = row.Parent ? row.Parent.Строки : row.Owner().Строки
-        var rowIdx = parentRows.�?ндекс(row)
+        var rowIdx = parentRows.Индекс(row)
         if (0 == rowIdx)
             return row.Parent
         row = parentRows.Получить(rowIdx - 1)

@@ -97,9 +97,9 @@ class IHotKeys{
         TempHotKeyFunction thk;
         return thk.assignKey(Key, disp, name);
     }
-	string hotKeyToString(uint code) {
-		return hotKeyPresentation(code);
-	}
+    string hotKeyToString(uint code) {
+        return hotKeyPresentation(code);
+    }
 };
 
 class TempHotKeyFunction {

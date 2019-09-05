@@ -501,13 +501,13 @@ class IV8View {
         return res;
     }
     IV8Form&& getInternalForm() {
-		IFramedView&& view = _getView();
-		if (view !is null) {
-			IForm&& form = view.unk;
-			if (form !is null)
-				return IV8Form(form);
-		}
-		return null;
+        IFramedView&& view = _getView();
+        if (view !is null) {
+            IForm&& form = view.unk;
+            if (form !is null)
+                return IV8Form(form);
+        }
+        return null;
     }
     protected Variant pict;
     Variant get_icon() {

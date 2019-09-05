@@ -15,15 +15,23 @@
 		// Забьем все нулями
 		mem::memset(obj.self, 0, TypeContextInfoItem_size);
 		// Инициализируем строки
-		//obj.name._ctor();
-		//obj.str1._ctor();
-		//obj.str2._ctor();
+		//obj.name.ctor();
+		//obj.str1.ctor();
+		//obj.str2.ctor();
 		// Инициализируем TypeDomainPattern'ы
 		obj.typeDomain._ctor(IID_NULL);
 		obj.providedTypeDomain._ctor(IID_NULL);
 		// Инициализация первого списка
+	  #if ver < 8.3.11
 		obj.lst_8 = obj.lst_12 = mem::addressOf(obj.lst_0);
 		obj.lst_4 = obj.lst_16 = 0;
+	  #else
+	    obj.lst_4 = 0;
+		obj.lst_0 = mem::addressOf(obj.padBegin) + 16;
+		mem::dword[obj.lst_0] = obj.lst_0;
+		mem::dword[obj.lst_0 + 4] = obj.lst_0;
+		mem::byte[obj.lst_0 + 0xD] = 1;
+	  #endif
 	}
 	---
 :props
@@ -36,23 +44,25 @@
 	// Какой-то список или хэшмап
 	uint lst_0
 	uint lst_4
+  #if ver < 8.3.11
 	uint lst_8
 	uint lst_12
 	uint lst_16
-	0x3C uint unk1
-	0x40 uint flag1
+	uint unk1
+  #endif
+	uint flag1
 
-	0x4C uint flag0_1
-	0x50 uint flag0_2
+	uint flag0_1
+	uint flag0_2
 
-	0x54 Guid objectId
-	0x64 Guid mdPropId
-	0x74 bool isTypeSource
-	0x78 TypeDomainPattern providedTypeDomain
-	0x7C v8string str1
-	0x94 v8string str2
-	0xAC bool byte_0
-	0xB0 Vector someVector
+	Guid objectId
+	Guid mdPropId
+	bool isTypeSource
+	TypeDomainPattern providedTypeDomain
+	v8string str1
+	v8string str2
+	bool byte_0
+	Vector someVector
 	uint padBegin
 	+100
 	uint padEnd
@@ -60,9 +70,9 @@
 :meths
 	void init()
 	{
-		obj.name._ctor();
-		obj.sourceString._ctor();
-		obj.tooltip._ctor();
+		obj.name.ctor();
+		obj.sourceString.ctor();
+		obj.tooltip.ctor();
 		obj.typeDomain._ctor(IID_NULL);
 		obj.providedTypeDomain._ctor(IID_NULL);
 		obj.zero1 = obj.zero2 = obj.flag1 = obj.buf1_0 = obj.buf1_1 = 0;
@@ -160,8 +170,8 @@
 :meths
 	void init()
 	{
-		obj.nameEng._ctor();
-		obj.nameRus._ctor();
+		obj.nameEng.ctor();
+		obj.nameRus.ctor();
 		obj.typeDomainPattern.ctor();
 		obj.zero1 = obj.zero2 = obj.zero3 = 0;
 		obj.pZero1 = obj.pZero2 = mem::addressOf(obj.zero1);
@@ -169,8 +179,8 @@
 	---
 	void done()
 	{
-		obj.nameEng._dtor();
-		obj.nameRus._dtor();
+		obj.nameEng.dtor();
+		obj.nameRus.dtor();
 		obj.typeDomainPattern.dtor();
 	}
 	---

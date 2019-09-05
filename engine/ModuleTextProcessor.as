@@ -40,17 +40,17 @@ enum ActivateModes {
 };
 
 string getTextLine(TextManager&& tm, uint line) {
-	v8string s;
-	IUnknown&& u;
-	tm.getCashObject(u);
-	tm.getLineFast(line, s, u);
-	return s.str;
+    v8string s;
+    IUnknown&& u;
+    tm.getCashObject(u);
+    tm.getLineFast(line, s, u);
+    return s.str;
 }
 
 void getTextLine(TextManager&& tm, uint line, v8string& s) {
-	IUnknown&& u;
-	tm.getCashObject(u);
-	tm.getLineFast(line, s, u);
+    IUnknown&& u;
+    tm.getCashObject(u);
+    tm.getLineFast(line, s, u);
 }
 
 bool my_is_alpha(wchar_t symbol) {
@@ -123,6 +123,9 @@ class ModuleTextProcessor : TextProcessor, ModuleTextSource {
     }
 
     void connectEditor(TextWnd&& editor) { &&editor.editorData = ModuleEditorData(); }
+    bool onChar(TextWnd&& editor, wchar_t symbol) {
+        return enableSmartEnter && symbol == '\r' && (GetKeyState(VK_SHIFT) & 0x8000) == 0 && beforeSmartEnter(editor);
+    }
     void afterChar(TextWnd&& editor, wchar_t symbol) {
         if (editor !is activeTextWnd)
             return;
@@ -169,11 +172,58 @@ class ModuleTextProcessor : TextProcessor, ModuleTextSource {
         case VK_DELETE:
             moduleElements.parsed = false;
             break;
+        /*
         case VK_ESCAPE:
-            //ParamShow::get().hide();
+            ParamShow::get().hide();
             break;
+        */
         }
         return false;
+    }
+    bool beforeSmartEnter(TextWnd&& editor) {
+        // Реализация "умного" перемещения каретки при нажатии Enter в определённых конструкциях
+        bool eatEnter = false;
+        TextPosition caretPos;
+        editor.ted.getCaretPosition(caretPos, false);
+        v8string line;
+        getTextLine(editor.textDoc.tm, caretPos.line, line);
+        string strLine = line, lineBefore = strLine.substr(0, caretPos.col - 1), lineAfter = strLine.substr(caretPos.col - 1);
+        if (!lineBefore.isEmpty() && !lineAfter.isEmpty() && (is_space(lineBefore[lineBefore.length - 1]) || is_space(lineAfter[0]))) {
+            lexem lex;
+            lex_provider lexSrc(lineBefore.cstr);
+            int mode = 0;
+            // Проверим, с чего начинается строка
+            lexSrc.nextWithKeyword(lex);
+            if (lex.type == kwFor) {
+                // С "Для"
+                lexSrc.nextWithKeyword(lex);
+                // Потом "Каждого"
+                mode = lex.type == kwEach ? 2 : 1;
+            } else if (lex.type == kwIf || lex.type == kwElsIf) {
+                // "Если" или "ИначеЕсли"
+                mode = 3;
+            } else if (lex.type == kwWhile) // "Пока"
+                mode = 4;
+            if (mode != 0) {
+                // Посмотрим, что за слово за кареткой
+                lexSrc.setSource(lineAfter.cstr);
+                lexSrc.nextWithKeyword(lex);
+                int newCol = 0;
+                if ((mode == 3 && lex.type == kwThen)       // Мы после "Если" или "ИначеЕсли" и перед "Тогда"
+                    || (mode != 3 && lex.type == kwDo)) {   // Мы перед "Цикл"
+                    newCol = strLine.length;
+                } else if ((mode == 1 && (lex.type == lexEqual || lex.type == kwTo))   // Мы в "Для" и перед "=" или "По"
+                    || (mode == 2 && lex.type == kwIn)) {   // Мы в "Для Каждого" и перед "Из"
+                    newCol = caretPos.col + (lex.start - lexSrc.start) / 2 + lex.length + 1;
+                    eatEnter = true;
+                }
+                if (newCol > 0) {
+                    caretPos.col = newCol;
+                    editor.ted.setCaretPosition(caretPos);
+                }
+            }
+        }
+        return eatEnter;
     }
     void itemInserted(TextWnd&& editor, SmartBoxInsertableItem&& item) {
         if (item !is null)
@@ -184,9 +234,9 @@ class ModuleTextProcessor : TextProcessor, ModuleTextSource {
     void smartEnter(TextPosition& caretPos, TextWnd&& editor) {
         v8string lineOver;
         v8string line;
-		IUnknown&& cashObj;
-		TextManager&& tm = editor.textDoc.tm;
-		tm.getCashObject(cashObj);
+        IUnknown&& cashObj;
+        TextManager&& tm = editor.textDoc.tm;
+        tm.getCashObject(cashObj);
         tm.getLineFast(caretPos.line - 1, lineOver, cashObj);
         lex_provider lexSrc(lineOver.cstr);
         lexem lex;
@@ -221,7 +271,7 @@ class ModuleTextProcessor : TextProcessor, ModuleTextSource {
         
         if ('?' == symbol) {
             IntelliSite&& ist = getIntelliSite();
-			ist.addItem(Delimeters::getDelimeter(Delimeters::question));
+            ist.addItem(Delimeters::getDelimeter(Delimeters::question));
             ist.show(pTxtWnd, "");
             return true;
         }
@@ -327,10 +377,10 @@ class ModuleTextProcessor : TextProcessor, ModuleTextSource {
         // Добавим ключевые слова
         getKeywordsGroup().processParseResult(parseResult, isite);
         // Добавим разделители
-		if (parseResult.isFlagSet(wantDefVal)) {
-			isite.addItem(Delimeters::getDelimeter(Delimeters::quote));
-			isite.addItem(Delimeters::getDelimeter(Delimeters::date));
-		}
+        if (parseResult.isFlagSet(wantDefVal)) {
+            isite.addItem(Delimeters::getDelimeter(Delimeters::quote));
+            isite.addItem(Delimeters::getDelimeter(Delimeters::date));
+        }
         // Добавим типы
         addTypes(parseResult, isite);
         // Для вставки некоторых элементов нужна информация о результатах парсинга
@@ -357,32 +407,32 @@ class ModuleTextProcessor : TextProcessor, ModuleTextSource {
         IMDObject&& rootObj = myContainer.unk;
         bool runModeIsManaged = getRunModeIsManaged(rootObj);
         // Добавим элементы из одного из глобальных модулей
-		if (mdInfo !is null && !(mdInfo.mdPropUuid == gModStdApp || // Модуль обычного приложения
-			mdInfo.mdPropUuid == gModMngApp ||                    // Модуль управляемого приложения
-			mdInfo.mdPropUuid == gModExtCon ||                    // Модуль внешнего соединения
-			mdInfo.mdPropUuid == gModSeance)) {                     // Модуль сеанса
-			ModuleElements&& globalModuleParser = getModuleElementsParser(rootObj, runModeIsManaged ? gModMngApp : gModStdApp);
-			globalModuleParser.parse();
-			globalModuleParser.processParseResultForOtherModule(result, isite, methNames, propNames);
-		}
+        if (mdInfo !is null && !(mdInfo.mdPropUuid == gModStdApp || // Модуль обычного приложения
+            mdInfo.mdPropUuid == gModMngApp ||                    // Модуль управляемого приложения
+            mdInfo.mdPropUuid == gModExtCon ||                    // Модуль внешнего соединения
+            mdInfo.mdPropUuid == gModSeance)) {                     // Модуль сеанса
+            ModuleElements&& globalModuleParser = getModuleElementsParser(rootObj, runModeIsManaged ? gModMngApp : gModStdApp);
+            globalModuleParser.parse();
+            globalModuleParser.processParseResultForOtherModule(result, isite, methNames, propNames);
+        }
         // Теперь переберём общие модули.
         for (uint i = 0, im = rootObj.childCount(mdClassCmnModule); i < im; i++) {
             IMDObject&& obj = rootObj.childAt(mdClassCmnModule, i);
-			if (mdInfo is null || obj.id != mdInfo.object.id) {
-				Value val;
-				obj.mdPropVal(gcmIsGlobal, val);
-				bool isGlobal;
-				val.getBoolean(isGlobal);
-				if (isGlobal) {
-					ModuleElements&& me = getModuleElementsParser(obj, gModule);
-					me.parse();
-					me.processParseResultForOtherModule(result, isite, methNames, propNames);
-				} else {
-					string nameOfModule = mdObjName(obj);
-					if (propNames.insert(nameOfModule))
-						isite.addItem(CommonModuleItem(nameOfModule));
-				}
-			}
+            if (mdInfo is null || obj.id != mdInfo.object.id) {
+                Value val;
+                obj.mdPropVal(gcmIsGlobal, val);
+                bool isGlobal;
+                val.getBoolean(isGlobal);
+                if (isGlobal) {
+                    ModuleElements&& me = getModuleElementsParser(obj, gModule);
+                    me.parse();
+                    me.processParseResultForOtherModule(result, isite, methNames, propNames);
+                } else {
+                    string nameOfModule = mdObjName(obj);
+                    if (propNames.insert(nameOfModule))
+                        isite.addItem(CommonModuleItem(nameOfModule));
+                }
+            }
         }
     }
 };
@@ -397,8 +447,8 @@ class ExtContextData {
     array<array<any>&&> extModules;
 
     ExtContextData(TextDocMdInfo&& mdInfo) {
-		store.resize(scgLast);
-		if (mdInfo is null || mdInfo.object is null)
+        store.resize(scgLast);
+        if (mdInfo is null || mdInfo.object is null)
             return;
         // Нужно получить поставщик информации о типах для этой конфигурации
         IMDEditService&& mdes = getMDEditService();
@@ -596,16 +646,16 @@ void addV8stock(ParseMethodResult&& result, IntelliSite&& isite, NoCaseSet& meth
 
 void addTypes(ParseMethodResult&& result, IntelliSite&& isite) {
     if (result.isFlagSet(allowNewTypes))
-		addTypeStores(isite, result.allowedAccesses);
+        addTypeStores(isite, result.allowedAccesses);
 }
 
 void addTypeStores(IntelliSite&& isite, uint allowedAccesses) {
-	isite.addItemGroup(checkAccess(resetExclude(v8stock[stockTypeNames, langCmn]), allowedAccesses));
-	if (0 != (useLangs & useLangEng))
-		isite.addItemGroup(checkAccess(resetExclude(v8stock[stockTypeNames, langEng]), allowedAccesses));
-	if (0 != (useLangs & useLangRus))
-		isite.addItemGroup(checkAccess(resetExclude(v8stock[stockTypeNames, langRus]), allowedAccesses));
-	isite.addItem(Delimeters::getDelimeter(Delimeters::parenthesisWithBackSpace));
+    isite.addItemGroup(checkAccess(resetExclude(v8stock[stockTypeNames, langCmn]), allowedAccesses));
+    if (0 != (useLangs & useLangEng))
+        isite.addItemGroup(checkAccess(resetExclude(v8stock[stockTypeNames, langEng]), allowedAccesses));
+    if (0 != (useLangs & useLangRus))
+        isite.addItemGroup(checkAccess(resetExclude(v8stock[stockTypeNames, langRus]), allowedAccesses));
+    isite.addItem(Delimeters::getDelimeter(Delimeters::parenthesisWithBackSpace));
 }
 
 void showV8Assist() {

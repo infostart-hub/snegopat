@@ -146,47 +146,47 @@ class IV8MDContainer {
             return uicfgmngr.identifier();
         return string();
     }
-	//metadata.current.saveToFile("e:\\test.cf")
-	bool saveToFile(const string& path) {
-		IV8DataFile&& tempFile = oneDesigner._v8files.createTempFile();
-		if (tempFile is null)
-			return false;
-		IV8DataFile&& file = oneDesigner._v8files.open("file://" + path, FileOpenModes(fomTruncate | fomIn | fomOut));
-		if (file is null)
-			return false;
-		IConfigMngr&& cfgMgr = container.getConfigMngr();
-	#if test > 0
-		{
-			IConfigMngr&& test = cfgMgr.unk;
-			if (test is null) {
-				doLog("Not IConfigMngr");
-				return false;
-			}
-		}
-		dumpVtable(&&cfgMgr);
-	#endif
-		IInfoBaseService&& ibservice = currentProcess().getService(IID_IInfoBaseService);
-		IConfigMngr&& copyMgr;
-		ibservice.connectConfig(copyMgr, tempFile.file, 1, 0);
-		if (copyMgr !is null) {
-		#if test > 0
-			{
-				IConfigMngr&& test = copyMgr.unk;
-				if (test is null) {
-					doLog("Not copy IConfigMngr");
-					return false;
-				}
-			}
-			dumpVtable(&&copyMgr, "_copy");
-		#endif
-			cfgMgr.extractConfig(copyMgr);
-			&&copyMgr = null;
-			tempFile.seek(0, fsBegin);
-			copy_file(file.file, tempFile.file, -1);
-			return true;
-		}
-		return false;
-	}
+    //metadata.current.saveToFile("e:\\test.cf")
+    bool saveToFile(const string& path) {
+        IV8DataFile&& tempFile = oneDesigner._v8files.createTempFile();
+        if (tempFile is null)
+            return false;
+        IV8DataFile&& file = oneDesigner._v8files.open("file://" + path, FileOpenModes(fomTruncate | fomIn | fomOut));
+        if (file is null)
+            return false;
+        IConfigMngr&& cfgMgr = container.getConfigMngr();
+    #if test > 0
+        {
+            IConfigMngr&& test = cfgMgr.unk;
+            if (test is null) {
+                doLog("Not IConfigMngr");
+                return false;
+            }
+        }
+        dumpVtable(&&cfgMgr);
+    #endif
+        IInfoBaseService&& ibservice = currentProcess().getService(IID_IInfoBaseService);
+        IConfigMngr&& copyMgr;
+        ibservice.connectConfig(copyMgr, tempFile.file, 1, 0);
+        if (copyMgr !is null) {
+        #if test > 0
+            {
+                IConfigMngr&& test = copyMgr.unk;
+                if (test is null) {
+                    doLog("Not copy IConfigMngr");
+                    return false;
+                }
+            }
+            dumpVtable(&&copyMgr, "_copy");
+        #endif
+            cfgMgr.extractConfig(copyMgr);
+            &&copyMgr = null;
+            tempFile.seek(0, fsBegin);
+            copy_file(file.file, tempFile.file, -1);
+            return true;
+        }
+        return false;
+    }
 };
 
 UintMap<IV8MDContainer&&> contFind;
@@ -373,7 +373,10 @@ class IV8MDObject {
     protected IV8MDClass&& myClass;
     protected Variant pict;
     IV8MDObject(IMDObject&& obj) {
-        &&object = obj;
+        &&object = obj.unk;
+        if (object is null) {
+            doLog("No md object");
+        }
     }
     bool isSame(IV8MDObject&& other) {
         return other.object is object;
@@ -454,15 +457,33 @@ class IV8MDObject {
     IV8MDContainer&& get_container() {
         IConfigMngrUI&& mngui;
         getMDEditService().getConfigMngrUI(mngui, object);
-        if (mngui !is null)
-            return getContainerWrapper(mngui.getMDCont());
+        if (mngui !is null) {
+            IConfigMngrUI&& test1 = mngui.unk;
+            if (test1 is null)
+                doLog("Bad test IConfigMngrUI");
+            IMDContainer&& cont = mngui.getMDCont();
+            if (cont is null)
+                doLog("No container");
+            else {
+                IMDContainer&& test2 = cont.unk;
+                if (test2 is null)
+                    doLog("Bad test IMDContainer");
+                return getContainerWrapper(cont);
+            }
+        } else
+            doLog("No IConfigMngrUI");
         IMDObject&& obj = object;
         IMDParentLink&& link = object.mdParentLink;
         while (link !is null) {
             &&object = link.getMDObject();
             &&link = object.mdParentLink;
         }
-        return getContainerWrapper(cast<IMDContainer>(obj));
+        IMDContainer&& cont = obj.unk;
+        if (cont is null) {
+            doLog("Object not container!!!");
+            return null;
+        }
+        return getContainerWrapper(cont);
     }
     void activateInTree() {
         IConfigMngrUI&& mngui;
@@ -773,19 +794,19 @@ bool loadObject(IV8DataFile&& file, IUnknown&& obj) {
 }
 
 class IObjectProperties {
-	int get_count() {
-		return 0;
-	}
-	string propName(int idx) {
-		return "";
-	}
-	Variant getValue(Variant idx) {
-		return Variant();
-	}
-	void setValue(Variant idx, Variant val) {
-	}
-	void activateProperty(Variant idx) {
-	}
+    int get_count() {
+        return 0;
+    }
+    string propName(int idx) {
+        return "";
+    }
+    Variant getValue(Variant idx) {
+        return Variant();
+    }
+    void setValue(Variant idx, Variant val) {
+    }
+    void activateProperty(Variant idx) {
+    }
 };
 
 IMDContainer&& getIBMDCont() {
@@ -898,7 +919,7 @@ class IV8MetaDataEvent {
 
 class MetaDataEvent {
     void onEvent(const Guid&in eventID, MDEventInfo& info, IUnknown& obj) {
-        //Print("Metadata event " + int(info.kind));
+        //Message("Metadata event " + int(info.kind));
         // Обработка событий метаданных.
         // Надо послать оповещение подписчикам
         IDispatch&& mdd = createDispatchFromAS(&&oneDesigner._metadata);
@@ -984,7 +1005,7 @@ Variant image2pict(IUnknown&& img) {
 }
 
 IMDContainer&& getMasterContainer(IMDContainer&& cont) {
-	//dumpVtable(&&cont);
+    //dumpVtable(&&cont);
     for (IMDContainer&& master = cont.masterContainer(); master !is null; &&master = cont.masterContainer())
         &&cont = master;
     return cont;
