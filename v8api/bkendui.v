@@ -38,10 +38,8 @@
 
   #if ver < 8.3.4
 	save int doModal2(IFramedView& pView, int i1, int i2, int i3, int i4, int i5, int i6, int i7)
-  #elif ver < 8.3.11
-	save int doModal2(IFramedView& pView, int i1, int i2, int i3, int i4, int i5, int i6, int i7, int i8)
   #else
-	save int doModal2(IFramedView& pView, int i1, int i2, int i3, int i4, int i5, int i6, int i7)
+	save int doModal2(IFramedView& pView, int i1, int i2, int i3, int i4, int i5, int i6, int i7, int i8)
   #endif
 ////////////////////////////////////////////////////////
 // Модальное состояние
@@ -87,9 +85,10 @@
 :iface MyMessageHandler {AA7D47D7-FBFB-489E-ACF0-5F90A7AE4744}
 	:virt
 		void process()
-#if ver < 8.3.11
+
 :struct mbp
 :props
+#if ver < 8.3.11
     int i1
     int i2
     int p1
@@ -105,8 +104,6 @@
     }
     ---
 #else
-:struct mbp
-:props
     int i1
     int i2
     int p1
@@ -178,7 +175,7 @@
     ---
     void Message(const string& text, MessageMarker mm=mNone)
     {
-        getBkEndUI().doMsgLine(v8string(text), mm);
+        getBkEndUI().doMsgLine(text, mm);
     }
     int MsgBox(const string& text, int type=mbOK, const string& caption="", uint timeout=0)
     {

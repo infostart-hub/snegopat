@@ -50,7 +50,11 @@
 		} else {
 			obj.len = inplaceStringSize;
 			uint dataLen = v8strData_text_offset + l * 2;
+		  #if ver < 8.3.11
 			obj.data = malloc(dataLen + 2);
+		  #else
+			obj.data = v8malloc(dataLen + 2);
+		  #endif
 			mem::size_t[obj.data] = 1;
 			mem::memcpy(obj.data + v8strData_text_offset, text, l * 2);
 			obj.pEnd = obj.data + dataLen;
@@ -62,7 +66,11 @@
 	void dtor()
 	{
 		if (obj.len == inplaceStringSize && 0 == InterlockedDecrement(obj.data))
+		  #if ver < 8.3.11
 			free(obj.data);
+		  #else
+			v8free(obj.data, obj.pEnd - obj.data + 2);
+		  #endif
 	}
 	---
 	string opImplConv()const|int_ptr v8string__opImplConv(v8string& obj, string& ret)

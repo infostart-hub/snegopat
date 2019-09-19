@@ -111,6 +111,7 @@ class ScriptLoader : AddinLoader {
         v8string textOfFile;
         readTextFile(textOfFile, fullPath);
         string source = textOfFile;
+
         if (source.isEmpty()) {
             oneAddinMgr._lastAddinError = "Не удалось получить текст файла " + fullPath;
             return null;

@@ -105,6 +105,7 @@ class ModuleTextProcessor : TextProcessor, ModuleTextSource {
     }
     // Подключение к и отключение от текстового документа
     void setTextDoc(TextDoc&& textDoc) {
+        //Print("ModuleTextProcessor connect to doc");
         if (textDoc !is null) { // Подключение к текстовому документу
             // Проверим, не является ли он каким-либо модулем объекта метаданных
             // и если да, то надо поискать, не создан ли уже для него парсер структуры
@@ -124,9 +125,11 @@ class ModuleTextProcessor : TextProcessor, ModuleTextSource {
 
     void connectEditor(TextWnd&& editor) { &&editor.editorData = ModuleEditorData(); }
     bool onChar(TextWnd&& editor, wchar_t symbol) {
+        //Print("MTP onChar");
         return enableSmartEnter && symbol == '\r' && (GetKeyState(VK_SHIFT) & 0x8000) == 0 && beforeSmartEnter(editor);
     }
     void afterChar(TextWnd&& editor, wchar_t symbol) {
+        //Print("MTP afterChar");
         if (editor !is activeTextWnd)
             return;
         if (!enableAutoReplaces && !enableSmartEnter && (!enableSnegoList || (symbol != 0 && qaCharsCount == 0)))
@@ -331,6 +334,7 @@ class ModuleTextProcessor : TextProcessor, ModuleTextSource {
         string methodText;
         execContextTypes directive;
         LexemTypes firstLexem = getMethodText(editor.textDoc.tm, line, col, false, methodText, directive);
+
         // Теперь проверим, не нужно ли перепарсить структуру модуля
         if (lastMethodBeginLine != line) {
             moduleElements.parsed = false;

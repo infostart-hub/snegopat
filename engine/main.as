@@ -177,6 +177,7 @@ bool TxtEdtCtrl_createWindow(IWindowView& view, HWND parentWindow) {
 }
 
 bool TxtEdtView_createWindow(IWindowView& view, HWND parentWindow) {
+    //Print("TxtEdtView_createWindow");
 #if test = 1
     dumpVtable(&&view, "_TxtEdtView_createWindow");
 #endif

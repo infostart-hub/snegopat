@@ -276,8 +276,8 @@ funcdef bool POnInitialUpdate(IFramedView&);
 funcdef void POnFinalOpen(IFramedView&);
 
 class DoModalPatchedTables {
-    uint vtableCopy;
-    uint realVtable;
+    int_ptr vtableCopy;
+    int_ptr realVtable;
     TrapVirtualStdCall trInitialUpdate;
     TrapVirtualStdCall trFinalOpen;
     POnInitialUpdate&& real_iu;
@@ -372,9 +372,9 @@ DoModalPatchedTables&& findPatchedTable(IFramedView& view) {
         // эту таблицу еще не патчили. Создадим её копию.
         &&patch = DoModalPatchedTables();
         patch.realVtable = pVtable;	// запомним адрес настоящей vtable
-        patch.vtableCopy = malloc(30 * 4);	// там не больше 30 функций
-        mem::memcpy(patch.vtableCopy, pVtable, 30 * 4);		// скопируем vtable
-        mem::dword[view.self] = patch.vtableCopy;			// направим view на копию vtable
+        patch.vtableCopy = malloc(30 * sizeof_ptr);	// там не больше 30 функций
+        mem::memcpy(patch.vtableCopy, pVtable, 30 * sizeof_ptr);		// скопируем vtable
+        mem::int_ptr[view.self] = patch.vtableCopy;			// направим view на копию vtable
         // и перехватим два метода в ней
         patch.trInitialUpdate.setTrap(&&view, IFramedView_onInitialUpdate, onFrameViewInitialUpdate_trap);
         patch.trInitialUpdate.getOriginal(&&patch.real_iu);
@@ -385,7 +385,7 @@ DoModalPatchedTables&& findPatchedTable(IFramedView& view) {
     } else
         &&patch = fnd.value;	// для этой vtable уже есть патченная копия
     // направим view на копию
-    mem::dword[view.self] = patch.vtableCopy;
+    mem::int_ptr[view.self] = patch.vtableCopy;
     return patch;
 }
 
@@ -453,7 +453,7 @@ void afterModal(IFramedView& pView, int result) {
     mapDialogsToInfo.remove(pView.self);
     info.object._reset();
     // у view восстановим оригинальную vtable
-    mem::dword[pView.self] = info.originals.realVtable;
+    mem::int_ptr[pView.self] = info.originals.realVtable;
 }
 
 
@@ -483,7 +483,7 @@ int doModal1_trap(IBkEndUI& pThis, IFramedView& pView, int i1, int i2, int i3, i
     return result;
 }
 
-#if ver < 8.3.4 | ver = 8.3.11
+#if ver < 8.3.4
 funcdef int DoModal2Func(IBkEndUI&, IFramedView&, int, int, int, int, int, int, int);
 int doModal2_trap(IBkEndUI& pThis, IFramedView& pView, int i1, int i2, int i3, int i4, int i5, int i6, int i7) {
 #else

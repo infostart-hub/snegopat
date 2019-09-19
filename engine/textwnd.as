@@ -171,9 +171,10 @@ void onCreateTextWnd(IWindowView&& pWnd, bool bControl) {
         ITextManager_Operations&& to = itm.unk;
         Guid textExtender;
         to.getExtenderCLSID(textExtender);
+        //Print("Text extender is " + textExtender);
         tdoc.setTextExtenderType(textExtender);
         textDocStorage.store(tdoc);
-    } //else Print("Found old text doc");
+    }// else Print("Found old text doc");
     tdoc.attachView(wnd);
     if (oneDesigner !is null)
         oneDesigner._fireCreateTextWindow(wnd);
@@ -182,6 +183,7 @@ void onCreateTextWnd(IWindowView&& pWnd, bool bControl) {
 // Вызывается из перехвата при смене расширения текстового редактора
 // (т.е. в меню текст выбрали тип текста - Встроеный язык, язык запросов, и т.п.)
 void changeTextExtender(ITextManager&& itm, const Guid& textExtender) {
+    //Print("changeTextExtender");
     TextDoc&& tdoc = textDocStorage.find(itm);
     if (tdoc !is null)
         tdoc.setTextExtenderType(textExtender);
@@ -343,6 +345,7 @@ class TextWnd {
     TextWnd(IWindowView&& v, bool isCtrl) {
         isControl = isCtrl;
         hWnd = v.hwnd();
+        //Print("HWND=" + hWnd + " v=" + v.self);
         &&wnd = attachWndToFunction(hWnd, WndFunc(this.WndProc), defaultMessages());
         &&ted = v.unk;
     }
@@ -382,6 +385,7 @@ class TextWnd {
         return textDoc.tp.onKeyDown(this, w, l);
     }
     LRESULT onChar(uint16 symb) {
+        //Print("TxtWnd::onChar");
         if (textDoc.tp.onChar(this, symb))
             return 0;
         LRESULT res = wnd.doDefault();

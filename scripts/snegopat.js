@@ -18,6 +18,8 @@ global.connectGlobals(SelfScript);
 var macroswnd = require("./macroswnd");
 var stdlib = require("./std");
 var stdcommands = require("./commands");
+//import * as hks         from "./hotkeys";
+//import * as snegopatwnd from "./snegopatwnd";
 stdlib.createMacros(SelfScript.self, "ВыбратьИВыполнитьМакрос", "Выбрать макрос из списка и выполнить его", stdcommands.CDebug.Start.info.picture, function () {
     var macrosesWnd = macroswnd.MacrosWnd();
     if (macrosesWnd.isOpened())

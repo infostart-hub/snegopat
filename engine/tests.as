@@ -30,10 +30,15 @@ void testScriptObject() {
     Message(str.str);
 }
 
+void testViewParent() {
+    oneDesigner._windows.get_mdiView().get_parent();
+}
+
 bool runTest() {
     //testReadTextFile();
     //testValueToString();
-    testScriptObject();
+    //testScriptObject();
+    testViewParent();
     return true;
 }
 

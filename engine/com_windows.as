@@ -118,8 +118,10 @@ class IV8Windows {
 
 IV8View&& frameView(uint offset) {
     ITopLevelFrameCore&& tlc = coreMainFrame.unk;
-    int addrOfViewCont = mem::dword[tlc.self + offset];
+    //MsgBox("Offsets of active and focused view in toplevelframe: искать от 0x" + formatInt(tlc.self, "0x", sizeof_ptr * 2));
+    int_ptr addrOfViewCont = mem::int_ptr[tlc.self + offset];
     if (addrOfViewCont > 0) {
+        //MsgBox("ViewContextInView: искать от 0x" + formatInt(addrOfViewCont, "0x", sizeof_ptr * 2));
         ViewContextRef&& pCont = toViewContext(addrOfViewCont + ViewContextInView);
         return getViewWrapper(pCont.ref.id);
     }
@@ -198,7 +200,9 @@ IMDObject&& getMdObjFromView(IFramedView&& view) {
         IEventRecipient&& er = view.unk;
         ICommandTarget&& ct = view.unk;
         if (er !is null && ct !is null && er.self < view.self && ct.request(CommandID(cmdFrameGroup, cmdFindInTree))) {
-            IMDObject&& obj = toIUnknown(mem::dword[er.self + 32]);
+            //MsgBox("MetaDataObjInEventRecipientOffset: Искать смещение от 0x" + formatInt(er.self, "0x", sizeof_ptr * 2) +
+            //    " до объекта с интерфейсом " + IID_IMDObject);
+            IMDObject&& obj = toIUnknown(mem::int_ptr[er.self + MetaDataObjInEventRecipientOffset]);
             obj.AddRef();
             return obj;
         }
@@ -542,6 +546,9 @@ class IV8View {
 };
 
 ViewContextRef&& getViewContext(IViewContext&& ctx) {
+    //Guid id;
+    //ctx.getID(id);
+    //MsgBox("ViewContextOffset: искать от 0x" + formatInt(ctx.self, "0x", sizeof_ptr * 2) + " " + id);
     return toViewContext(ctx.self + ViewContextOffset);
 }
 

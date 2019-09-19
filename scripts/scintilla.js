@@ -128,13 +128,13 @@ var SetupFormObject = (function () {
         }
     };
     SetupFormObject.prototype.StylesBgColorПриИзменении = function (Элемент) {
-        if (toV8Value(Элемент.val.Значение).typeName(1) == "Цвет"){
-			var valClr = Элемент.val.Значение;
-			if ((valClr.Зеленый < 0) && (valClr.Красный < 0) && (valClr.Синий < 0)){
-				Предупреждение("Встроенный тип 1С \"Цвет\" не поддерживается. Измените любую из составляющих цвета, чтобы он превратился в тип RGB");
-				return;
-			}
-		}
+        if (toV8Value(Элемент.val.Значение).typeName(1) == "Цвет") {
+            var valClr = Элемент.val.Значение;
+            if ((valClr.Зеленый < 0) && (valClr.Красный < 0) && (valClr.Синий < 0)) {
+                Предупреждение("Встроенный тип 1С \"Цвет\" не поддерживается. Измените любую из составляющих цвета, чтобы он превратился в тип RGB");
+                return;
+            }
+        }
         if (this.form.ЭлементыФормы.Styles.ТекущаяСтрока.StyleName == "default") {
             var currColor = Элемент.val.Значение;
             if (Вопрос("Установить этот цвет фона для остальных стилей?", РежимДиалогаВопрос.ДаНет, 0) == КодВозвратаДиалога.Нет)
@@ -148,13 +148,13 @@ var SetupFormObject = (function () {
         }
     };
     SetupFormObject.prototype.StylesFontColorПриИзменении = function (Элемент) {
-        if (toV8Value(Элемент.val.Значение).typeName(1) == "Цвет"){
-			var valClr = Элемент.val.Значение;
-			if ((valClr.Зеленый < 0) && (valClr.Красный < 0) && (valClr.Синий < 0)){
-				Предупреждение("Встроенный тип 1С \"Цвет\" не поддерживается. Измените любую из составляющих цвета, чтобы он превратился в тип RGB");
-				return;
-			}
-		}
+        if (toV8Value(Элемент.val.Значение).typeName(1) == "Цвет") {
+            var valClr = Элемент.val.Значение;
+            if ((valClr.Зеленый < 0) && (valClr.Красный < 0) && (valClr.Синий < 0)) {
+                Предупреждение("Встроенный тип 1С \"Цвет\" не поддерживается. Измените любую из составляющих цвета, чтобы он превратился в тип RGB");
+                return;
+            }
+        }
     };
     return SetupFormObject;
 }());
@@ -230,33 +230,31 @@ function getColorSheme(num) {
     }
 }
 function OnMetaDataEvent(mde) {
-	scintilla_int.callOnMetaDataEvent(mde);
+    scintilla_int.callOnMetaDataEvent(mde);
 }
-
 //{ МАКРОСЫ 
-SelfScript.self['macrosСвернуть/развернуть текущий блок'] = function() {
-	scintilla_int.callToggleFold();
-}
-SelfScript.self['macrosСвернуть/развернуть текущий блок с вложенными'] = function() {
-	scintilla_int.callToggleFold(true);
-}
-SelfScript.self['macrosСбросить маркеры модифицированности строк'] = function() {
-	scintilla_int.callResetModifiedLineStates();
-}
-SelfScript.self['macrosПрокрутка на строку вниз'] = function() {
-	scintilla_int.callLineScroll(1);
-}
-SelfScript.self['macrosПрокрутка на строку вверх'] = function() {
-	scintilla_int.callLineScroll(-1);
-}
-SelfScript.self['macrosПерейти к следующей модифицированной строке'] = function() {
-	scintilla_int.callGotoModifiedLine(1);
-}
-SelfScript.self['macrosПерейти к предыдущей модифицированной строке'] = function() {
-	scintilla_int.callGotoModifiedLine(-1);
-}
+SelfScript.self['macrosСвернуть/развернуть текущий блок'] = function () {
+    scintilla_int.callToggleFold();
+};
+SelfScript.self['macrosСвернуть/развернуть текущий блок с вложенными'] = function () {
+    scintilla_int.callToggleFold(true);
+};
+SelfScript.self['macrosСбросить маркеры модифицированности строк'] = function () {
+    scintilla_int.callResetModifiedLineStates();
+};
+SelfScript.self['macrosПрокрутка на строку вниз'] = function () {
+    scintilla_int.callLineScroll(1);
+};
+SelfScript.self['macrosПрокрутка на строку вверх'] = function () {
+    scintilla_int.callLineScroll(-1);
+};
+SelfScript.self['macrosПерейти к следующей модифицированной строке'] = function () {
+    scintilla_int.callGotoModifiedLine(1);
+};
+SelfScript.self['macrosПерейти к предыдущей модифицированной строке'] = function () {
+    scintilla_int.callGotoModifiedLine(-1);
+};
 //}
-
 function ColorToColor1C(clr) {
     return v8New("Цвет", clr & 255, clr >> 8 & 255, clr >> 16);
 }

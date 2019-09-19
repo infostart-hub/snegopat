@@ -312,9 +312,16 @@
 		IUnknown@		parent
 
 :enum ViewOffsets
-	0x40 ViewContextOffset
+  #if ver < 8.3.11
+	64 ViewContextOffset
 	44 FocusedViewInCoreFrame
 	48 ActiveViewInCoreFrame
 	96 ViewContextInView
+  #else
+	56 ViewContextOffset
+	48 FocusedViewInCoreFrame
+	52 ActiveViewInCoreFrame
+	88 ViewContextInView
+  #endif
 
 :guid gMDIClientID	{33ECE94C-5FB9-4540-9B97-C874FD45AE08}

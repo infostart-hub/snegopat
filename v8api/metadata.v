@@ -131,18 +131,13 @@
 		50
 	  #elif ver <8.3.7.1759
 	    54
-	  #else
+	  #elif ver < 8.3.11
 		55
+	  #else
+	    56
 	  #endif
 		IConfigMngr@+ getConfigMngr()
-	  
-	  #if ver < 8.3.6
-		52
-	  #elif ver <8.3.7.1759
-	    56
-	  #else
-		57
-	  #endif
+	  +1
 		IMDContainer@+ masterContainer()
 
 :iface IMDParentLink {6F00D0F0-4DAD-11D4-9415-008048DA11F9}
@@ -292,9 +287,6 @@
 		+2
 		const Guid& moduleExpandType(const Guid& propId)
 		+1
-		// //Артур
-		// +1
-		// // +10 Артур завершение
 		uint openModule(ITextManager@&, const Guid& propId, bool s, bool open, ITextEditor@& editor)
 
 :iface IMDTypedObj {752BB41D-05DA-4FD1-A680-78DFB6C6EB1C}
@@ -307,6 +299,14 @@
 	:virt
 	+11
     uint url(URL&)
+
+:enum MdOffsets
+  #if ver < 8.3.11
+	32
+  #else
+	24
+  #endif
+	MetaDataObjInEventRecipientOffset
 
 :struct MDProperty
 	:props

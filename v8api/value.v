@@ -188,7 +188,7 @@
 	void opAssign(const uint16&)|?assign@GenericValue@core@@QAEXPB_S@Z
 	bool opEquals(const v8string&in)const|?equals@GenericValue@core@@QBE_NABV?$basic_string@_SU?$fix_char_traits@_S@stdx@@V?$allocator@_S@std@@@stdx@@@Z
 	bool opEquals(const uint16&)const|?equals@GenericValue@core@@QBE_NPB_S@Z
-	bool getString(v8string&)const|?toString@GenericValue@core@@QBEXAAV?$basic_string@_SU?$fix_char_traits@_S@stdx@@V?$allocator@_S@std@@@stdx@@@Z
+	bool getString(v8string&)const|?getString@GenericValue@core@@QBE_NAAV?$basic_string@_SU?$fix_char_traits@_S@stdx@@V?$allocator@_S@std@@@stdx@@@Z
 	void toString(v8string&)const|?toString@GenericValue@core@@QBEXAAV?$basic_string@_SU?$fix_char_traits@_S@stdx@@V?$allocator@_S@std@@@stdx@@@Z
 #endif
 

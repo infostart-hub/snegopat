@@ -1,4 +1,4 @@
-﻿#if ver < 8.2.19 | (ver > 8.3.0 & ver < 8.3.4) | ver >= 8.3.11
+﻿#if ver < 8.2.19 | (ver > 8.3.0 & ver < 8.3.4) | ver >= 8.3.12
 #err Unsupported version of 1C - Эта версия 1С не поддерживается!
 #endif
 
@@ -55,16 +55,16 @@
 :dlls
 #if ver < 8.3
 	stl82.dll
-	uint malloc(uint)|?__stl_new@stlp_std@@YAPAXI@Z
-	void free(uint)|?__stl_delete@stlp_std@@YAXPAX@Z
+	int_ptr malloc(size_t)|?__stl_new@stlp_std@@YAPAXI@Z
+	void free(int_ptr)|?__stl_delete@stlp_std@@YAXPAX@Z
 #elif ver < 8.3.11
 	nuke83.dll
-	uint malloc(uint)|?alloc@details@nuke@@YAPAXI@Z
-	void free(uint)|?free@details@nuke@@YAXPAX@Z
+	int_ptr malloc(size_t)|?alloc@details@nuke@@YAPAXI@Z
+	void free(int_ptr)|?free@details@nuke@@YAXPAX@Z
 #else
 	ucrtbase.dll
-	uint malloc(uint)|malloc
-	void free(uint)|free
+	int_ptr malloc(size_t)|malloc
+	void free(int_ptr)|free
 #endif
 
 :iface IGlobalContext {151C4C40-37A4-48EA-990C-14B584EF8A6C}

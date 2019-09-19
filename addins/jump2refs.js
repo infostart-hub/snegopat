@@ -45,8 +45,10 @@ function onMessage(params)
 // Перехват появления модального диалога
 function onDoModal(dlgInfo)
 {
-    dlgInfo.cancel = true   // Просто сразу скажем, что в нем нажали OK
-    dlgInfo.result = mbaOK
+	if (dlgInfo.stage == openModalWnd) {
+		dlgInfo.result = mbaOk; // Нажимаем "Ок".
+		dlgInfo.cancel = true;  // Окно показывать не надо.
+    }   
 }
 
 // Функция ищет объект метаданных в контейнере по его имени
@@ -75,25 +77,27 @@ function doJump(command, forceShow)
         return false
     // Для начала проверим, что мы в окне метаданных
 	var view = windows.getFocusedView()//windows.getActiveView()
-    if(!view)
-        return false
 	var state = command.getState();
-	if(!state || !state.enabled)
+    if(!view || !state || !state.enabled) {
+        MessageBox("Не выбран объект метаданных")
         return false
+    }
 	refs = []
     // Ставим перехват на вывод в окно сообщений
 	events.connect(windows, "onMessage", SelfScript.self)
     // Подавляем показ диалога
-    events.connect(windows, "onDoModal", SelfScript.self)
+	// Пока нет, не подавляем
+    // events.connect(windows, "onDoModal", SelfScript.self)
     // Посылаем команду поиска ссылок
 	command.send()
     // Убираем перехваты
     events.disconnect(windows, "onMessage", SelfScript.self)
-    events.disconnect(windows, "onDoModal", SelfScript.self)
+    //events.disconnect(windows, "onDoModal", SelfScript.self)
  
-    if(refs.length < 2)
+    if(refs.length < 2) {
+        MessageBox("Ссылок не найдено");
         return false
-    
+    }
     var rootObject = view.mdObj.container.rootObject
     var currentObject = findObject(rootObject, refs[0].match(/"(.+)"/)[1])
     

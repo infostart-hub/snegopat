@@ -977,7 +977,7 @@ Variant image2pict(IUnknown&& img) {
         &&iPict = toIV8Picture(mem::dword[gl.ref.block.self + pictOffset]);
         key = "," + gl.ref.size.cx + "," + gl.ref.size.cy + "," + gl.ref.point.x + "," + gl.ref.point.y;
     } else
-        &&iPict = toIV8Picture(mem::dword[image.self + pictOffset]);
+        &&iPict = toIV8Picture(mem::int_ptr[image.self + pictOffset]);
     iPict.AddRef();
     key = "" + iPict.self + key;
     auto find = pictCache.find(key);

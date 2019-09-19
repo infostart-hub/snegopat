@@ -202,11 +202,9 @@ class ValueParamsVector {
     ValueParamsVector(uint argsCount = 0) {
         &&values = array<Value>(argsCount);
         if (argsCount > 0) {
-            uint mem = 4 * argsCount;
-            args.start = malloc(mem);
-            args.allocked = args.end = args.start + mem;
+            args.allock(argsCount, sizeof_ptr);
             for (uint i = 0; i < argsCount; i++)
-                mem::dword[args.start + i * 4] = values[i].self;
+                mem::int_ptr[args.start + i * sizeof_ptr] = values[i].self;
         }
     }
 };
