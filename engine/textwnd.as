@@ -542,7 +542,7 @@ class EditorsManager {
     }
     // Подписка на изменения в тексте документа
     void _subscribeToTextChange(TextManager& tm, TextModifiedReceiver& receiver) {
-        //initTextModifiedTraps();
+        initTextModifiedTraps();
         array<TextModifiedReceiver&&>&& subscribers;
         auto fnd = textChangeSubscribers.find(tm.self);
         if (fnd.isEnd()) {
