@@ -483,7 +483,7 @@ LexemTypes getMethodText(TextManager& pTextManager, uint& line, uint col, bool b
                 }
                 break;
             } else if (lex.type == kwEndProcedure || lex.type == kwEndFunction) {
-                lines.insertLast(currLine.substr(lex.start - lexSrc.start) + lex.length);
+                lines.insertLast(currLine.substr((lex.start - lexSrc.start) / 2 + lex.length));
                 typeOfMethodBegin = 2;
                 break;
             }
