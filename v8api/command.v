@@ -102,7 +102,7 @@
 :guid CLSID_CmdStateImpl {6E3B9D91-2921-4B9D-8C25-4E7884FA3B17}
 
 :guid cmdFrameGroup {00000000-0000-0000-0000-000000000000}
-
+:guid cmdFrntend	{6B7291BF-BCD2-41AF-BAC7-414D47CC6E6A}
 :enum FrameCommands
 	72  cmdFindInTree
 	600 cmdFrameShowAssist

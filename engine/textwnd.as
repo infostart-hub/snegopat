@@ -278,20 +278,20 @@ class TextDoc {
             //Print("cons=" + st.self + " offset=" + (st.self + ModuleTxtExtSettingsMap));
             // для получения смещения смотреть дизасм setSettings у этого st
           #if ver < 8.3.11
-            for (uint node = mem::dword[st.self + ModuleTxtExtSettingsMap]; node != 0; node = mem::dword[node]) {
+            for (uint node = mem::int_ptr[st.self + ModuleTxtExtSettingsMap]; node != 0; node = mem::int_ptr[node]) {
                 GuidRef&& pg = toGuid(node + 4);
                 if (pg.ref == IID_IAssistantData) {
-                    &&data = toIUnknown(mem::dword[node + 20]);
+                    &&data = toIUnknown(mem::int_ptr[node + 20]);
                     data.AddRef();
                     break;
                 }
             }
           #else
-            uint mapBegin = mem::dword[st.self + ModuleTxtExtSettingsMap];
-            for (uint node = mem::dword[mapBegin]; node != mapBegin; node = mem::dword[node]) {
+            uint mapBegin = mem::int_ptr[st.self + ModuleTxtExtSettingsMap];
+            for (uint node = mem::int_ptr[mapBegin]; node != mapBegin; node = mem::int_ptr[node]) {
                 GuidRef&& pg = toGuid(node + 8);
                 if (pg.ref == IID_IAssistantData) {
-                    &&data = toIUnknown(mem::dword[node + 24]);
+                    &&data = toIUnknown(mem::int_ptr[node + 24]);
                     data.AddRef();
                     break;
                 }
@@ -373,7 +373,11 @@ class TextWnd {
                 return 0;
             break;
         case WM_CHAR: {
-            return onChar(w);
+            if (beforeChar(w))
+                return 0;
+            LRESULT res = wnd.doDefault();
+            afterChar(w);
+            return res;
             }
         }
         return editor.wndProc(msg, w, l);
@@ -384,14 +388,11 @@ class TextWnd {
     bool onKeyDown(WPARAM w, LPARAM l) {
         return textDoc.tp.onKeyDown(this, w, l);
     }
-    LRESULT onChar(uint16 symb) {
-        //Print("TxtWnd::onChar");
-        if (textDoc.tp.onChar(this, symb))
-            return 0;
-        LRESULT res = wnd.doDefault();
+    bool beforeChar(uint16 symb) {
+        return textDoc.tp.onChar(this, symb);
+    }
+    void afterChar(uint16 symb) {
         textDoc.tp.afterChar(this, symb);
-        return res;
-        
     }
     ITextWindow&& getComWrapper() {
         if (iwnd is null)
@@ -668,7 +669,11 @@ void initTextModifiedTraps() {
     #else
         string dll = "core83.dll";
     #endif
+    #if ver < 8.3.11
         trSetSelText.setTrapByName(dll, "?setSelectText@TextManager@core@@QAEXPB_W_N@Z", asCALL_THISCALL, setSelectText_trap);
+    #else
+        trSetSelText.setTrapByName(dll, "?setSelectText@TextManager@core@@QAEXPB_S_N@Z", asCALL_THISCALL, setSelectText_trap);
+    #endif
         trClearTextSel.setTrapByName(dll, "?clearTextSelection@TextManager@core@@QAEXXZ", asCALL_THISCALL, clearTextSelection_trap);
     } else if (trSetSelText.state == trapDisabled) {
         trSetSelText.swap();

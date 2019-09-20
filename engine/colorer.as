@@ -1494,16 +1494,20 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
             break;
         }
         case WM_CHAR: {
-            if ((w == VK_RETURN || w == VK_SPACE) && inReflection) 
+            if ((w == VK_RETURN || w == VK_SPACE) && inReflection)
                 return 0;
-            
             LRESULT res = wnd.doDefault();
             if (w == VK_RETURN)
                 autoIndent();
-            txtWnd.onChar(w);
+            txtWnd.afterChar(w);
             return res;
         }
         case WM_KEYDOWN:
+            /*if (w == VK_RETURN) {
+                if (txtWnd.beforeChar(w)) {
+                    return 0;
+                }
+            }*/
             if ((w == VK_RIGHT) || (w == VK_LEFT)) {
                 //если курсор в начале строки - развернем блок, если нажата стрелка вправо или свернем, если нажата стрелка влево
                 int line = swnd.currentLine();
@@ -1517,7 +1521,6 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
                     }
                 }
             }
-
         case WM_SYSKEYDOWN:
             if (checkForSubst(w) || txtWnd.onKeyDown(w, l))
                 return 0;
@@ -1529,7 +1532,7 @@ class ScintillaEditor : TextEditorWindow, SelectionChangedReceiver {
                 TextPosition tp; 
                 calcPosition(swnd.currentPos(), tp);
                 txtWnd.ted.setCaretPosition(tp);
-                CommandID cmdGotoDef(Guid("{6B7291BF-BCD2-41AF-BAC7-414D47CC6E6A}"), 83);
+                CommandID cmdGotoDef(cmdFrntend, 83);
                 getMainFrameCommandState(cmdGotoDef);
                 sendCommandToMainFrame(cmdGotoDef); //перейти к определению (F12)
                 return 0;
