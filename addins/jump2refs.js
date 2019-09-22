@@ -79,7 +79,7 @@ function doJump(command, forceShow)
 	var view = windows.getFocusedView()//windows.getActiveView()
 	var state = command.getState();
     if(!view || !state || !state.enabled) {
-        MessageBox("Не выбран объект метаданных")
+        //MessageBox("Не выбран объект метаданных")
         return false
     }
 	refs = []
