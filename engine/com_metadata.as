@@ -603,7 +603,7 @@ class IV8MDObject {
                       #if ver < 8.3.9
                         emh.openModule(textMan, propUuid, true, true, textEditor);
                       #else
-                        uint16 o = 0x101;
+                        uint32 o = 0x10101;
                         emh.openModule(textMan, propUuid, o, textEditor);
                       #endif
                         if (textEditor !is null) {

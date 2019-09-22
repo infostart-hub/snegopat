@@ -291,7 +291,7 @@
 		uint openModule(ITextManager@&, const Guid& propId, bool s, bool open, ITextEditor@& editor)
 	  #else
 	    +1
-		uint openModule(ITextManager@&, const Guid& propId, uint16& open, ITextEditor@& editor)
+		uint openModule(ITextManager@&, const Guid& propId, uint32& open, ITextEditor@& editor)
 	  #endif
 
 :iface IMDTypedObj {752BB41D-05DA-4FD1-A680-78DFB6C6EB1C}
