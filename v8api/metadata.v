@@ -287,7 +287,12 @@
 		+2
 		const Guid& moduleExpandType(const Guid& propId)
 		+1
+	  #if ver < 8.3.9
 		uint openModule(ITextManager@&, const Guid& propId, bool s, bool open, ITextEditor@& editor)
+	  #else
+	    +1
+		uint openModule(ITextManager@&, const Guid& propId, uint16& open, ITextEditor@& editor)
+	  #endif
 
 :iface IMDTypedObj {752BB41D-05DA-4FD1-A680-78DFB6C6EB1C}
 	:base IMDBaseObj
@@ -441,6 +446,8 @@
 :guid gModOfMgr			{D1B64A2C-8078-4982-8190-8F81AEFDA192}
 // ID свойства метаданных "Модуль"
 :guid gModule			{D5963243-262E-4398-B4D7-FB16D06484F6}
+// ID свойства метаданных Форма
+:guid formPropUuid		{32E087AB-1491-49B6-ABA7-43571B41AC2B}
 // ID свойств метаданных общих модулей
 :guid gcmIsGlobal		{7DBB2BC7-6BAE-4B81-91CB-681317272A0B}	// Глобальный
 :guid gcmClMngApp		{74CE8A02-ABD2-46A6-8544-8CFBB4E8C6E0}	// КлиентУправляемоеПриложение

@@ -2323,8 +2323,7 @@ int_ptr enumFontCallback = 0;
 
 void enumMonoFonts(NoCaseMap<int>& fonts) {
     LOGFONT logfont;
-    for (uint i = 0; i < LOGFONT_size; i++)
-        mem::byte[logfont.self + i] = 0;
+    mem::memset(logfont.self, 0, LOGFONT_size);
     logfont.lfCharSet = 1;
     logfont.lfPitchAndFamily = 1; // FIXED_PITCH;
     HDC hdc = GetDC(0);

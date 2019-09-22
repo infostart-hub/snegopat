@@ -817,6 +817,11 @@ ExtSearch = ScriptForm.extend({
 
         // Откроем и/или активируем окно объекта, в котором выполнялся поиск.
         var targetWindow = row._object.activate();
+
+        if (!targetWindow) {
+            DoMessageBox("Не удалось открыть текстовое окно");
+            return;
+        }
      
         if (!targetWindow.IsActive())
         {

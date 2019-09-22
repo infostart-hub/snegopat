@@ -491,8 +491,7 @@ class IV8MDObject {
         if (mngui !is null)
             mngui.activateObjInTree(object.id, IID_NULL, true);
     }
-    void editProperty(Variant propID) //, IV8View** pRetVal);
-    {
+    void editProperty(Variant propID) {
         Guid propUuid;
         if (mdclass._findPropId(propID, propUuid)) {
             IMDEditHelper&& peh;
@@ -586,10 +585,10 @@ class IV8MDObject {
     }
     void setModuleText(Variant propIdx, const string& text) {
     }
+    
     ITextWindow&& openModule(Variant propIdx) {
+        //for test - metadata.current.rootObject.childObject("Документы", 0).childObject("Формы", 0).openModule("Форма")
         Guid propUuid;
-                            Value val123;
-                            v8string n123;
         if (mdclass._findPropId(propIdx, propUuid)) {
             IMDEditHelper&& peh;
             getMDEditService().getEditHelper(peh, object);
@@ -599,33 +598,22 @@ class IV8MDObject {
                     Vector v;
                     emh.hasModule(propUuid, v);
                     if (v.end > v.start) {
-                        // Артур в 8.3.10 и 8.3.9 метод IMDEditModuleHelper.openModule не работает, поэтому использую хак выше!
-                        #if ver >= 8.3.9
-                            var2val(propIdx, val123);
-                            val123.getString(n123);
-                            if (n123 == "Форма"){
-                                Value val124("Модуль");
-                                Variant var;
-                                val2var(val124, var);
-                                editProperty(var);
+                        ITextEditor&& textEditor;
+                        ITextManager&& textMan;
+                      #if ver < 8.3.9
+                        emh.openModule(textMan, propUuid, true, true, textEditor);
+                      #else
+                        uint16 o = 0x101;
+                        emh.openModule(textMan, propUuid, o, textEditor);
+                      #endif
+                        if (textEditor !is null) {
+                            TextDoc&& tdoc = textDocStorage.find(textMan);
+                            if (tdoc !is null) {
+                                TextWnd&& wnd = tdoc.findWnd(textEditor);
+                                if (wnd !is null)
+                                    return wnd.getComWrapper();
                             }
-                            else
-                                editProperty(propIdx);
-                            
-                            return oneDesigner._snegopat.activeTextWindow();
-                        #else
-                            ITextEditor&& textEditor;
-                            ITextManager&& textMan;
-                            emh.openModule(textMan, propUuid, true, true, textEditor);
-                            if (textEditor !is null) {
-                                TextDoc&& tdoc = textDocStorage.find(textMan);
-                                if (tdoc !is null) {
-                                    TextWnd&& wnd = tdoc.findWnd(textEditor);
-                                    if (wnd !is null)
-                                        return wnd.getComWrapper();
-                                }
-                            }
-                        #endif 
+                        }
                     }
                 }
             }
