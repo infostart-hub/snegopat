@@ -255,7 +255,7 @@
 	:base IMDObject
 	:virt
 		// Артур
-	  #if ver >= 8.3.10
+	  #if ver > 8.3.10.1877
 	    44
 		#else
 		//завершение
