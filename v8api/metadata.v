@@ -287,10 +287,12 @@
 		+2
 		const Guid& moduleExpandType(const Guid& propId)
 		+1
-	  #if ver < 8.3.9
+	  #if ver >= 8.3.9
+	    +1
+	  #endif
+	  #if ver < 8.3.10
 		uint openModule(ITextManager@&, const Guid& propId, bool s, bool open, ITextEditor@& editor)
 	  #else
-	    +1
 		uint openModule(ITextManager@&, const Guid& propId, uint32& open, ITextEditor@& editor)
 	  #endif
 

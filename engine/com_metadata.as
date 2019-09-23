@@ -600,7 +600,7 @@ class IV8MDObject {
                     if (v.end > v.start) {
                         ITextEditor&& textEditor;
                         ITextManager&& textMan;
-                      #if ver < 8.3.9
+                      #if ver < 8.3.10
                         emh.openModule(textMan, propUuid, true, true, textEditor);
                       #else
                         uint32 o = 0x10101;
