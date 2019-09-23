@@ -12,8 +12,8 @@
 очищаться перед синтакс-проверкой.
 @*/
 
-function onSyntaxCheck(cmd)
-{
+// Добавим обработчик команды синтакс-проверки
+stdcommands.Frntend.SyntaxCheck.addHandler(function(cmd) {
     if(cmd.isBefore)    // Обработчик вызван перед выполнением команды
     {
         // Есть два способа:
@@ -21,7 +21,5 @@ function onSyntaxCheck(cmd)
         // либо просто послать команду очистки окна
         stdcommands.Frntend.ClearMessageWindow.send()
     }
-}
-// Добавим обработчик команды синтакс-проверки
-stdcommands.Frntend.SyntaxCheck.addHandler(SelfScript.self, "onSyntaxCheck")
+}, "-");
 

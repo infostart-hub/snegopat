@@ -80,10 +80,15 @@
 	39
 #endif
 	uint getCurrentLine(IV8Bookmark@&)
+#if ver < 8.3.11
 	bool expandLine(IV8Bookmark& bkmk, bool expand, bool expandChildren, bool show = true)
+#else
+	bool expandLine(IV8Bookmark& bkmk, bool expand, bool expandChildren, bool show = true, bool p = true)
+#endif
 	bool isExpandedLine(IV8Bookmark& bkmk)
-
-#if ver >= 8.3.8
+#if ver >= 8.3.10
+	59
+#elif ver >= 8.3.8
 	58
 #elif ver > 8.3.6.1945
 	56

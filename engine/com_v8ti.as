@@ -7,7 +7,7 @@
 #include "../../all.h"
 
 
-//Packet v8TypeInfo("v8TypeInfo", initV8TypeInfo, piOnDesignerInit);
+Packet v8TypeInfo("v8TypeInfo", initV8TypeInfo, piOnDesignerInit);
 TrapVirtualStdCall trGetTypeInfoCount;
 TrapVirtualStdCall trGetTypeInfo;
 

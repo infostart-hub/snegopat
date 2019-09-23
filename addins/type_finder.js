@@ -198,16 +198,12 @@ function onDoModal(dlgInfo)
         {
             // TODO Артур - в 2.0.2.0 не работает hotkeys.addTemp, и ххх.props всегда пусто :(
             // // Показывается стандартный диалог - добавим горячих клавиш и подсказок
-            // hkID = [hk.AddHotKey('Ctrl+F', SelfScript.uniqueName, "НайтиТип"),
-            //         hk.AddHotKey('Ctrl+Shift+F', SelfScript.uniqueName, "ПоказатьОтмеченныеТипы"),
-            //         hk.AddHotKey('Ctrl+K', SelfScript.uniqueName, "ПереключитьСоставныеТипы")]
-            // // hkID = [hotkeys.addTemp(hk.stringTovkcode('Ctrl+F'), SelfScript.uniqueName, "НайтиТип"),
-            // //         hotkeys.addTemp(hk.stringTovkcode('Ctrl+Shift+F'), SelfScript.uniqueName, "ПоказатьОтмеченныеТипы"),
-            // //         hotkeys.addTemp(hk.stringTovkcode('Ctrl+K'), SelfScript.uniqueName, "ПереключитьСоставныеТипы")]
-            // // Надо показать в диалоге, что мы добавили
-            // typeTreeCtrl.props.setValue("Подсказка", ("Для поиска нажмите Ctrl + F, для поиска только среди уже выбранных типов - Ctrl + Shift + F"))
-            // multyTypeCtrl.props.setValue("Подсказка", ("Включить/выключить составной тип данных (Ctrl + K)"))
-            // multyTypeCtrl.props.setValue("Заголовок", ("Cоставной тип данных (Ctrl + K)"))
+            hkID = [hk.AddHotKey('Ctrl+F', SelfScript.uniqueName, "НайтиТип"),
+                     hk.AddHotKey('Ctrl+Shift+F', SelfScript.uniqueName, "ПоказатьОтмеченныеТипы"),
+                     hk.AddHotKey('Ctrl+K', SelfScript.uniqueName, "ПереключитьСоставныеТипы")]
+            //typeTreeCtrl.props.setValue("Подсказка", ("Для поиска нажмите Ctrl + F, для поиска только среди уже выбранных типов - Ctrl + Shift + F"))
+            //multyTypeCtrl.props.setValue("Подсказка", ("Включить/выключить составной тип данных (Ctrl + K)"))
+            //multyTypeCtrl.props.setValue("Заголовок", ("Cоставной тип данных (Ctrl + K)"))
             // // typeTreeCtrl.props.setValue("Подсказка", stdlib.LocalWString("Для поиска нажмите Ctrl + F, для поиска только среди уже выбранных типов - Ctrl + Shift + F"))
             // // multyTypeCtrl.props.setValue("Подсказка", stdlib.LocalWString("Включить/выключить составной тип данных (Ctrl + K)"))
             // // multyTypeCtrl.props.setValue("Заголовок", stdlib.LocalWString("Cоставной тип данных (Ctrl + K)"))
