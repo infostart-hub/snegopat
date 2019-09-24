@@ -15,7 +15,7 @@ class IV8Control {
     private uint ctrlId;
 
     IV8Control(IForm&& o, uint id) {
-        &&form= o;
+        &&form = o;
         ctrlId = id;
     }
 
@@ -92,7 +92,7 @@ class IV8Control {
             IFormCtrl&& fc;
             form.getControl(fc, ctrlId, IID_IFormCtrl);
             if (fc !is null)
-                return fc.getCode().str;
+                return fc.getCode();
         }
         return "";
     }
@@ -110,10 +110,8 @@ class IV8Control {
         if (ext is null && form !is null) {
             IGrid&& grd;
             form.getControl(grd, ctrlId, IID_IGrid);
-            if (grd !is null) {
-                //dumpVtable(&&grd);
+            if (grd !is null)
                 &&ext = IGridCtrl(grd);
-            }
         }
         return ext;
     }

@@ -798,28 +798,40 @@ class IObjectProperties {
 };
 
 IMDContainer&& getIBMDCont() {
-    //return getDefaultInfoBase().getConfigMgr().getMDCont();
-    
-    IInfoBaseService&& ibs = currentProcess().getService(IID_IInfoBaseService);
-    //dumpVtable(&&ibs);
+#if test = 0
+    return getDefaultInfoBase().getConfigMgr().getMDCont();
+#else
     IInfoBase&& ib = getDefaultInfoBase();
-    //dumpVtable(&&ib);
-    IConfigMngr&& mng = ib.getConfigMgr();
-    
-    //+ mike_a
-    if(mng is null)
+    if (!checkInterface(&&ib))
         return null;
-    
-    //dumpVtable(&&mng);
+    IConfigMngr&& mng = ib.getConfigMgr();
+    if (!checkInterface(&&mng))
+        return null;
     IMDContainer&& mdcont = mng.getMDCont();
-    //dumpVtable(&&mdcont);
+    if (!checkInterface(&&mdcont))
+        return null;
     return mdcont;
+#endif
 }
 
 IMDContainer&& editedMetaDataCont() {
+#if test = 0
     IConfigMngrUI&& pmdUI;
     getMDEditService().getTemplatesMainConfigMngrUI(pmdUI);
     return pmdUI.getMDCont();
+#else
+    IMDEditService&& mdes = getMDEditService();
+    if (!checkInterface(&&mdes))
+        return null;
+    IConfigMngrUI&& pmdUI;
+    mdes.getTemplatesMainConfigMngrUI(pmdUI);
+    if (!checkInterface(&&pmdUI))
+        return null;
+    IMDContainer&& mdcont = pmdUI.getMDCont();
+    if (!checkInterface(&&mdcont))
+        return null;
+    return mdcont;
+#endif
 }
 
 string mdObjName(IMDObject&& object) {
