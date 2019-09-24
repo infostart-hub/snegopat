@@ -117,7 +117,7 @@
 		// Артур
 	  // #else
 	  //   +7
-	  #elif ver <8.3.10
+	  #elif ver <=8.3.10.1877
 	    +7
 	  #else
 	    +8
@@ -172,10 +172,12 @@
 		38
 	  #elif ver < 8.3.10
 		82
-	  #else
+	  #elif ver < 8.3.11
 	    83
+	  #else
+	    84
 	  #endif
-		IMDContainer@+ getMDCont(int i = 0)
+	  IMDContainer@+ getMDCont(int i = 0)
 
 	  #if ver < 8.3.9
 		+24
@@ -208,6 +210,10 @@
 	  #elif ver < 8.3.7
 		59
 	  #elif ver < 8.3.9
+	    53
+	  #elif ver < 8.3.11
+	    54
+	  #elif ver < 8.3.12
 	    53
 	  #else
 	    54
@@ -254,17 +260,17 @@
 :iface IMDBaseObj {D3624077-1010-45F0-A596-77ADD399D777}
 	:base IMDObject
 	:virt
-		// Артур
+	  // Артур
 	  #if ver > 8.3.10.1877
 	    44
-		#else
-		//завершение
-			#if ver >= 8.3.6
-				+4
-			#endif
-			#if ver >= 8.3.7.1759
-				+1
-			#endif
+	  #else
+	  //завершение
+		#if ver >= 8.3.6
+			+4
+		#endif
+		#if ver >= 8.3.7.1759
+			+1
+		#endif
 		// Артур
 	  #endif
 		// завершение
