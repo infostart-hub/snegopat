@@ -211,7 +211,7 @@
 		59
 	  #elif ver < 8.3.9
 	    53
-	  #elif ver < 8.3.11
+	  #elif ver < 8.3.10.2772
 	    54
 	  #elif ver < 8.3.12
 	    53
