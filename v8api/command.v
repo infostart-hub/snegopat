@@ -107,3 +107,5 @@
 	72  cmdFindInTree
 	600 cmdFrameShowAssist
 	601 cmdFrameShowParams
+:enum FrntEndCommands
+	63 cmdQueryWizard

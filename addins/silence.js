@@ -58,8 +58,8 @@ logger.debug("onMessageBox param.text" + param.text);
     // пользователя и в зависимости от него выполнить какие-то действия
     // param.result = MessageBox(param.text, param.type, param.caption, param.timeout)
     // param.cancel = true
-    if(param.text == "Внимание!!! Месторасположение информационной базы изменилось.\nПродолжить?")
-    {
+    if(param.text == "Внимание!!! Месторасположение информационной базы изменилось.\nПродолжить?" ||
+		param.text == "Не найден текст запроса.\nСоздать новый запрос?") {
         param.result = mbaYes
         param.cancel = true
         return;
@@ -82,6 +82,7 @@ logger.debug("onMessageBox param.text" + param.text);
         Message(param.text)
         return;
     }
+	
 }
 // Перехватываем модальное окошко и если в первом контроле в тексте содержиться 
 // фраза "При проверке модуля обнаружены ошибки!" тогда подавляем данно сообщение с выводом в трее неблокируюещего 

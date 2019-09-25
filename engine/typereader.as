@@ -48,9 +48,9 @@ class TypeNameItem : SmartBoxInsertableItem {
             }
         }
         text = d.descr;
-        if (d.descr == "Запрос") {
-            text += "(\"\n¦\");";
-        } else {
+        if (d.descr == "Запрос")
+            text += "(\n¦);";
+        else {
             if (hasCtorParams > 0)
                 text += "(¦)";
             if (getIntelliSite().isLineTailEmpty())
@@ -62,7 +62,9 @@ class TypeNameItem : SmartBoxInsertableItem {
     }
 #if ver >= 8.3.4
     void afterInsert(TextWnd&& editor) override {
-        if (hasCtorParams > 0)
+        if (d.descr == "Запрос")
+            sendCommandToMainFrame(CommandID(cmdFrntend, cmdQueryWizard));
+        else if (hasCtorParams > 0)
             sendCommandToMainFrame(CommandID(cmdFrameGroup, cmdFrameShowParams));
     }
 #endif
