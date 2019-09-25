@@ -189,7 +189,7 @@ void ITextExtColors_getColorsTrap(ITextExtColors& pThis, const v8string& sourceL
     uint newCount;
     array<SQLBlockInfo&&>&& newBlocks = parseQuoteLexemAsSQL(srcLine, infos, newCount);
     // Теперь все полученные блоки нужно слить в один вектор
-    free(infos.start);
+    infos.dtor();
     uint pWrite = infos.allock(newCount, SyntaxItemInfo_size);
     for (uint idx = 0, m = newBlocks.length; idx < m; idx++) {
         SQLBlockInfo&& pBlock = newBlocks[idx];
@@ -385,7 +385,8 @@ void processGetColorInfo(Vector& items, Vector& res) {
         }
         if (newCount > 0) {
             uint oldBGCount = res.count(BackColorsItem_size),
-                newSpace = malloc((oldBGCount + newCount) * BackColorsItem_size);
+                newSize = (oldBGCount + newCount) * BackColorsItem_size,
+                newSpace = v8malloc(newSize);
             BackColorsItemRef&& ptr = toBackColorsItem(newSpace);
             &&p = toSyntaxItemInfo(items.start);
             while (p < items.end) {
@@ -399,10 +400,10 @@ void processGetColorInfo(Vector& items, Vector& res) {
             }
             if (oldBGCount > 0) {   // надо скопировать прошлые значения
                 mem::memcpy(ptr.self, res.start, oldBGCount * BackColorsItem_size);
-                free(res.start);
+                res.dtor();
             }
             res.start = newSpace;
-            res.end = res.allocked = res.start + (oldBGCount + newCount) * BackColorsItem_size;
+            res.end = res.allocked = res.start + newSize;
         }
     }
 }

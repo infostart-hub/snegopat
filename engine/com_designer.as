@@ -470,10 +470,10 @@ void VectorV8StringPushBack(Vector& v, const v8string&in str) {
         // места больше нет, надо перевыделить память и переместить строки
         // строки в V8 перемещать можно простым копированием памяти
         uint oldSize = v.allocked - v.start, newSize = oldSize + v8string_size * 3;
-        uint newData = malloc(newSize);
+        uint newData = v8malloc(newSize);
         if (oldSize != 0) {
             mem::memcpy(newData, v.start, oldSize);
-            free(v.start);
+            v.dtor();
         }
         v.start = newData;
         v.end = v.start + oldSize;
