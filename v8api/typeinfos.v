@@ -27,10 +27,12 @@
 		obj.lst_4 = obj.lst_16 = 0;
 	  #else
 	    obj.lst_4 = 0;
-		obj.lst_0 = mem::addressOf(obj.padBegin) + 16;
+		obj.lst_0 = malloc(16);
 		mem::dword[obj.lst_0] = obj.lst_0;
 		mem::dword[obj.lst_0 + 4] = obj.lst_0;
+		mem::dword[obj.lst_0 + 8] = obj.lst_0;
 		mem::byte[obj.lst_0 + 0xD] = 1;
+		mem::byte[obj.lst_0 + 0xC] = 1;
 	  #endif
 	}
 	---
@@ -51,10 +53,11 @@
 	uint unk1
   #endif
 	uint flag1
-
+  #if ver >= 8.3.11.3133
+	+8
+  #endif
 	uint flag0_1
 	uint flag0_2
-
 	Guid objectId
 	Guid mdPropId
 	bool isTypeSource
@@ -63,10 +66,9 @@
 	v8string str2
 	bool byte_0
 	Vector someVector
-	uint padBegin
 	+100
-	uint padEnd
 #else
+ // если меньше 8.3.4
 :meths
 	void init()
 	{

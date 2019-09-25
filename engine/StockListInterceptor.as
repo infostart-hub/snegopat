@@ -131,14 +131,13 @@ bool showAssistList(IAssistList& lst, TextWnd&& wnd, IV8DataSource&& ds, IV8Book
         cellFormat.validFields = cfText;
         uisrc.getCellFormat(item, 0, val, cellFormat);
         string name = cellFormat.text;
-        //Message(name);
         imagesIdx imgidx = imgType;
         SmartBoxItem&& newItem;
 
         if (ali !is null && tci !is null) {
             uint realIdx;
             ali.realIndex(ali.indexFromBkmk(item), realIdx);
-            tci.info(realIdx, typeContextInfoItem, 1);
+            tci.info(realIdx, typeContextInfoItem, 0);
             if (typeContextInfoItem.isMethod) {
                 if (!methods.insert(name))  // ключ уже был в наборе
                     continue;

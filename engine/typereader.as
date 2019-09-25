@@ -49,7 +49,7 @@ class TypeNameItem : SmartBoxInsertableItem {
         }
         text = d.descr;
         if (d.descr == "Запрос") {
-            text += "(\"¦\n\");";
+            text += "(\"\n¦\");";
         } else {
             if (hasCtorParams > 0)
                 text += "(¦)";
