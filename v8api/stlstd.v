@@ -3,9 +3,9 @@
 // Вектор
 :class Vector
 :props
-	uint start
-	uint end
-	uint allocked
+	int_ptr start
+	int_ptr end
+	int_ptr allocked
 :meths
 	void ctor()
 	{
@@ -22,12 +22,12 @@
 	  #endif
 	}
 	---
-	uint size()
+	int_ptr size()
 	{
 		return obj.end - obj.start;
 	}
 	---
-	uint allock(uint count, uint size)
+	int_ptr allock(uint count, uint size)
 	{
 		uint s = count * size;
 		obj.start =
@@ -40,7 +40,7 @@
 		return obj.start;
 	}
 	---
-	uint count(uint s)
+	int_ptr count(uint s)
 	{
 		return obj.start == 0 ? 0 : (obj.end - obj.start) / s;
 	}

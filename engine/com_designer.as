@@ -466,11 +466,11 @@ class ISelectFileData {
 };
 
 void VectorV8StringPushBack(Vector& v, const v8string&in str) {
-    if (v.end == v.allocked) {
+    if (v.end + v8string_size > v.allocked) {
         // места больше нет, надо перевыделить память и переместить строки
         // строки в V8 перемещать можно простым копированием памяти
-        uint oldSize = v.allocked - v.start, newSize = oldSize + v8string_size * 3;
-        uint newData = v8malloc(newSize);
+        int_ptr oldSize = v.allocked - v.start, newSize = oldSize + v8string_size * 3;
+        int_ptr newData = v8malloc(newSize);
         if (oldSize != 0) {
             mem::memcpy(newData, v.start, oldSize);
             v.dtor();

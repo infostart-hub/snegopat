@@ -14,8 +14,7 @@ TypeContextInfoItem typeContextInfoItem;
 ContextValueInfo    contextValueInfo;
 FieldInfo           oneFieldInfo;
 
-class BuiltinFuncItem : SmartBoxInsertableItem, MethodInsertable
-{
+class BuiltinFuncItem : SmartBoxInsertableItem, MethodInsertable {
     BuiltinFuncItem(const string& name, uint pc) {
         super(name, imgPublicMethod);
         paramsCount = pc;
@@ -27,12 +26,46 @@ class BuiltinFuncItem : SmartBoxInsertableItem, MethodInsertable
 };
 
 class TypeNameItem : SmartBoxInsertableItem {
+    int hasCtorParams = -1;
     TypeNameItem(const string& name) {
         super(name, imgType);
+    }
+    void textForInsert(string&out text) {
+        if (hasCtorParams < 0) {
+            hasCtorParams = 0;
+            auto fnd = oneDesigner.__mapTypeNames.find(d.descr);
+            if (!fnd.isEnd()) {
+                IType&& type;
+                currentProcess().createByClsid(fnd.value, IID_IType, type);
+                if (type !is null) {
+                    for (uint i = 1; i < 10; i++) {
+                        if (type.hasCtor(i)) {
+                            hasCtorParams = 1;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        text = d.descr;
+        if (d.descr == "Запрос") {
+            text += "(\"¦\n\");";
+        } else {
+            if (hasCtorParams > 0)
+                text += "(¦)";
+            if (getIntelliSite().isLineTailEmpty())
+                text += ";";
+        }
     }
     void textForTooltip(string& text) {
         text = "Тип §" + d.descr;
     }
+#if ver >= 8.3.4
+    void afterInsert(TextWnd&& editor) override {
+        if (hasCtorParams > 0)
+            sendCommandToMainFrame(CommandID(cmdFrameGroup, cmdFrameShowParams));
+    }
+#endif
 };
 
 class GlobalContextMethod : SmartBoxInsertableItem, MethodInsertable {
@@ -94,7 +127,7 @@ class ExtContextProp : SmartBoxInsertableItem {
     }
 };
 
-enum typeOfStockGroups{
+enum typeOfStockGroups {
     stockBuiltin,           // Встроенные в язык методы
     stockTypeNames,         // Имена типов для Новый
     stockGlobalProc,        // Процедуры глобального контекста
@@ -233,8 +266,7 @@ void readGlobals() {
             if (nameRus == nameEng) {
                 if (allMethods.insert(nameEng)) // Такого ключа еще не было в наборе
                     v8stock[ts, langCmn].insertLast(GlobalContextMethod(nameEng, pc, isFunc));
-            }
-            else {
+            } else {
                 if (allMethods.insert(nameEng))
                     v8stock[ts, langEng].insertLast(GlobalContextMethod(nameEng, pc, isFunc));
                 if (allMethods.insert(nameRus)) // Такого ключа еще не было в наборе
@@ -256,7 +288,7 @@ void readGlobals() {
                     if (type !is null) {
                         IValue&& val;
                         type.createValue(val);
-                        
+
                         if (val !is null) {
                             IEnumValCreator&& eval = val.unk;
                             if (eval !is null) {
@@ -287,7 +319,7 @@ void readGlobals() {
 
 funcdef SmartBoxItem&& CreateSmartBoxItem(const string& name);
 SmartBoxItem&& createGlobalPropItem(const string& name) { return GlobalContextProp(name); }
-SmartBoxItem&& createSysEnumItem(const string& name)    { return SysEnum(name); }
+SmartBoxItem&& createSysEnumItem(const string& name) { return SysEnum(name); }
 
 // Функция чтения состава какого-либо стокового контекста и создания для него групп элементов для списка
 void readContextDef(IContextDef&& pDef, array<array<SmartBoxItem&&>>& store, const string& context) {
