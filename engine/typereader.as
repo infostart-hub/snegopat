@@ -60,14 +60,14 @@ class TypeNameItem : SmartBoxInsertableItem {
     void textForTooltip(string& text) {
         text = "Тип §" + d.descr;
     }
-#if ver >= 8.3.4
     void afterInsert(TextWnd&& editor) override {
         if (d.descr == "Запрос")
             sendCommandToMainFrame(CommandID(cmdFrntend, cmdQueryWizard));
+    #if ver >= 8.3.4
         else if (hasCtorParams > 0)
             sendCommandToMainFrame(CommandID(cmdFrameGroup, cmdFrameShowParams));
+    #endif
     }
-#endif
 };
 
 class GlobalContextMethod : SmartBoxInsertableItem, MethodInsertable {
