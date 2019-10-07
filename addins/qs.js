@@ -168,7 +168,7 @@ function processMetaDataObject(from) {
     });
 }
 function CmdPanelprepare() {
-    if (DoQueryBox("Начальное заполнение поисковой базы может занять длительное время. Поизвести его?", QuestionDialogMode.YesNo) != DialogReturnCode.Yes)
+    if (DoQueryBox("Начальное заполнение поисковой базы может занять длительное время. Произвести его?", QuestionDialogMode.YesNo) != DialogReturnCode.Yes)
         return;
     if (dbPath.length) {
         if (DoQueryBox("Создать новую поисковую базу?", QuestionDialogMode.YesNo) == DialogReturnCode.Yes) {
