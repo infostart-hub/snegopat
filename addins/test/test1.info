@@ -1,0 +1,9 @@
+uname: testScript
+descr: Проверка
+load: sdkfljsdf<repo>slkdfjsdkl
+version: 1.0
+help: inplace
+
+/*@
+Это как бы проверка справки
+@*/

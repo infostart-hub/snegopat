@@ -157,7 +157,8 @@ void printSyntaxInfos(const string& text, Vector& infos) {
     SyntaxItemInfoRef&& s = toSyntaxItemInfo(infos.start);
     Print("------");
     while (s < infos.end) {
-        Print(text.substr(s.ref.start, s.ref.len) + "  blockKind=" + s.ref.blockKind + " blockMode=" + s.ref.blockMode + " isBlock=" + int(s.ref.isBlock));
+        Print(text.substr(s.ref.start, s.ref.len) + "  blockKind=" + s.ref.blockKind + " blockMode=" + s.ref.blockMode + " isBlock=" + int(s.ref.isBlock)
+            + " cat=" + s.ref.lexemCategory + " lexType=" + s.ref.lexemType);
         &&s = s + 1;
     }
 }
@@ -169,10 +170,10 @@ void ITextExtColors_getColorsTrap(ITextExtColors& pThis, const v8string& sourceL
     TE_gc&& orig;
     trITextExtColors_getColors.getOriginal(&&orig);
     orig(pThis, sourceLine, infos);
-    //printSyntaxInfos(sourceLine.str, infos);
     // На нет и суда нет
     if (infos.end == infos.start)
         return;
+    //printSyntaxInfos(sourceLine.str, infos);
     // Проверим на группирующие комментарии
     string srcLine = sourceLine.str;
     SyntaxItemInfoRef&& sInfo = toSyntaxItemInfo(infos.start);

@@ -1,5 +1,4 @@
-﻿"use strict";
-//engine: JScript
+﻿//engine: JScript
 //uname: scintilla
 //dname: Редактор Scintilla
 //debug: yes
@@ -13,9 +12,9 @@ global.connectGlobals(SelfScript);
 events.connect(metadata, "MetaDataEvent", SelfScript.self, "OnMetaDataEvent");
 var pflScintillaStyles = "Scintilla/Styles/";
 var pflScintillaSettings = "Scintilla/Settings/";
-var SetupFormObject = (function () {
+var SetupFormObject = /** @class */ (function () {
     function SetupFormObject() {
-        this.form = loadScriptForm(env.pathes.core + 'forms\\scintilla.ssf', this);
+        this.form = loadScriptFormEpf(env.pathes.core + 'forms\\sn_forms.epf', 'ScintillaSetup', this);
         this.initForm();
     }
     SetupFormObject.get = function () {
@@ -183,7 +182,7 @@ function macros_getSettings() {
 }
 function getColorSheme(num) {
     switch (num) {
-        case 0:
+        case 0://стандартная цветовая схема
             var defaultFont = v8New("Шрифт", "Courier New", 10, false, false, false);
             var defaultBGColor = v8New("Цвет", 255, 255, 255);
             return {

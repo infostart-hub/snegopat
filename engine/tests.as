@@ -31,7 +31,7 @@ void testScriptObject() {
 }
 
 void testViewParent() {
-    oneDesigner._windows.get_mdiView().get_parent();
+    oneDesigner._snegopat.activeTextWindow();
 }
 
 bool runTest() {
@@ -39,6 +39,7 @@ bool runTest() {
     //testValueToString();
     //testScriptObject();
     testViewParent();
+    Message("Test");
     return true;
 }
 

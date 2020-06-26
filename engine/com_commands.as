@@ -71,14 +71,22 @@ class CommandService {
 class CommandDescription {
     ICmdDescription&& __cmdDescr;
     string get_group() const {
+    #if ver < 8.3.4
         CommandID id;
         __cmdDescr.id(id);
         return id.group;
+    #else
+        return __cmdDescr.id().group;
+    #endif
     }
     uint get_num() const {
+    #if ver < 8.3.4
         CommandID id;
         __cmdDescr.id(id);
         return id.num;
+    #else
+        return __cmdDescr.id().num;
+    #endif
     }
     string get_text() const { return __cmdDescr.text(); }
     string get_accel() const { return __cmdDescr.accelText(); }

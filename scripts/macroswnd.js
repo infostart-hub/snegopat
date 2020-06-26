@@ -1,5 +1,4 @@
-﻿"use strict";
-//engine: JScript
+﻿//engine: JScript
 //uname: macroswnd
 //dname: Показ окна макросов
 //debug: no
@@ -46,7 +45,7 @@ var TypeofObjects;
 })(TypeofObjects || (TypeofObjects = {}));
 ;
 ;
-var RowInfo = (function () {
+var RowInfo = /** @class */ (function () {
     function RowInfo(type, _a) {
         var _b = _a.addin, addin = _b === void 0 ? "" : _b, _c = _a.macros, macros = _c === void 0 ? "" : _c, _d = _a.group, group = _d === void 0 ? "" : _d;
         this.type = type;
@@ -63,14 +62,14 @@ var RowInfo = (function () {
 ;
 // real singleton
 exports.MacrosWnd = (function () {
-    var MacrosWnd = (function () {
+    var MacrosWnd = /** @class */ (function () {
         function MacrosWnd() {
             this.lastMacros = "";
             this.filled = false;
             this.mode = TypeofObjects.Macros;
             this.pattern = null;
             this.hotkeys = {};
-            this.form = loadScriptForm(env.pathes.core + "forms\\macroses.ssf", this);
+            this.form = loadScriptFormEpf(env.pathes.core + "forms\\sn_forms.epf", "Macroses", this);
             this.form.MacrosTree.Columns.Add("rowInfo");
             var ctrls = this.form.Controls;
             this.MacrosTreeCtrl = ctrls.MacrosTree;

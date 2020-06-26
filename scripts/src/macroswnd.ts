@@ -80,7 +80,7 @@ export var MacrosWnd = (function(){
         tc: stdlib.TextChangesWatcher;
 
         constructor() {
-            this.form = loadScriptForm(env.pathes.core + "forms\\macroses.ssf", this);
+            this.form = loadScriptFormEpf(env.pathes.core + "forms\\sn_forms.epf", "Macroses", this);
             this.form.MacrosTree.Columns.Add("rowInfo");
             var ctrls: any = this.form.Controls;
             this.MacrosTreeCtrl = ctrls.MacrosTree;
@@ -354,4 +354,3 @@ export var MacrosWnd = (function(){
         }
     }
 })();
-                                                                                                                                                                                                                                                                                    

@@ -125,11 +125,9 @@ class ModuleTextProcessor : TextProcessor, ModuleTextSource {
 
     void connectEditor(TextWnd&& editor) { &&editor.editorData = ModuleEditorData(); }
     bool onChar(TextWnd&& editor, wchar_t symbol) {
-        //Print("MTP onChar");
         return enableSmartEnter && symbol == '\r' && (GetKeyState(VK_SHIFT) & 0x8000) == 0 && beforeSmartEnter(editor);
     }
     void afterChar(TextWnd&& editor, wchar_t symbol) {
-        //Print("MTP afterChar");
         if (editor !is activeTextWnd)
             return;
         if (!enableAutoReplaces && !enableSmartEnter && (!enableSnegoList || (symbol != 0 && qaCharsCount == 0)))

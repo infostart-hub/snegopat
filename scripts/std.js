@@ -1,5 +1,4 @@
-﻿"use strict";
-//engine: JScript
+﻿//engine: JScript
 //debug: no
 //uname: stdlib
 //dname: Стандартная библиотека
@@ -353,7 +352,7 @@ exports.toArray = toArray;
  *  invoker - функция обратного вызова, вызывается после окончания изменения текста,
  *   новый текст передается параметром функции
  */
-var TextChangesWatcher = (function () {
+var TextChangesWatcher = /** @class */ (function () {
     function TextChangesWatcher(field, ticks, invoker, toLowerCase) {
         if (toLowerCase === void 0) { toLowerCase = true; }
         this.field = field;

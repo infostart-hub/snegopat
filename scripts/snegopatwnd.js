@@ -1,5 +1,4 @@
-﻿"use strict";
-//engine: JScript
+﻿//engine: JScript
 //uname: snegopatwnd
 //dname: Показ окна Снегопата
 //addin: global
@@ -61,7 +60,7 @@ var FormDriver = (function () {
         },
         open: function () {
             if (!form) {
-                form = loadScriptForm(env.pathes.core + "forms\\snegopat.ssf", this);
+                form = loadScriptFormEpf(env.pathes.core + "forms\\sn_forms.epf", "MainWindow", this);
                 form.UniqueKey = form.WindowOptionsKey = "SnegopatMainForm";
                 this.switchPage(0);
                 events.connect(Designer, "beforeExitApp", function () { profileRoot.setValue(wndStateProfilePath, form.IsOpen()); }, "-");
@@ -77,7 +76,7 @@ function openWnd() {
     FormDriver.open();
 }
 exports.openWnd = openWnd;
-var AddinsPage = (function () {
+var AddinsPage = /** @class */ (function () {
     function AddinsPage() {
         this.lastInfoControl = "";
     }
@@ -243,14 +242,16 @@ var AddinsPage = (function () {
     AddinsPage.prototype.setInfo = function (path) {
         if (!path || !path.length)
             path = "core\\00 firststep.md0.html";
+        path = env.pathes.help + path;
         try {
-            path = env.pathes.help + path;
             var testPath = "/" + path.replace(/ /g, "%20").replace(/\\/g, "/").toLowerCase();
-            var loc = this.form.Controls.AddinInfo.Document.parentWindow.location;
+            var loc = getLocation(this.form.Controls.AddinInfo.Document);
             if (loc.protocol != "file:" || loc.pathname.toLowerCase() != testPath)
                 this.form.Controls.AddinInfo.Navigate(path);
         }
-        catch (e) { }
+        catch (e) {
+            this.form.Controls.AddinInfo.Navigate(path);
+        }
     };
     // Обработчик команды загрузки аддина
     AddinsPage.prototype.handlerDoLoadAddin = function (button) {
@@ -330,7 +331,7 @@ var AddinsPage = (function () {
         }
     };
     AddinsPage.prototype.handlerAddinInfoSyncContent = function () {
-        var loc = this.form.Controls.AddinInfo.Document.parentWindow.location;
+        var loc = getLocation(this.form.Controls.AddinInfo.Document);
         if (loc.protocol == "file:") {
             var hf = "/" + env.pathes.help.replace(/\\/g, "/").replace(/ /g, "%20").toLowerCase();
             if (loc.pathname.toLowerCase().indexOf(hf) == 0) {
@@ -541,7 +542,7 @@ var AddinsPage = (function () {
     return AddinsPage;
 }());
 // Базовый класс обработчика параметра настроек снегопата
-var Param = (function () {
+var Param = /** @class */ (function () {
     function Param(control) {
         this.control = control;
     }
@@ -564,7 +565,7 @@ var Param = (function () {
 }());
 ;
 // Данный обработчик параметра раскидывает параметр-битовый набор флагов по отдельным флажкам на форме
-var ParamFlags = (function (_super) {
+var ParamFlags = /** @class */ (function (_super) {
     __extends(ParamFlags, _super);
     function ParamFlags() {
         var ctrls = [];
@@ -593,7 +594,7 @@ var ParamFlags = (function (_super) {
     return ParamFlags;
 }(Param));
 ;
-var ParamColor = (function (_super) {
+var ParamColor = /** @class */ (function (_super) {
     __extends(ParamColor, _super);
     function ParamColor() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -611,7 +612,7 @@ var ParamColor = (function (_super) {
     return ParamColor;
 }(Param));
 ;
-var SettingsPage = (function () {
+var SettingsPage = /** @class */ (function () {
     function SettingsPage() {
         this.optMap = {};
         this.params = {
@@ -734,7 +735,7 @@ var SettingsPage = (function () {
     };
     return SettingsPage;
 }());
-var HotkeysPage = (function () {
+var HotkeysPage = /** @class */ (function () {
     function HotkeysPage() {
     }
     HotkeysPage.prototype.connect = function (form) {
@@ -820,7 +821,7 @@ var HotkeysPage = (function () {
     };
     return HotkeysPage;
 }());
-var UpdatePage = (function () {
+var UpdatePage = /** @class */ (function () {
     function UpdatePage() {
         this.wsh = new ActiveXObject("WScript.Shell");
         this.pathToFossil = '';
@@ -1246,7 +1247,7 @@ var UpdatePage = (function () {
     };
     return UpdatePage;
 }());
-var HelpPage = (function () {
+var HelpPage = /** @class */ (function () {
     function HelpPage() {
     }
     HelpPage.prototype.connect = function (form) {
@@ -1307,7 +1308,7 @@ var HelpPage = (function () {
             ra.Picture = PictureLib.ListViewModeList;
     };
     HelpPage.prototype.handlerHelpBarsyncContent = function () {
-        var loc = this.form.Controls.HelpHtml.Document.parentWindow.location;
+        var loc = getLocation(this.form.Controls.HelpHtml.Document);
         if (loc.protocol == "file:") {
             var hf = "/" + env.pathes.help.replace(/\\/g, "/").replace(/ /g, "%20").toLowerCase();
             if (loc.pathname.toLowerCase().indexOf(hf) == 0) {
@@ -1352,7 +1353,7 @@ var HelpPage = (function () {
     return HelpPage;
 }());
 ;
-var AboutPage = (function () {
+var AboutPage = /** @class */ (function () {
     function AboutPage() {
     }
     AboutPage.prototype.connect = function (form) {
@@ -1365,10 +1366,23 @@ var AboutPage = (function () {
         this.form.Controls.AboutHtml.Navigate("about:blank");
     };
     AboutPage.prototype.handlerAboutHtmlDocumentComplete = function () {
+        //debugger
         try {
             this.form.Controls.AboutHtml.Document.parentWindow.setDesigner(Designer);
         }
-        catch (e) { }
+        catch (e) {
+            var data = JSON.stringify({
+                "BuildDateTime": env.BuildDateTime,
+                "sVersion": env.BuildDateTime,
+                "ownerName": env.ownerName,
+                "snMainFolder": env.snMainFolder,
+                "v8Version": env.v8Version
+            });
+            try {
+                this.form.Controls.AboutHtml.Document.defaultView.setData(data);
+            }
+            catch (e) { }
+        }
     };
     AboutPage.prototype.handlerAboutHtmlonhelp = function (Control, pEvtObj) {
         RunApp("https://snegopat.ru");
@@ -1391,5 +1405,13 @@ function restoreWindowState() {
         }
         else
             openWnd();
+    }
+}
+function getLocation(htmlDoc) {
+    try {
+        return htmlDoc.parentWindow.location;
+    }
+    catch (e) {
+        return htmlDoc.defaultView.location;
     }
 }

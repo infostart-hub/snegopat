@@ -19,27 +19,31 @@ class Develop {
 };
 
 class V8Dumper {
-    string content;
+    //string content;
     NoCaseMap<string> typeGuidToNames;
     NoCaseSet allNames;
     array<string> newNames;
+    IFile&& file;
+    void write(const string& content) {
+        utf8string str = content.toUtf8();
+        file.write(str.ptr, str.length);
+    }
 
     void dump() {
         // Откроем файл для дампа
-        IFile&& file;
         URL url("file://" + myFolder + "v8.d.ts");
         IFileSystem&& fs = getFSService();
         {
             ExceptionCatcher catcher;
             CppCatch c("class core::Exception", ExceptionHandler(catcher.handle));
-            fs.openURL(file, url, fomOut | fomTruncate);
+            fs.openURL(file, url, fomOut | fomTruncate | fomShareRead);
             if (catcher.hasException) {
                 Print("dont open file");
                 return;
             }
         }
         // Пропишем то, что подключаем сами
-        content = "interface V8Global{ connectGlobals(obj);}\ndeclare var global: V8Global;\n";
+        write("interface V8Global{ connectGlobals(obj);}\ndeclare var global: V8Global;\n");
         // Переберём подключенные глобальные контексты
         for (auto it = oneDesigner.__globalContextes.begin(); it++;) {
             IContext&& ctx;
@@ -54,8 +58,6 @@ class V8Dumper {
             getGuidTypeName(ptr.ref);
         // Теперь создадим специализации для v8new
         dumpV8New();
-        utf8string str = content.toUtf8();
-        file.write(str.ptr, str.length);
         dumpSnegApi();
     }
     void dumpContextDef(IContextDef&& ctx, const string& name0, const string& name1) {
@@ -101,6 +103,8 @@ class V8Dumper {
             // Переберём методы
             for (uint idx = 0, m = ctx.methsCount(); idx < m; idx++) {
                 string meth0(ctx.methName(idx, 0)), meth1(ctx.methName(idx, 1)), typeName;
+                if (meth0.isEmpty())
+                    continue;
                 if (propNames.contains(meth0) || propNames.contains(meth1))
                     continue;
                 if (ctx.hasRetVal(idx)) {
@@ -123,13 +127,13 @@ class V8Dumper {
             lines.insertLast("}");
         if (!name1.isEmpty() && name1 != name0)
             lines.insertLast("declare type " + name1 + " = " + name0 + ";");
-        content += join(lines, "\n") + "\n";
+        write(join(lines, "\n") + "\n");
     }
     
     void dumpV8New() {
         for (uint i = 0; i < newNames.length; i++)
             newNames[i] = "declare function v8New(name:\"" + newNames[i] + "\",... params): " + newNames[i] + ";";
-        content += join(newNames, "\n") + "\n";
+        write(join(newNames, "\n") + "\n");
     }
     void getTypeName(TypeDomainPattern& types, string& typeName) {
         typeName = "";
@@ -179,6 +183,11 @@ class V8Dumper {
             {
                 string name0(type.getTypeString(0)),
                     name1(type.getTypeString(1));
+                // На этих типах падает
+                if (",ConfigurationMetadataObject,UnknownObject,CommandGroup,CommonModule,Action,DataCompositionAppearanceTemplateLib,MainServerAccess,"
+                    "GraphicalSchemaItemSwitchCases,MngSrvDataCompositionAreaTemplateField,".find("," + name0 + ",") >= 0)
+                    return "";
+                //write("// " + name0 + "\n");
                 if ("Array" ==  name0)
                     name0 += "V8";
                 else if ("FormItems" == name0)

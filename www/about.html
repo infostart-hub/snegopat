@@ -122,13 +122,19 @@ if (browserok) {
         window.onload=initsnow
 }
 
-function setDesigner(des)
-{
-	//des.Message("im set");
-	document.getElementById("message").innerHTML = "Текущая версия: " + des.env.sVersion + " ( " + des.env.BuildDateTime +  " )<br/>" +
-                "Владелец: " + des.env.ownerName+  "<br/>" +
-                "Каталог: " + des.env.snMainFolder +  "<br/>" +
-                "Версия 1С: " + des.env.v8Version;
+function showInfo(data) {
+	document.getElementById("message").innerHTML = "Текущая версия: " + data.sVersion + " ( " + data.BuildDateTime +  " )<br/>" +
+		"Владелец: " + data.ownerName+  "<br/>" +
+		"Каталог: " + data.snMainFolder +  "<br/>" +
+		"Версия 1С: " + data.v8Version;
+}
+
+function setData(strData) {
+	showInfo(JSON.parse(strData));
+}
+
+function setDesigner(des) {
+	showInfo(des.env);
 }
 
 function setPageSize()
@@ -145,7 +151,7 @@ function gotoSite() {
 </script>
 <center>
         <div><h2>Снегопат: проект по расширению<br/>возможностей Конфигуратора<br/>1С-Предприятия 8.2, 8.3.<br/>
-        &copy;Александр Орефков 2009-2016.<br/>
+        &copy;Александр Орефков 2009-2020.<br/>
         <a href="#" onclick="gotoSite()">https://snegopat.ru</a>
         </h2></div>
         <div id="message"></div>

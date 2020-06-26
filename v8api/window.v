@@ -6,7 +6,7 @@
     bool isViewEnable()
     Size getViewExtent()
 	+1
-    void getMinMaxExtent(Size& minExtent, Size& maxExtent)
+    +1 //void getMinMaxExtent(Size& minExtent, Size& maxExtent)
 
 :iface IWindowView {E3F69D70-0188-11d4-9400-008048DA11F9}
 :base IView
@@ -58,7 +58,11 @@
 :iface IFramedView {7C27C850-A0F4-11D4-84AF-008048DA06DF}
 :virt
 	void setID(const Guid&in id)
+  #if ver < 8.3.13
 	uint getID(Guid&out)
+  #else
+	const Guid& _getID()
+  #endif
 	CloseAction closeAction()
 	save void localFrame(WndType type, Guid& id, uint& style)
 	// Заголовок
@@ -66,7 +70,7 @@
 	// Иконка
 	uint icon(IUnknown@&out)
 	// извещение об активизации
-	void onActivate(ActivateType action, IFramedView@ otherView)
+	save void onActivate(ActivateType action, IFramedView@ otherView)
 	// установка фокуса
 	void setViewFocus()
 	// окончание создания
@@ -80,6 +84,14 @@
 	+1
 	save int mdiType()	// 0 - стандартное MDI окно, 1 - 1Сное MDI окно
 	+2
+  #if ver >= 8.3.13
+:meths
+	void getID(Guid& guid)
+	{
+		guid = obj._getID();
+	}
+	---
+  #endif
 
 :iface IDocumentView {425EE301-9DD3-11D4-84AE-008048DA06DF}
 	:base IFramedView
@@ -113,12 +125,15 @@
 
 :iface ITopLevelFrame {DE300901-A120-11d4-9429-008048DA11F9}
 :virt
+#if ver>=8.3.15
+	
+#endif
     void init(const v8string&in title, HICON icon, HWND parent, const Rect&in rect, int nCmdShow)
     bool close(bool testAbility = false)
     bool canClose()
     void cancelClose()
     int frameType()
-    void openView(IFramedView@+ view, const ViewPosition& position, bool activate = true, bool show = true)
+    +1 //void openView(IFramedView@+ view, const ViewPosition& position, bool activate = true, bool show = true)
 #if ver>=8.3.6
 	+1
 #endif
@@ -151,7 +166,7 @@
 	v8string getAdditionalTitle()
     +1
     uint commandReceiver(ICommandReceiver@&out)
-    void setForeground()
+    +1 //void setForeground()
 
 :iface IWindow {904BC445-3226-11D4-9859-008048DA1252}
 :virt
@@ -180,7 +195,7 @@
 :iface IFramedViewSite {547B35A0-A8E2-11D4-84B2-008048DA06DF}
 	:virt
 		+7
-	    void split(IFramedView@+ other, ViewPlacements place, bool outside, int tabPos)
+	    void split(IFramedView@+ other, ViewPlacements place, bool outside, int tabPos, int t = 0)
 	    bool canSplit()
 	    +1
 	    void getViewPosition(ViewPosition&out vp)
@@ -238,7 +253,7 @@
 		uint head
 		uint end
 		+4
-
+// Для уточнения смотреть IBkEndUI::OpenView и IFramedViewSite_getViewPosition
 :struct ViewPosition
 :props
 	ViewStates		state
@@ -265,6 +280,11 @@
 	Rect			unk4
 	int				unk5
 	Size			unk6
+  #if ver < 8.3.15
+  #else
+	bool			unk7
+  #endif
+
 :meths
 	void ctor()
 	{
@@ -303,12 +323,18 @@
 :struct ViewContext
 	:props
 		Guid			id
+	  #if ver < 8.3.15
 		+28
+	  #else
+	    +32
+	  #endif
 		ViewPosition	vpCurrent
 		+12
 		ViewPosition	vpOriginal
 		Size			sizeOriginal
+	  #if ver < 8.3.15
 		+4
+	  #endif
 		IUnknown@		parent
 
 :enum ViewOffsets
@@ -317,10 +343,15 @@
 	44 FocusedViewInCoreFrame
 	48 ActiveViewInCoreFrame
 	96 ViewContextInView
-  #else
+  #elif ver < 8.3.15
 	56 ViewContextOffset
 	48 FocusedViewInCoreFrame
 	52 ActiveViewInCoreFrame
+	88 ViewContextInView
+  #else
+	56 ViewContextOffset
+	52 FocusedViewInCoreFrame
+	56 ActiveViewInCoreFrame
 	88 ViewContextInView
   #endif
 

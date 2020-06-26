@@ -121,7 +121,7 @@ IV8View&& frameView(uint offset) {
     //MsgBox("Offsets of active and focused view in toplevelframe: искать от 0x" + formatInt(tlc.self, "0x", sizeof_ptr * 2));
     int_ptr addrOfViewCont = mem::int_ptr[tlc.self + offset];
     if (addrOfViewCont > 0) {
-        //MsgBox("ViewContextInView: искать от 0x" + formatInt(addrOfViewCont, "0x", sizeof_ptr * 2));
+        //MsgBox("ViewContextInView: искать от 0x" + formatInt(addrOfViewCont + ViewContextInView + ViewContext_parent_offset, "0x", sizeof_ptr * 2));
         ViewContextRef&& pCont = toViewContext(addrOfViewCont + ViewContextInView);
         return getViewWrapper(pCont.ref.id);
     }
@@ -262,6 +262,7 @@ class IV8View {
         return v is null ? string() : v.title().str;
     }
     uint get_hwnd() {
+    #if ver < 8.3.12
         IFramedView&& v = _getView();
         if (v !is null) {
             IWindowView&& wv = v.unk;
@@ -271,6 +272,7 @@ class IV8View {
             if (wnd !is null)
                 return wnd.hwnd();
         }
+    #endif
         return 0;
     }
     IV8ViewPosition&& position() {
@@ -566,6 +568,7 @@ IFramedView&& frameViewParent(IFramedView&& view) {
     if (co !is null) {
         IViewContext&& ctx = cast<IUnknown>(co.getSite());
         if (ctx !is null) {
+            //MsgBox("Check " + mem::addressOf(getViewContext(ctx).ref.parent));
             IFramedView&& object = cast<IUnknown>(getViewContext(ctx).ref.parent);
             return object;
         }

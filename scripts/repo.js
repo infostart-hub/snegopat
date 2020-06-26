@@ -1,5 +1,4 @@
-﻿"use strict";
-//engine: JScript
+﻿//engine: JScript
 //uname: repo
 //dname: Репозитарий аддинов
 //debug: no
@@ -73,7 +72,7 @@ function sortAddinsFolder(folder) {
     for (var k in folder.childs)
         sortAddinsFolder(folder.childs[k]);
 }
-var RepoSystem = (function () {
+var RepoSystem = /** @class */ (function () {
     function RepoSystem(name, parent, typeOfRepo, rootFolder, baseFolder, maskForAuto, isStd) {
         this.root = { name: name, basePath: baseFolder, path: rootFolder, typeOfRepo: typeOfRepo, childs: [], addins: [] };
         this.processRootFolder(maskForAuto, isStd);
@@ -186,7 +185,7 @@ var RepoSystem = (function () {
     return RepoSystem;
 }());
 ;
-var Reposytory = (function () {
+var Reposytory = /** @class */ (function () {
     function Reposytory() {
         this.root = { name: "", basePath: "", path: "", typeOfRepo: "", addins: [], childs: [] };
         this.addinsByLoadStr = {};

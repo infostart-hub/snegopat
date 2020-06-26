@@ -855,7 +855,7 @@ function CmdshistorySort(Button){
 
 function loadSessionManager() {
     try {
-        sessionManager = stdlib.require(stdlib.getSnegopatMainFolder() + "scripts\\SessionManager.js").GetSessionManager();
+        sessionManager = stdlib.require(env.pathes.addins + "SessionManager.js").GetSessionManager();
     } catch (e) {
         Message("Невозможно загрузить Менеджер сессий " + e.description());
     };

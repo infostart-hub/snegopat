@@ -139,20 +139,20 @@ class IntelliSite : SmartBoxSite {
         // Обновляем опции
         readSettings();
         // Запоминаем стартовые условия
-        //Message("Font " + fontSize.cx + ", " + fontSize.cy + " " + string(font.lf.lfFaceNameStart));
         editor.getCaretPosition(caretPos);  // где в тексте каретка
         GetCaretPos(boxCornerPosition);     // координаты каретки в окне
         xCaret = boxCornerPosition.x;
         yCaret = boxCornerPosition.y;
         boxCornerPosition.y += fontSize.cy + 3;     // Первоначально считаем, что список будет ниже текста
-        ClientToScreen(textWnd.hWnd, boxCornerPosition);    // координаты угла списка должны быть экранные, ибо POPUP
+        HWND hWnd = getHwnd(textWnd);
+        ClientToScreen(hWnd, boxCornerPosition);    // координаты угла списка должны быть экранные, ибо POPUP
         //Print("Text pos: " + caretPos.line + ", " + caretPos.col + "  Caret pos: " + xCaret + ", " + yCaret +
         //      " boxCorner: " + boxCornerPosition.x + ", " + boxCornerPosition.y + " Font: " + fontSize.cx + ", " + fontSize.cy);
         // Создаем окно списка и устанавливаем ему элементы для показа
-        smartBox.createWindow(this, uint(WS_POPUP | (snegoList ? WS_DLGFRAME : WS_BORDER)), 0, textWnd.hWnd);
+        smartBox.createWindow(this, uint(WS_POPUP | (snegoList ? WS_DLGFRAME : WS_BORDER)), 0, hWnd);
         // Теперь проверим, уместится ли список ниже текста
         Rect rcScreen;
-        screenGeometry(textWnd.hWnd, rcScreen); // Получим границы текущего монитора
+        screenGeometry(hWnd, rcScreen); // Получим границы текущего монитора
         if (boxCornerPosition.y + smartBox.fullHeight(maxItems) > rcScreen.bottom) {
             // Список не влезет снизу. Будем отображать его над текстом
             boxIsUnderLine = false;
@@ -346,7 +346,7 @@ class IntelliSite : SmartBoxSite {
     }
     bool onKillFocus(HWND hNewWnd) {
         if (!bInHide) {
-            if (hNewWnd == textWnd.hWnd) {
+            if (hNewWnd == getHwnd(textWnd)) {
                 SetFocus(smartBox.hwnd);
                 return true;
             } else if (hNewWnd == smartBox.hwnd)
@@ -386,11 +386,13 @@ class IntelliSite : SmartBoxSite {
         &&editor = null;
         // Уведомим текстовый процессор о закрытии списка
         tw.textDoc.tp.itemInserted(tw, insert);
+        &&activeTextWnd = tw;
     }
     private void hideAndSend(uint msg, uint wParam, uint lParam) {
-        HWND hWnd = textWnd.hWnd;
+        HWND hWnd = getHwnd(textWnd);
         hide();
-        SendMessage(hWnd, msg, wParam, lParam);
+        SetFocus(hWnd);
+        PostMessage(hWnd, msg, wParam, lParam);
     }
     private void moveCaret(int step, int removeSymbols) {
         caretPos.col += step;
@@ -471,7 +473,7 @@ class IntelliSite : SmartBoxSite {
             if (templateToolTip.hwnd == 0)
                 templateToolTip.create(smartBox.hwnd);
             Rect rcScreen;
-            screenGeometry(textWnd.hWnd, rcScreen);
+            screenGeometry(getHwnd(textWnd), rcScreen);
             int leftWidth = boxCornerPosition.x - rcScreen.left;
             int rightWidth = rcScreen.right - (boxCornerPosition.x + boxWidth);
 
@@ -481,7 +483,7 @@ class IntelliSite : SmartBoxSite {
             Point pt;
             pt.x = xCaret;
             pt.y = yCaret - 3 - height;
-            ClientToScreen(textWnd.hWnd, pt);
+            ClientToScreen(getHwnd(textWnd), pt);
             if (int(width) > rightWidth)
                 pt.x -= width;
             // Проверим на пересечение с окном списка

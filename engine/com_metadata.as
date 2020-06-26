@@ -155,30 +155,10 @@ class IV8MDContainer {
         if (file is null)
             return false;
         IConfigMngr&& cfgMgr = container.getConfigMngr();
-    #if test > 0
-        {
-            IConfigMngr&& test = cfgMgr.unk;
-            if (test is null) {
-                doLog("Not IConfigMngr");
-                return false;
-            }
-        }
-        dumpVtable(&&cfgMgr);
-    #endif
         IInfoBaseService&& ibservice = currentProcess().getService(IID_IInfoBaseService);
         IConfigMngr&& copyMgr;
-        ibservice.connectConfig(copyMgr, tempFile.file, 1, 0);
+        ibservice.connectConfig(copyMgr, tempFile.file, 1);
         if (copyMgr !is null) {
-        #if test > 0
-            {
-                IConfigMngr&& test = copyMgr.unk;
-                if (test is null) {
-                    doLog("Not copy IConfigMngr");
-                    return false;
-                }
-            }
-            dumpVtable(&&copyMgr, "_copy");
-        #endif
             cfgMgr.extractConfig(copyMgr);
             &&copyMgr = null;
             tempFile.seek(0, fsBegin);

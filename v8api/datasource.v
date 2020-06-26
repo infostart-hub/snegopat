@@ -86,19 +86,20 @@
 	bool expandLine(IV8Bookmark& bkmk, bool expand, bool expandChildren, bool show = true, bool p = true)
 #endif
 	bool isExpandedLine(IV8Bookmark& bkmk)
-#if ver >= 8.3.10
-	59
-#elif ver >= 8.3.8
-	58
-#elif ver > 8.3.6.1945
-	56
-#elif ver > 8.3.6.1920
-	57
-#elif ver >= 8.3
-	53
- #else
+
+#if ver < 8.3
 	52
- #endif
+#elif ver <= 8.3.6.1920
+	53
+#elif ver <= 8.3.6.1945
+	57
+#elif ver < 8.3.8
+	56
+#elif ver < 8.3.11
+	58
+#else
+	59
+#endif
 	CheckState getCellCheck(IV8Bookmark& bkmk, uint id)
 	void setCellCheck(IV8Bookmark& bkmk, uint id, CheckState st)
 	+1
@@ -197,4 +198,4 @@
 
 :iface IV8Bookmark {379295BF-7FC0-4B26-9B8B-B14505719EDC}
 :virt
-	void fake()
+	+1

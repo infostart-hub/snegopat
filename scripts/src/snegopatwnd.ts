@@ -62,7 +62,7 @@ var FormDriver = (function () {
 		},
 		open: function () {
 			if (!form) {
-				form = loadScriptForm(env.pathes.core + "forms\\snegopat.ssf", this);
+				form = loadScriptFormEpf(env.pathes.core + "forms\\sn_forms.epf", "MainWindow", this);
 				form.UniqueKey = form.WindowOptionsKey = "SnegopatMainForm";
 				this.switchPage(0);
 				events.connect(Designer, "beforeExitApp", function () { profileRoot.setValue(wndStateProfilePath, form.IsOpen()) }, "-");
@@ -262,13 +262,15 @@ class AddinsPage implements Page {
 	setInfo(path: string) {
 		if (!path || !path.length)
 			path = "core\\00 firststep.md0.html";
+		path = env.pathes.help + path;
 		try {
-			path = env.pathes.help + path;
 			var testPath = "/" + path.replace(/ /g, "%20").replace(/\\/g, "/").toLowerCase();
-			var loc = this.form.Controls.AddinInfo.Document.parentWindow.location;
+			var loc = getLocation(this.form.Controls.AddinInfo.Document);
 			if (loc.protocol != "file:" || loc.pathname.toLowerCase() != testPath)
 				this.form.Controls.AddinInfo.Navigate(path);
-		} catch (e) { }
+		} catch (e) {
+			this.form.Controls.AddinInfo.Navigate(path);
+		}
 	}
 	// Обработчик команды загрузки аддина
 	handlerDoLoadAddin(button: { val: CommandBarButton }) {
@@ -344,7 +346,7 @@ class AddinsPage implements Page {
 		}
 	}
 	handlerAddinInfoSyncContent() {
-		var loc = this.form.Controls.AddinInfo.Document.parentWindow.location;
+		var loc = getLocation(this.form.Controls.AddinInfo.Document);
 		if (loc.protocol == "file:") {
 			var hf = "/" + env.pathes.help.replace(/\\/g, "/").replace(/ /g, "%20").toLowerCase();
 			if (loc.pathname.toLowerCase().indexOf(hf) == 0) {
@@ -1312,7 +1314,7 @@ class HelpPage implements Page {
 			ra.Picture = (<any>PictureLib).ListViewModeList;
 	}
 	handlerHelpBarsyncContent() {
-		var loc = this.form.Controls.HelpHtml.Document.parentWindow.location;
+		var loc = getLocation(this.form.Controls.HelpHtml.Document);
 		if (loc.protocol == "file:") {
 			var hf = "/" + env.pathes.help.replace(/\\/g, "/").replace(/ /g, "%20").toLowerCase();
 			if (loc.pathname.toLowerCase().indexOf(hf) == 0) {
@@ -1370,9 +1372,21 @@ class AboutPage implements Page {
 		this.form.Controls.AboutHtml.Navigate("about:blank");
 	}
 	handlerAboutHtmlDocumentComplete() {
+		//debugger
 		try {
 			this.form.Controls.AboutHtml.Document.parentWindow.setDesigner(Designer);
-		} catch (e) { }
+		} catch (e) {
+			var data = JSON.stringify({
+				"BuildDateTime": env.BuildDateTime,
+				"sVersion": env.BuildDateTime,
+				"ownerName": env.ownerName,
+				"snMainFolder": env.snMainFolder,
+				"v8Version": env.v8Version
+			});
+			try {
+				this.form.Controls.AboutHtml.Document.defaultView.setData(data);
+			} catch (e) {}
+		}
 	}
 	handlerAboutHtmlonhelp(Control, pEvtObj) {
 		RunApp("https://snegopat.ru");
@@ -1397,4 +1411,11 @@ function restoreWindowState() {
 		} else
 			openWnd();
 	}
+}
+function getLocation(htmlDoc) {
+	try {
+		return htmlDoc.parentWindow.location;
+	} catch (e) {
+		return htmlDoc.defaultView.location;
+    }
 }

@@ -9,6 +9,8 @@
 /// <reference path="../snegopat.d.ts"/>
 /// <reference path="../v8.d.ts"/>
 
+import { MacrosWnd } from "./macroswnd";
+
 /*@
 Скрипт для работы с хоткеями.
 @*/
@@ -105,6 +107,9 @@ export function applyKeysFromValueTable(vt: ValueTable): void {
         var cmds = row.Команда.split("::");
         hotkeys.add(KeyCodes.codeFromString(row.СочетаниеКлавиш), cmds[0], cmds[1]);
     }
+    try {
+        (<any>addins.byUniqueName("macroswnd").object).MacrosWnd().onChangeAddin();
+    } catch (e) { }
 }
 
 export function AddHotKey(str, addin, macros) {
@@ -200,10 +205,10 @@ type SelectForm = Form & { Ctrl: boolean, Alt: boolean, Shift: boolean, Controls
 export class SelectHotKey {
     form: SelectForm;
     constructor(owner) {
-        this.form = loadScriptForm(env.pathes.core + "forms\\hotkeyselect.ssf", this);
+        this.form = loadScriptFormEpf(env.pathes.core + "forms\\sn_forms.epf", "SelectHotkey", this);
         this.form.FormOwner = owner;
     }
-    select(current: string): void {
+    select(current: string) {
         var hk = KeyCodes.codeFromString(current);
         this.form.Ctrl = (hk & hkCtrl) != 0;
         this.form.Alt = (hk & hkAlt) != 0;

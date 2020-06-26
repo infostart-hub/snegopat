@@ -26,7 +26,7 @@
     v8string title()
     uint width()
     bool colInfo(VTColumnInfo&out info)
-    uint columnContainer(IValueTableBaseRO@&)
+    //uint columnContainer(IValueTableBaseRO@&)
 
 :iface IVTColumn {775383C9-59D7-496E-84AC-4FE30DFD3A38}
 :base IVTColumnRO
@@ -41,10 +41,10 @@
 :virt
     uint index() 
     uint columnCount()
-    Value value(const int& columnId)
-    Value valueAt(uint column)
+    +1 //Value value(const int& columnId)
+    +1 //Value valueAt(uint column)
     +1
-    uint parentTable(IValueTableBaseRO@&)
+    +1 //uint parentTable(IValueTableBaseRO@&)
 	+1
 
 :iface IVTRow {68F3330B-9CDB-4DFD-8702-FF38F90C10EE}

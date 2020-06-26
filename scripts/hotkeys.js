@@ -1,5 +1,4 @@
-﻿"use strict";
-//engine: JScript
+﻿//engine: JScript
 //debug: no
 //uname: hotkeys
 //dname: Работа с хоткеями
@@ -57,7 +56,7 @@ exports.KeyCodes = (function () {
 exports.ProfileExchanger = (function () {
     var profileKey = "Snegopat/HotKeys";
     var profileAddinsWithKey = "Snegopat/AddinsHotKeysVersions";
-    var Worker = (function () {
+    var Worker = /** @class */ (function () {
         function Worker() {
             var vt = v8New("ТаблицаЗначений");
             vt.Колонки.Добавить("Команда");
@@ -96,6 +95,10 @@ function applyKeysFromValueTable(vt) {
         var cmds = row.Команда.split("::");
         hotkeys.add(exports.KeyCodes.codeFromString(row.СочетаниеКлавиш), cmds[0], cmds[1]);
     }
+    try {
+        addins.byUniqueName("macroswnd").object.MacrosWnd().onChangeAddin();
+    }
+    catch (e) { }
 }
 exports.applyKeysFromValueTable = applyKeysFromValueTable;
 function AddHotKey(str, addin, macros) {
@@ -107,7 +110,7 @@ exports.AddHotKey = AddHotKey;
     applyKeysFromValueTable(exports.ProfileExchanger.loadHotkeys());
     events.connect(Designer, "onLoadAddin", SelfScript.self, "registerAddinHotkeys");
 })();
-var PredefinedHotKeyReceiver = (function () {
+var PredefinedHotKeyReceiver = /** @class */ (function () {
     function PredefinedHotKeyReceiver() {
         this.receiver = [];
         this.version = 0;
@@ -189,9 +192,9 @@ function registerAddinHotkeys(addin) {
     exports.ProfileExchanger.savePredefHotkeys(addinsHotKey);
     saveProfile();
 }
-var SelectHotKey = (function () {
+var SelectHotKey = /** @class */ (function () {
     function SelectHotKey(owner) {
-        this.form = loadScriptForm(env.pathes.core + "forms\\hotkeyselect.ssf", this);
+        this.form = loadScriptFormEpf(env.pathes.core + "forms\\sn_forms.epf", "SelectHotkey", this);
         this.form.FormOwner = owner;
     }
     SelectHotKey.prototype.select = function (current) {

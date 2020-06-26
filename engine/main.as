@@ -172,19 +172,18 @@ bool TxtEdtCtrl_createWindow(IWindowView& view, HWND parentWindow) {
     WV_CreateWindow&& orig;
     trTxtEdtCtrl_createWnd.getOriginal(&&orig);
     bool res = orig(view, parentWindow);
-    onCreateTextWnd(view, true);
+    onCreateTextWnd(view, true, parentWindow);
     return res;
 }
 
 bool TxtEdtView_createWindow(IWindowView& view, HWND parentWindow) {
-    //Print("TxtEdtView_createWindow");
 #if test = 1
     dumpVtable(&&view, "_TxtEdtView_createWindow");
 #endif
     WV_CreateWindow&& orig;
     trTxtEdtView_createWnd.getOriginal(&&orig);
     bool res = orig(view, parentWindow);
-    onCreateTextWnd(view, false);
+    onCreateTextWnd(view, false, parentWindow);
     return res;
 }
 

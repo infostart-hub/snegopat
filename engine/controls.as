@@ -162,6 +162,7 @@ class IV8Form {
                     uint idc = form.getControlID(i);
                     IFormCtrl&& fctrl;
                     form.getControl(fctrl, idc, IID_IFormCtrl);
+                    //Print("i=" + i + " idc=" + idc + " ctrl=" + (fctrl is null ? 0 : fctrl.self));
                     if (fctrl !is null && name == fctrl.getCode().str) {
                         ctrlID = idc;
                         break;
@@ -286,6 +287,20 @@ UintMap<DoModalPatchedTables> mapFramedViewVTablesToPatches;
 class ModalDialogInfo {
     DoModalPatchedTables&& originals;
     IDoModalHook&& object;
+    void doFinalOpen() {
+        object._stage = openModalWnd;
+        array<Variant> args(1);
+        args[0].setDispatch(createDispatchFromAS(&&object));
+        oneDesigner._events.fireEvent(dspWindows, "onDoModal", args);
+        // Если отменили, то закроем диалог
+        if (object.cancel) {
+            IFormViewCore&& fp = object._view.unk;
+            if (fp !is null) {
+                fp.updateData(true, -1);
+                fp.endDialog(object.result);
+            }
+        }
+    }
 };
 UintMap<ModalDialogInfo&&> mapDialogsToInfo;
 
@@ -301,17 +316,17 @@ enum DoModalHookStages {
 };
 
 class IDoModalHook {
-    private IFramedView&& view;
+    IFramedView&& _view;
     private IV8Form&& _form;
     IDoModalHook(IFramedView&& v) {
-        &&view = v;
+        &&_view = v;
     }
     string get_caption() {
-        return view.title();
+        return _view.title();
     }
     IV8Form&& get_form() {
         if (_form is null) {
-            IForm&& f = view.unk;
+            IForm&& f = _view.unk;
             if (f !is null)
                 &&_form = IV8Form(f);
         }
@@ -325,12 +340,11 @@ class IDoModalHook {
             _form.detach();
             &&_form = null;
         }
-        &&view = null;
+        &&_view = null;
     }
 };
 
 bool onFrameViewInitialUpdate_trap(IFramedView& pView) {
-    //Print("Trap initial update");
     ModalDialogInfo&& info = mapDialogsToInfo.find(pView.self).value;
     if (!info.originals.real_iu(pView))
         return false;
@@ -338,25 +352,17 @@ bool onFrameViewInitialUpdate_trap(IFramedView& pView) {
     array<Variant> args(1);
     args[0].setDispatch(createDispatchFromAS(&&info.object));
     oneDesigner._events.fireEvent(dspWindows, "onDoModal", args);
-    return !info.object.cancel;
+    return true;
 }
 
 void onFrameViewFinalOpen_trap(IFramedView& pView) {
-    //Print("Trap final open");
     ModalDialogInfo&& info = mapDialogsToInfo.find(pView.self).value;
     info.originals.real_fo(pView);
-    info.object._stage = openModalWnd;
-    array<Variant> args(1);
-    args[0].setDispatch(createDispatchFromAS(&&info.object));
-    oneDesigner._events.fireEvent(dspWindows, "onDoModal", args);
-    // Если отменили, то закроем диалог
-    if (info.object.cancel) {
-        IFormViewCore&& fp = pView.unk;
-        if (fp !is null) {
-            fp.updateData(true, -1);
-            fp.endDialog(info.object.result);
-        }
-    }
+  #if ver < 8.3.16.1359
+    info.doFinalOpen();
+  #else
+    idleHandlersSingle.insertLast(PVV(info.doFinalOpen));
+  #endif
 }
 
 // Функция направляет view на копию vtable, в которой перехвачены два метода.
@@ -454,7 +460,6 @@ void afterModal(IFramedView& pView, int result) {
     mem::int_ptr[pView.self] = info.originals.realVtable;
 }
 
-
 #if ver < 8.3.4
 funcdef int DoModal1Func(IBkEndUI&, IFramedView&, int, int, int, int, int, int, int, int);
 int doModal1_trap(IBkEndUI& pThis, IFramedView& pView, int i1, int i2, int i3, int i4, int i5, int i6, int i7, int i8) {
@@ -462,7 +467,6 @@ int doModal1_trap(IBkEndUI& pThis, IFramedView& pView, int i1, int i2, int i3, i
 funcdef int DoModal1Func(IBkEndUI&, IFramedView&, int, int, int, int, int, int, int, int, int);
 int doModal1_trap(IBkEndUI& pThis, IFramedView& pView, int i1, int i2, int i3, int i4, int i5, int i6, int i7, int i8, int i9) {
 #endif
-    //Print("Do modal 1");
     int result = 0;
     bool bCreated = false;
     if (!generateModalEvent(pView, result, bCreated))
@@ -488,7 +492,6 @@ int doModal2_trap(IBkEndUI& pThis, IFramedView& pView, int i1, int i2, int i3, i
 funcdef int DoModal2Func(IBkEndUI&, IFramedView&, int, int, int, int, int, int, int, int);
 int doModal2_trap(IBkEndUI& pThis, IFramedView& pView, int i1, int i2, int i3, int i4, int i5, int i6, int i7, int i8) {
 #endif
-    //Print("Do modal 2");
     int result = 0;
     bool bCreated = false;
     if (!generateModalEvent(pView, result, bCreated))
@@ -511,6 +514,5 @@ bool setTrapOnDoModal() {
     IBkEndUI&& ui = getBkEndUI();
     trDoModal1.setTrap(&&ui, IBkEndUI_doModal1, doModal1_trap);
     trDoModal2.setTrap(&&ui, IBkEndUI_doModal2, doModal2_trap);
-    //dumpVtable(&&ui);
     return true;
 }

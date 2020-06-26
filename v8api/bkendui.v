@@ -30,8 +30,10 @@
 
 #if ver < 8.3
     save int messageBox(const v8string&in text, uint type=0, uint timeout=0, uint caption=0, HWND parent=uint(-1), mbp& param=mbp(), int i1=0, int i2=0, int i3=0)
-#else
+#elif ver < 8.3.12
     save int messageBox(const v8string&in text, uint type=0, uint timeout=0, uint caption=0, HWND parent=uint(-1), mbp& param=mbp(), int i1=0, int i2=0, int i3=0, int i4=0, int i5=0)
+#else
+    save int messageBox(const v8string&in text, uint type=0, uint timeout=0, uint caption=0, HWND parent=0, mbp& param=mbp(), int i1=0, int i2=0, int i3=0, int i4=0, int i5=0)
 #endif
 
 	+1
@@ -69,7 +71,11 @@
         43
     #endif
     save int doMsgLine(const v8string&in text, MessageMarker marker=mNone, const Guid&in g=IID_NULL, int i1=0, IUnknown@ pUnkObject=null, const V8Picture&in customMarker=V8Picture())
+  #if ver < 8.3.15
 		+21
+  #else
+        +22
+  #endif
 	save bool GetFileName(SelectFileName& data, int timeout, HWND parent)
 
 

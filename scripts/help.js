@@ -1,5 +1,4 @@
-﻿"use strict";
-//engine: JScript
+﻿//engine: JScript
 //uname: help
 //dname: Справка снегопата
 //debug: no
@@ -114,7 +113,7 @@ var Store = (function () {
  *  - addins
  *  - custom
  */
-var HelpSystem = (function () {
+var HelpSystem = /** @class */ (function () {
     function HelpSystem() {
         this.root = { title: "Документация", path: "", folder: true, topics: [] };
         this.allFiles = {};

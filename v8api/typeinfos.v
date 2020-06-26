@@ -194,10 +194,10 @@
     bool notIndexable(int nPropPos)
     void propInfo(int prop, ContextValueInfo& valueInfo)
     void methRetInfo(int meth, ContextValueInfo& valueInfo)
-    uint propContext(IUnknown@&, int prop)
-    uint methRetContext(IUnknown@&, int meth)
-    bool propIsTypeProvider(int prop, TypeDomainPattern& typeDomainPattern)
-    bool methIsTypeProvider(int meth, TypeDomainPattern& typeDomainPattern)
+    //uint propContext(IUnknown@&, int prop)
+    //uint methRetContext(IUnknown@&, int meth)
+    //bool propIsTypeProvider(int prop, TypeDomainPattern& typeDomainPattern)
+    //bool methIsTypeProvider(int meth, TypeDomainPattern& typeDomainPattern)
 
 :iface IAssistListInfo {DEE6D279-28B7-4782-82BB-39A6C02E5A81}
 :virt

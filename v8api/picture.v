@@ -53,8 +53,10 @@
 :enum PictOffset
   #if ver < 8.3.6
 	64 pictOffset
-  #else
+  #elif ver < 8.3.16
 	68 pictOffset
+  #else
+	64 pictOffset
   #endif
 
 :guid CLSID_V8PictureValue {85D76168-7B84-4321-89CC-E04A68E81047}

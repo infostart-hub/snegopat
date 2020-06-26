@@ -1,5 +1,4 @@
-﻿"use strict";
-//engine: JScript
+﻿//engine: JScript
 //uname: SnegopatMainScript
 //dname: Снегопат
 //debug: no
@@ -41,12 +40,6 @@ stdlib.createMacros(SelfScript.self, "ВыбратьИВыполнитьМакр
     stdlib.createMacros(SelfScript.self, nameOfMacros, "Вставить " + nameOfinsert + " в текущей позиции редактируемого текста", stdcommands.TextEdit.Templates.info.picture, new Function("return replaceSelInTxtWnd('" + textBefore.replace("'", "\\'") + "', '" + textAfter.replace("'", "\\'") + "', " + (activateHint ? "true" : "false") + ")"), hotKey);
     return arguments.callee;
 })("<", "", "Alt + ,")(">", "", "Alt + .")("@", "", "Alt + 2")("#", "", "Alt + 3", false)("$", "", "Alt + 4")("^", "", "Alt + 6")("&", "", "Alt + 7", false)("Null", "", "Alt + N")("~", "", "Alt + ~")("[", "]", "Alt + [")("{", "}", "Alt + Shift + [")("]", "", "Alt + ]")("}", "", "Alt + Shift + ]")("'", "'", "Alt + '")("\"", "\"", "Alt + Shift + '")("=", "", "Alt + =");
-stdlib.createMacros(SelfScript.self, "Разработка\\Создать новую форму (*.ssf)", "Позволяет создать новую форму для скрипта", PictureLib.Form, function () {
-    newScriptForm();
-});
-stdlib.createMacros(SelfScript.self, "Разработка\\Открыть форму (*.ssf)", "Позволяет выбрать и открыть ssf файл формы скрипта для редактирования", PictureLib.НастройкиОтчета, function () {
-    changeScriptForm();
-});
 stdlib.createMacros(SelfScript.self, "Разработка\\Сдампить SnegAPI в snegopat.d.ts", "Сформировать файл описания SnegAPI в формате TypeScript", undefined, function () {
     develop.dumpSnegApiToDts();
     MessageBox("Готово");

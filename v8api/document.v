@@ -15,11 +15,17 @@
 		bool canClose()
 		+1
 		v8string getTitle()
+	  #if ver >= 8.3.12
+		+2
+	  #endif
 		void setTitle(const v8string&in title)
 		void setConfigMode(bool configMode)
 		bool getConfigMode()
 		void getKey(v8string&out key)
 		const URL& url()
+	  #if ver>=8.3.14
+	    +1
+	  #endif
 		const Guid& getKind()
 		void setReadOnly(bool bFlag)
 		bool getReadOnly()

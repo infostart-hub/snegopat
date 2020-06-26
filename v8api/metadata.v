@@ -17,7 +17,13 @@
 :service IInfoBaseService {F7399BD5-100E-4D0A-A5CE-F97810ACFEE9}
 	:virt
 		+1
+	  #if ver < 8.3.5
+		uint connectConfig(IConfigMngr@& res, IFile@ file, int mode)
+	  #elif ver < 8.3.16
 		uint connectConfig(IConfigMngr@& res, IFile@ file, int mode, int t=0)
+	  #else
+		uint connectConfig(IConfigMngr@& res, IFile@ file, int mode, int t=0, int m=0)
+	  #endif
 		12
 	  #if ver < 8.3.4
 		uint getDefault(IInfoBase@&)
@@ -38,8 +44,12 @@
 	:virt
 	  #if ver < 8.3.6
 		24
-	  #else
+	  #elif ver < 8.3.9
 		22
+	  #elif ver < 8.3.11
+	    23
+	  #else
+	    22
 	  #endif
 		void mdTreeShow(bool show, bool activate = true)
 		bool mdTreeIsVisible()
@@ -58,7 +68,8 @@
 		IMDContainer@+ getMDCont()
 		+1
 		uint getPictureCol(IUnknown@&)
-		+2
+		+1
+		uint getLangSettings(ILangSettings@&)
 		uint getStyleCol(IUnknown@&)
 		uint getTypesInfoProvider(ITypesInfoProvider@&)
 		+4
@@ -103,6 +114,9 @@
 		IMDObject@+ child(const Guid& childMdKind, const Guid& id)
 		IMDObject@+ childAt(const Guid& childMdKind, uint index)
 		+9
+	 #if ver >= 8.3.10.2772
+		+1
+	#endif
 		bool isModified()
 		void setModified(bool modified)
 		+5
@@ -114,14 +128,14 @@
 		+2
 	  #elif ver <8.3.7.1759
 	    +6
-		// Артур
-	  // #else
-	  //   +7
 	  #elif ver <=8.3.10.1877
 	    +7
+	  #elif ver < 8.3.12
+	    +7
+	  #elif ver < 8.3.15
+		+7
 	  #else
 	    +8
-		// завершение
 	  #endif
 		IMDObject@+ objById(const Guid& objId)
 		+4
@@ -131,10 +145,14 @@
 		50
 	  #elif ver <8.3.7.1759
 	    54
+	  #elif ver = 8.3.10.2772
+	    56
 	  #elif ver < 8.3.11
 		55
-	  #else
+	  #elif ver < 8.3.15
 	    56
+	  #else
+	    57
 	  #endif
 		IConfigMngr@+ getConfigMngr()
 	  +1
@@ -174,13 +192,17 @@
 		82
 	  #elif ver < 8.3.11
 	    83
-	  #else
+	  #elif ver < 8.3.17
 	    84
+	  #else
+	    85
 	  #endif
 	  IMDContainer@+ getMDCont(int i = 0)
 
-	  #if ver < 8.3.9
-		+24
+	  #if ver < 8.3.5
+	    65
+	  #elif ver < 8.3.9
+		63
 	  #elif ver < 8.3.10
 		41
 	  #else
@@ -211,12 +233,18 @@
 		59
 	  #elif ver < 8.3.9
 	    53
-	  #elif ver < 8.3.10.2252
+	  #elif ver < 8.3.10.2561
 	    54
 	  #elif ver < 8.3.12
 	    53
-	  #else
+	  #elif ver < 8.3.13
 	    54
+	  #elif ver < 8.3.15
+	    53
+	  #elif ver < 8.3.17
+	    55
+	  #else
+		56
 	  #endif
 		IConfigMngr@+ getConfigMgr()
 
@@ -260,18 +288,17 @@
 :iface IMDBaseObj {D3624077-1010-45F0-A596-77ADD399D777}
 	:base IMDObject
 	:virt
-	  // Артур
-	  #if ver > 8.3.10.1877
+	  #if ver >= 8.3.15
+	    45
+	  #elif ver > 8.3.10.1877
 	    44
 	  #else
-	  //завершение
 		#if ver >= 8.3.6
 			+4
 		#endif
 		#if ver >= 8.3.7.1759
 			+1
 		#endif
-		// Артур
 	  #endif
 		// завершение
 		const v8string& getName()

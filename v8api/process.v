@@ -1,4 +1,4 @@
-﻿#if ver < 8.2.19 | (ver > 8.3.0 & ver < 8.3.4) | ver >= 8.3.12
+﻿#if ver < 8.2.19 | (ver > 8.3.0 & ver < 8.3.4) | ver >= 8.3.18
 #err Unsupported version of 1C - Эта версия 1С не поддерживается!
 #endif
 
@@ -69,7 +69,7 @@
 
 :iface IGlobalContext {151C4C40-37A4-48EA-990C-14B584EF8A6C}
 :virt
-	void none()
+	+1
 
 :iface IGlobalContextInit {845491E6-70AF-4495-B4E2-D77AC794E797}
 :virt

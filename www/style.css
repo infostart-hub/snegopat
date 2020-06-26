@@ -1,0 +1,23 @@
+@media print {
+	.noprint {
+		display: none;
+	}
+}
+
+body {
+	background-color: white;
+	margin: auto;
+	padding: 15px;
+	font-family: verdana, geneva, sans-serif;
+	font-size: 11pt;
+	max-width:960px;
+}
+
+textarea{
+	width: 100%;
+}
+
+blockquote {
+	margin: 0 0 18px;
+	border-left: none;
+}

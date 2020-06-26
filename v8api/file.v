@@ -59,8 +59,8 @@
 		uint open(IFileEx@& res, const v8string&in fileName, FileOpenModes mode)
 		void remove(uint pPattern)
 		void rename(const v8string&in oldFileName, const v8string&in newFileName)
-		void compressToFile(IFileEx@+ file, uint blockSize = 512)
-		void compressToPath(const URL& path, FileOpenModes mode, uint blockSize = 512)
+		//void compressToFile(IFileEx@+ file, uint blockSize = 512)
+		//void compressToPath(const URL& path, FileOpenModes mode, uint blockSize = 512)
 
 :struct FileException
 	//:base Exception
@@ -71,9 +71,18 @@
 		int code
 		URL	url
 
+:iface IUnpackFile {F10901A0-3BAC-11D4-8A57-008048DA06DF}
+	:virt
+	#if ver < 8.3.10
+		void init(IFile&& dest)
+	#else
+		void init(IFile&& dest, int t=0)
+	#endif
+
 :guid CLSID_MemoryFile	{C1AF3F04-620A-40BC-8CA8-F6089B4A46F5}
 :guid CLSID_TempFile	{4FBE2375-4CED-4038-A89A-1C772F305CBE}
 :guid CLSID_StorageRW	{1E87FC1E-F03C-44D3-B87E-1DB84EF2C70C}
+:guid CLSID_UnpackFile  {F10901A2-3BAC-11D4-8A57-008048DA06DF}
 
 :iface ITempFile {0C6E9F49-A3CA-4C45-B078-5871639BF726}
 	:virt
@@ -81,6 +90,15 @@
 		void attach(const URL& url)
 	    void setMemLimit(uint limit)
 		uint getMemLimit()
+:dlls
+#if ver < 8.3
+    core82.dll
+#else
+    core83.dll
+#endif
+	uint64 copy_file(IFile& dst, IFile& src, uint64 size)|?copy_file@core@@YA_KPAVIFile@1@0_K@Z
+
+
 
 :global
 :meths

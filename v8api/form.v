@@ -56,41 +56,20 @@
     +1 //void removeControl(uint uint)
   // Артур 
   #if ver >= 8.3.10
-//   #if ver>8.3.9
     +2
   #endif
-    uint getControlID(IUnknown& control)
+    +1 //uint getControlID(IUnknown& control)
     uint getControlID(uint index)
     uint controlsCount()
-    bool setControlData(uint controlId, const Value& value)
-    bool getControlData(uint controlId, Value& value)
+    +1 //bool setControlData(uint controlId, const Value& value)
+    +1 //bool getControlData(uint controlId, Value& value)
+  #if ver >= 8.3.10
+    16
+  #endif
 	uint getControl(IUnknown@&out res, uint controlId, const Guid& iid)
     uint getActiveControlId()
+    +4
     bool activateControl(uint controlId)
-    bool activateNextControl(bool cycle, bool skip = false, const uint& startID = 0)
-    bool activatePrevControl(bool cycle)
-    bool activateFirstControl(bool skip = false)
-    bool activateLastControl()
-    uint getNextControlId(uint controlId)
-    uint getPrevControlId(uint controlId)
-    +1 //ILayouter* getControlLayouter(uint uint)
-    bool isControlVisible(uint controlId)
-    bool isControlEnable(uint controlId)
-    v8string getTitle()
-    void setTitle(const v8string& title)
-    +1 //const LocalWString& getTitleLocalString()
-    +1 //void setTitleLocalString(const LocalWString& title)
-    Size getFormSize(bool inDLU = true)
-    void setFormSize(const Size& size, bool inDLU = true)
-    +1 //void setFormSizeUnconditionally(const Size& size, bool inDLU = true)
-    bool onCtrlChangeData(uint controlId)
-    bool setCtrlDirty(uint controlId, bool dirty)
-    bool getCtrlDirty(uint controlId)
-    +1 //void setEnterButtonBehaviour(EnterButtonBehaviour behaviour)
-    +1 //EnterButtonBehaviour getEnterButtonBehaviour()
-    +1 //void setContextHelp(const URL& help)
-    URL getContextHelp()
-    void onContextHelp()
 
 :iface IFormCtrl {1E7F6215-C9DF-11D4-943C-004095E12FC7}
 :virt

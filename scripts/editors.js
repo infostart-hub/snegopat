@@ -1,5 +1,4 @@
-﻿"use strict";
-//engine: JScript
+﻿//engine: JScript
 //uname: alteditors
 //dname: Настройка альтернативных редакторов
 //debug: yes
@@ -18,9 +17,9 @@ function initProfileKeys() {
     var editors = v8New('Map');
     profileRoot.createValue(profileKeyName(), editors, pflSnegopat);
 }
-var FormObject = (function () {
+var FormObject = /** @class */ (function () {
     function FormObject() {
-        this.form = loadScriptForm(env.pathes.core + 'forms\\editors.ssf', this);
+        this.form = loadScriptFormEpf(env.pathes.core + 'forms\\sn_forms.epf', 'SelectEditor', this);
         this.extentions = {};
         this.loadAltEditors();
         var activeEditors = profileRoot.getValue(profileKeyName());

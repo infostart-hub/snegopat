@@ -1,5 +1,4 @@
-﻿"use strict";
-//engine: JScript
+﻿//engine: JScript
 //debug: no
 //uname: stdcommands
 //dname: Стандартные команды
@@ -40,7 +39,7 @@ exports.__esModule = true;
 /// <reference path="../snegopat.d.ts"/>
 /// <reference path="../v8.d.ts"/>
 // Описание команды
-var Command = (function () {
+var Command = /** @class */ (function () {
     function Command(num, description) {
         this.num = num;
         this.description = description;
@@ -321,7 +320,7 @@ exports.CfgStore = {
     CloseCfgStore: new Command(104, "Закрыть хранилище"),
     CreateCfgStore: new Command(100, "Создать хранилище")
 };
-var TestForm = (function () {
+var TestForm = /** @class */ (function () {
     function TestForm() {
         TestForm.one = this;
         this.form = loadScriptForm(env.pathes.core + "forms\\commands.ssf", this);

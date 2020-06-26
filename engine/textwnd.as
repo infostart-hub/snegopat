@@ -150,16 +150,38 @@ class TextDocStorage {
             td.setTextExtenderType(textExtender);
         }
     }
+#if ver > 8.3.12
+    TextWnd&& find(HWND hwnd) {
+        for (uint i = 0; i < openedDocs.length; i++) {
+            TextDoc&& doc = openedDocs[i];
+            for (uint j = 0; j < doc.views.length; j++) {
+                TextWnd&& tw = doc.views[j];
+                if (tw.hWnd == hwnd || tw.parent == hwnd) {
+                    return tw;
+                }
+            }
+        }
+        return null;
+    }
+#endif
 };
 
 // Вызывается из перехвата при создании окна текстового редактора
-void onCreateTextWnd(IWindowView&& pWnd, bool bControl) {
+void onCreateTextWnd(IWindowView&& pWnd, bool bControl, HWND parent) {
     if (bControl) {
         IControlDesign&& ctrl = pWnd.unk;
         if (ctrl !is null && ctrl.getMode() != ctrlRunning)
             return; // С контролами на формах не работаем
     }
+#if ver >= 8.3.12
+    IFramedView&& vf = pWnd.unk;
+    if (vf is null)
+        return;
+#endif
     TextWnd wnd(pWnd, bControl);
+#if ver >= 8.3.12
+    wnd.parent = parent;
+#endif
     ITextManager&& itm;
     wnd.ted.getITextManager(itm);
     TextDoc&& tdoc = textDocStorage.find(itm);
@@ -332,9 +354,86 @@ class TextDoc {
     }
 };
 
+#if ver < 8.3.12
+
+HWND getHwnd(TextWnd&& tw) {
+    return tw.hWnd;
+}
+
+#else
+
+HWND getHwnd(TextWnd&& tw) {
+    return hRealMainWnd;
+}
+
+HWND hRealMainWnd;
+
+TrapSwap trDispatchMsg;
+funcdef void FuncDispatchMessagesTrap(MSG&, int_ptr);
+
+void DispatchMessagesTrap(MSG& msg, int_ptr p1) {
+    FuncDispatchMessagesTrap&& orig;
+    
+    if (activeTextWnd !is null) {
+        if (msg.message == WM_KEYDOWN || msg.message == WM_SYSKEYDOWN) {
+            if (activeTextWnd.onKeyDown(msg.wParam, msg.lParam))
+                return;
+        } else if (msg.message == WM_CHAR) {
+            if (activeTextWnd.beforeChar(msg.wParam))
+                return;
+            trDispatchMsg.getOriginal(&&orig);
+            trDispatchMsg.swap();
+            orig(msg, p1);
+            activeTextWnd.afterChar(msg.wParam);
+            trDispatchMsg.swap();
+            return;
+        }
+    }
+    trDispatchMsg.getOriginal(&&orig);
+    trDispatchMsg.swap();
+    orig(msg, p1);
+    trDispatchMsg.swap();
+}
+
+
+TrapVirtualStdCall trFrameViewActivate;
+funcdef void FuncTextWnd_Activate(IFramedView&& view, ActivateType action, IFramedView&& otherView);
+void TextWnd_Activate(IFramedView&& view, ActivateType action, IFramedView&& otherView) {
+    if (action == atDeactivate)
+        &&activeTextWnd = null;
+    else if (action == atActivate) {
+        IWindowView&& wv = view.unk;
+        &&activeTextWnd = textDocStorage.find(wv.hwnd());
+    }
+    FuncTextWnd_Activate&& orig;
+    trFrameViewActivate.getOriginal(&&orig);
+    orig(view, action, otherView);
+}
+
+TrapSwap trWindowDetach;
+
+funcdef void FuncWindowDetach(HWND);
+
+void Window_DetachTrap(HWND wnd) {
+    FuncWindowDetach&& orig;
+    trWindowDetach.getOriginal(&&orig);
+    trWindowDetach.swap();
+    orig(wnd);
+    trWindowDetach.swap();
+    TextWnd&& tw = textDocStorage.find(wnd);
+    if (tw !is null)
+        tw.onDestroy();
+}
+
+#endif
+
 class TextWnd {
-    ASWnd&&        wnd;            // сабклассер текстового окна, перенаправляет указанные события оконной процедуры в скриптовый обработчик
-    HWND           hWnd;           // WinAPI хэндл окна
+#if ver < 8.3.12
+    ASWnd&& wnd;                   // сабклассер текстового окна, перенаправляет указанные события оконной процедуры в скриптовый обработчик
+#else
+    HWND           parent;
+#endif
+    HWND           hWnd;           // До 12 релиза WinAPI хэндл окна, после - указатель на объект wbase::Window
     ITextEditor&&  ted;            // Интерфейс редактора 1С
     TextDoc&&      textDoc;        // Родительский объект, общий для всех окон одного текста
     EditorData&&   editorData;     // Данные, нужные для текстового процессора
@@ -345,14 +444,29 @@ class TextWnd {
     TextWnd(IWindowView&& v, bool isCtrl) {
         isControl = isCtrl;
         hWnd = v.hwnd();
-        //Print("HWND=" + hWnd + " v=" + v.self);
-        &&wnd = attachWndToFunction(hWnd, WndFunc(this.WndProc), defaultMessages());
         &&ted = v.unk;
+    #if ver < 8.3.12
+        // Сабклассируем окно текстового редактора
+        &&wnd = attachWndToFunction(hWnd, WndFunc(this.WndProc), defaultMessages());
+    #else
+        if (trFrameViewActivate.state == trapNotActive) {
+            // Поставим перехват на уведомление редактора об активации, для отслеживания активного редактора
+            IFramedView&& fv = ted.unk;
+            trFrameViewActivate.setTrap(&&fv, IFramedView_onActivate, TextWnd_Activate);
+            // Поставим перехват на детач окна, чтобы освобождать наши ресурсы, связанные с ним
+            trWindowDetach.setTrapByName("wbase83.dll", "?detach@Window@wbase@@QAEXXZ", asCALL_THISCALL, Window_DetachTrap);
+            // Ставим перехват на роутинг виндовых сообщений для работы контекстной подсказки.
+            trDispatchMsg.setTrapByName("wbase83.dll", "?dispatch_msg@wbase@@YAXABUtagMSG@@PAVIMsgDispHook@1@@Z", asCALL_CDECL, DispatchMessagesTrap);
+            // Получим хэндл основного окна
+            hRealMainWnd = FindWindow("V8TopLevelFrame".cstr, 0);
+        }
+    #endif
+
     }
-    array<uint> defaultMessages() {
+    array<uint>&& defaultMessages() {
         return array<uint> = { WM_KEYDOWN, WM_SYSKEYDOWN, WM_CHAR, WM_DESTROY, WM_SETFOCUS, WM_KILLFOCUS };
     }
-
+#if ver < 8.3.12
     LRESULT WndProc(uint msg, WPARAM w, LPARAM l) {
         switch (msg) {
         case WM_SETFOCUS:
@@ -362,10 +476,7 @@ class TextWnd {
             &&activeTextWnd = null;
             break;
         case WM_DESTROY:
-            if (textDoc !is null)
-                textDoc.detachView(this);
-            if (iwnd !is null)		 // Если есть скриптовая обёртка
-                iwnd._disconnect();  // отвяжемся от неё
+            onDestroy();
             return wnd.doDefault();
         case WM_KEYDOWN:
         case WM_SYSKEYDOWN:
@@ -382,9 +493,12 @@ class TextWnd {
         }
         return editor.wndProc(msg, w, l);
     }
+#endif
+    /*
     ~TextWnd() {
-        //Print("delete TextWnd");
+        Print("delete TextWnd");
     }
+    */
     bool onKeyDown(WPARAM w, LPARAM l) {
         return textDoc.tp.onKeyDown(this, w, l);
     }
@@ -398,6 +512,13 @@ class TextWnd {
         if (iwnd is null)
             &&iwnd = ITextWindow(this);
         return iwnd;
+    }
+    void onDestroy() {
+        if (textDoc !is null)
+            textDoc.detachView(this);
+        if (iwnd !is null)		 // Если есть скриптовая обёртка
+            iwnd._disconnect();  // отвяжемся от неё
+        &&ted = null;
     }
 };
 
@@ -422,9 +543,11 @@ class TextEditorWindow {
     void attach(TextWnd&& tw)			{ &&txtWnd = tw; }
     void detach()						{ &&txtWnd = null; }
     // Обработчик оконной процедуры
+#if ver < 8.3.12
     LRESULT wndProc(uint msg, WPARAM w, LPARAM l) {
         return txtWnd.wnd.doDefault();
     }
+#endif
     // Функции для работы снегопатовского списка контекстной подсказки
     void getFontSize(Size& fontSize) {
         ITxtEdtOptions&& params = txtWnd.ted.unk;
@@ -433,10 +556,10 @@ class TextEditorWindow {
         getLogFontSizes(font.lf, fontSize);
     }
     void createCaret(uint lineHeight) {
-        CreateCaret(txtWnd.hWnd, 0, 2, lineHeight);
+        CreateCaret(getHwnd(txtWnd), 0, 2, lineHeight);
     }
     void showCaret() {
-        ShowCaret(txtWnd.hWnd);
+        ShowCaret(getHwnd(txtWnd));
     }
     uint getTextWidth(const string& text, const Size& fontSize) {
         return fontSize.cx * text.length;
@@ -508,7 +631,9 @@ class EditorsManager {
     }
     // Регистрация вида редактора
     void _registerEditor(EditorInfo&& editorInfo) {
+    #if ver <= 8.3.12
         editors.insertLast(editorInfo);
+    #endif
     }
     // Подписка на изменения в окне редактора
     void _subscribeToSelChange(ITextEditor& editor, SelectionChangedReceiver& receiver) {

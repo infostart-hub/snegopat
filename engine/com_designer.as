@@ -167,6 +167,13 @@ class Designer {
         val2var(form, res);
         return res;
     }
+    Variant loadScriptFormEpf(string path, string formName, IDispatch&& eventHandler, const string& eventPrefix = "") {
+        Value form;
+        ::loadScriptFormEpf(path, formName, eventHandler, eventPrefix, form);
+        Variant res;
+        val2var(form, res);
+        return res;
+    }
     V8Value&& toV8Value(Variant varValue) {
         return V8Value(varValue);
     }

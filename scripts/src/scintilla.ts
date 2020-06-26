@@ -38,7 +38,7 @@ class SetupFormObject {
     form: SetupForm;
 
     constructor() {
-        this.form = loadScriptForm(env.pathes.core + 'forms\\scintilla.ssf', this);
+		this.form = loadScriptFormEpf(env.pathes.core + 'forms\\sn_forms.epf', 'ScintillaSetup', this);
 		this.initForm();
     }
 

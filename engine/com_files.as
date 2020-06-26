@@ -87,6 +87,50 @@ class MemoryBuffer {
     }
 };
 
+string file_getString(IFileEx&& file, StringDataMode mode, int length = -1) {
+    string result;
+    if (file is null) {
+        setComException("Файл закрыт");
+        return result;
+    }
+    ExceptionCatcher catcher;
+    CppCatch c("class core::Exception", ExceptionHandler(catcher.handle));
+
+    if (-1 == length) {
+        // Прочитать всё до конца
+        uint64 curPos = file.seek(0, fsCurrent);
+        uint64 endPos = file.seek(0, fsEnd);
+        file.seek(curPos, fsBegin);
+        if (catcher.hasException) {
+            setComException(catcher.errStr);
+            return result;
+        }
+        length = endPos - curPos;
+    }
+    if (length > 0) {
+        IFile&& f = file;
+        if (dsUtf16 == mode) {
+            length &= ~1;	// Длина должна быть четной
+            f.read(result.setLength(length / 2), length);
+            if (catcher.hasException) {
+                setComException(catcher.errStr);
+                return string();
+            }
+        } else {
+            MemoryBuffer buf(length);
+            length = f.read(buf.bytes, length);
+            if (catcher.hasException) {
+                setComException(catcher.errStr);
+                return result;
+            }
+            int cp = dsUtf8 == mode ? CP_UTF8 : CP_ACP;
+            int len = MultiByteToWideChar(cp, 0, buf.bytes, length, 0, 0);
+            MultiByteToWideChar(cp, 0, buf.bytes, length, result.setLength(len), len);
+        }
+    }
+    return result;
+}
+
 class IV8DataFile {
     IFileEx&& file;
     IV8DataFile(IFileEx&& f) {
@@ -133,47 +177,7 @@ class IV8DataFile {
         return res;
     }
     string getString(StringDataMode mode, int length=-1) {
-        string result;
-        if (file is null) {
-            setComException("Файл закрыт");
-            return result;
-        }
-        ExceptionCatcher catcher;
-        CppCatch c("class core::Exception", ExceptionHandler(catcher.handle));
-        
-        if (-1 == length) {
-            // Прочитать всё до конца
-            uint64 curPos = file.seek(0, fsCurrent);
-            uint64 endPos = file.seek(0, fsEnd);
-            file.seek(curPos, fsBegin);
-            if (catcher.hasException) {
-                setComException(catcher.errStr);
-                return result;
-            }
-            length = endPos - curPos;
-        }
-        if (length > 0) {
-            IFile&& f = file;
-            if (dsUtf16 == mode) {
-                length &= ~1;	// Длина должна быть нечетной
-                f.read(result.setLength(length / 2), length);
-                if (catcher.hasException) {
-                    setComException(catcher.errStr);
-                    return string();
-                }
-            } else {
-                MemoryBuffer buf(length);
-                length = f.read(buf.bytes, length);
-                if (catcher.hasException) {
-                    setComException(catcher.errStr);
-                    return result;
-                }
-                int cp = dsUtf8 == mode ? CP_UTF8 : CP_ACP;
-                int len = MultiByteToWideChar(cp, 0, buf.bytes, length, 0, 0);
-                MultiByteToWideChar(cp, 0, buf.bytes, length, result.setLength(len), len);
-            }
-        }
-        return result;
+        return file_getString(file, mode, length);
     }
     void putString(StringDataMode mode, const string& str, int length = -1) {
         if (length == -1)

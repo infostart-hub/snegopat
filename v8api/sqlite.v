@@ -60,7 +60,7 @@
 	0x00080000	SQLITE_OPEN_WAL                // VFS only
 
 :global
-:dlls sqlite3.dll
+:dlls tools\sqlite3.dll
 	int		sqlite3_open(uint name, uint&out db)|sqlite3_open
 	int		sqlite3_open_v2(uint name, uint&out db, int flags, uint vfs=0)|sqlite3_open_v2
 	int		sqlite3_close(uint db)|sqlite3_close

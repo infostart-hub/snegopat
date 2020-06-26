@@ -75,16 +75,21 @@
     uint8 flags
 
 :iface ICmdDescription {3A3AA3A0-DE39-11D3-8A57-008048DA06DF}
-:virt
+  :virt
+  #if ver < 8.3.4
 	void id(CommandID&)
+  #else
+    const CommandID& id()
+  #endif
 	v8string text()
 	uint image(IImage@&)
-	uint picture(IV8Picture@&)
-	const Guid& group()
-  #if ver < 8.3.5
-	+1
+  #if ver < 8.3.4
+	10
+  #elif ver < 8.3.10
+    9
+  #else
+    10
   #endif
-    +1
 	v8string accelText()
 	v8string description()
 	v8string tooltip()

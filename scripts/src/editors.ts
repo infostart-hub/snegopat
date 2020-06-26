@@ -35,7 +35,7 @@ class FormObject {
         return FormObject.one;
     }
     constructor() {
-        this.form = loadScriptForm(env.pathes.core + 'forms\\editors.ssf', this);
+        this.form = loadScriptFormEpf(env.pathes.core + 'forms\\sn_forms.epf', 'SelectEditor', this);
         this.extentions = {};
         this.loadAltEditors();
         var activeEditors: Map = profileRoot.getValue(profileKeyName());

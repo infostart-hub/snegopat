@@ -9,17 +9,7 @@ void designScriptForm(const string& path) {
     IUnknown&& test;
     IConfigMngrUI&& configMngrUI;
     getMDEditService().getTemplatesMainConfigMngrUI(configMngrUI);
-    if (configMngrUI is null || 0 != configMngrUI.queryIface(IID_IConfigMngrUI, &&test) || test is null) {
-        MsgBox("Bad configMngrUI");
-        return;
-    }
-    //dumpVtable(&&configMngrUI);
     IMDContainer&& container = configMngrUI.getMDCont();
-    if (container is null || 0 != container.queryIface(IID_IMDContainer, &&test) || test is null) {
-        MsgBox("Bad mdcontainer");
-        return;
-    }
-    //dumpVtable(&&container);
     IDocumentFactory&& docFactory;
     currentProcess().createByClsid(CLSID_FormDesDocFactory, IID_IDocumentFactory, docFactory);
     if (docFactory is null)
@@ -132,10 +122,78 @@ void designInternalForm(const string path) {
     }
 }
 
-bool loadScriptForm(string path, IDispatch&& eventHandler, const string& eventPrefix, Value&out result) {
+IStorageRW&& attachStorage(IFileEx&& file) {
+    IStorageRW&& stg;
+    currentProcess().createByClsid(CLSID_StorageRW, IID_IStorageRW, stg);
+    ExceptionCatcher catcher;
+    CppCatch c("class core::Exception", ExceptionHandler(catcher.handle));
+    stg.initFromFile(file);
+    if (catcher.hasException) {
+        setComException(catcher.errStr);
+        return null;
+    }
+    return stg;
+}
+
+IFileEx&& openFromStorage(IStorageRW&& stg, const string& name) {
+    IFileEx&& file;
+    ExceptionCatcher catcher;
+    CppCatch c("class core::Exception", ExceptionHandler(catcher.handle));
+    stg.open(file, name, FileOpenModes(fomIn|fomShareRead));
+    if (catcher.hasException) {
+        setComException(catcher.errStr);
+        return null;
+    }
+    return unpackFile(file);
+}
+
+IFileEx&& unpackFile(IFileEx&& file) {
+    IFileEx&& tmp;
+    currentProcess().createByClsid(CLSID_TempFile, IID_IFileEx, tmp);
+    IUnpackFile&& unpacker;
+    currentProcess().createByClsid(CLSID_UnpackFile, IID_IUnpackFile, unpacker);
+    unpacker.init(file);
+    IFile&& w = unpacker.unk;
+    copy_file(tmp, w, uint(-1));
+    tmp.seek(0, fsBegin);
+    return tmp;
+}
+
+IFileEx&& findForm(IFile&& form, const string& name) {
+    IFileEx&& fex = form.unk;
+    if (fex is null)
+        return null;
+    IStorageRW&& stg = attachStorage(fex);
+    if (stg is null)
+        return null;
+    // Откроем и прочитаем файл root
+    IFileEx&& root = openFromStorage(stg, "root");
+    if (root is null)
+        return null;
+    string rootText = file_getString(root, dsUtf8);
+    // выдернем из текста id файла описания метаданных, откроем его и прочитаем текст
+    string mdId = rootText.match(RegExp(",([^,]+),")).text(0, 1);
+    &&root = openFromStorage(stg, mdId);
+    rootText = file_getString(root, dsUtf8);
+    // Выдернем id'шники форм
+    auto formUuids = rootText.match(RegExp("(?i)\\{d5b0e5ed-256d-401c-9c36-f630cafd8a62,\\d+,([^\\}]+)\\}")).text(0, 1).split(",");
+    // Переберем файлы с этими айдишниками
+    for (uint i = 0; i < formUuids.length; i++) {
+        // Открываем и читаем
+        &&root = openFromStorage(stg, formUuids[i]);
+        rootText = file_getString(root, dsUtf8);
+        // Выдёргиваем из текста название формы
+        string formName = rootText.match(RegExp("(?i)\\{1,0," + formUuids[i] + "\\},\"([^\"]+)\",")).text(0, 1);
+        if (formName == name)// Нашли нужную форму, вернем файл, ей соответствующий
+            return openFromStorage(stg, formUuids[i] + ".0");
+    }
+    return null;
+}
+
+IFile&& loadFormFile(string path, string formName) {
     path = findFullPath(path);
     if (path.isEmpty())
-        return false;
+        return null;
     path = "file://" + path;
     IFile&& file;
     ExceptionCatcher catcher;
@@ -143,8 +201,18 @@ bool loadScriptForm(string path, IDispatch&& eventHandler, const string& eventPr
     getFSService().openURL(file, URL(path), fomIn | fomShareRead);
     if (catcher.hasException) {
         setComException(catcher.errStr);
-        return false;
+        return null;
     }
+    if (file !is null && !formName.isEmpty()) {
+        IFileEx&& tmp;
+        currentProcess().createByClsid(CLSID_TempFile, IID_IFileEx, tmp);
+        copy_file(tmp, file, -1);
+        &&file = findForm(tmp, formName);
+    }
+    return file;
+}
+
+bool loadScriptForm(IFile&& file, IDispatch&& eventHandler, const string& eventPrefix, Value& out result, bool epf) {
     if (file is null)
         return false;
     ICustomForm&& customForm;
@@ -163,11 +231,14 @@ bool loadScriptForm(string path, IDispatch&& eventHandler, const string& eventPr
     ISettingsConsumer&& st = customForm.unk;
     IConfigMngrUI&& configMngrUI;
     getMDEditService().getTemplatesMainConfigMngrUI(configMngrUI);
-	//dumpVtable(&&configMngrUI);
+    //dumpVtable(&&configMngrUI);
     IMDContainer&& container = configMngrUI.getMDCont();
     st.setSettings(container, IID_IMDContainer);
     ILangSettings&& lang;
-    currentProcess().createByClsid(CLSID_SimpleLangSettings, IID_ILangSettings, lang);
+    if (epf)
+        configMngrUI.getLangSettings(lang);
+    else
+        currentProcess().createByClsid(CLSID_SimpleLangSettings, IID_ILangSettings, lang);
     st.setSettings(&&lang, IID_ILangSettings);
 
     IUnknown&& unk;
@@ -184,6 +255,14 @@ bool loadScriptForm(string path, IDispatch&& eventHandler, const string& eventPr
     patchMyFormVtable(customForm.unk);
     &&result.pValue = customForm.unk;
     return true;
+}
+
+bool loadScriptFormEpf(string path, string formName, IDispatch&& eventHandler, const string& eventPrefix, Value& out result) {
+    return loadScriptForm(loadFormFile(path, formName), eventHandler, eventPrefix, result, true);
+}
+
+bool loadScriptForm(string path, IDispatch&& eventHandler, const string& eventPrefix, Value&out result) {
+    return loadScriptForm(loadFormFile(path, ""), eventHandler, eventPrefix, result, false);
 }
 
 // Реализация интерфейса IRuntimeModule. Объект назначается форме в качестве рантайм-модуля
@@ -307,7 +386,7 @@ uint FileSystem_openURL(IFileSystem& fs, IFile&&&file, const URL& url, int mode)
 void checkSaveFormTrapped() {
     if (!saveFormTrapped) {
         saveFormTrapped = true;
-        IFileSystem&& fs = currentProcess().getService(IID_IFileSystem);
+        IFileSystem&& fs = getFSService();
         trFileOpenUrl.setTrap(&&fs, IFileSystem_openURL, FileSystem_openURL);
         exitAppHandlers.insertLast(function() { trFileOpenUrl.swap(); });
     }

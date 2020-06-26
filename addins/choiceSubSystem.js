@@ -117,28 +117,38 @@ SubSystemFilter = stdlib.Class.extend({
             this.settings.SaveSettings()
         }
     },
+	
+	inFinalOpen: 0,
 
     onDoModal:function(dlgInfo){
         //7OH
-        reCaptionCfgStore = /Отбор\sпо\sподсистемам/ig
+        var reCaptionCfgStore = /Отбор\sпо\sподсистемам/ig
         if (!reCaptionCfgStore.test(dlgInfo.Caption))
             return;
+		//debugger
 
 		try{ 
             var form = dlgInfo.form
             var treeSubSystem   = form.getControl('eMDTreeCtrl')
             var checkParents    = form.getControl('eParentCheck')
             var checkChilds     = form.getControl('eChildCheck')
-        }catch(e)   { return }
+        }catch(e)   { 
+			Message(e.description);
+			return
+		}
         // Если это не диалог отбора подсистем, то сюда уже не попадем
         if(dlgInfo.stage == afterInitial)
         {
+			this.inFinalOpen = 0;
             if(this.DisableSelection)
             {
+                delete this.DisableSelection
                 // Это мы открыли окно диалога для отключения отбора
                 // Имитируем нажатие кнопки "Отключить"
-                form.sendEvent(form.getControl('eClear').id, 0)
-                delete this.DisableSelection
+                //form.sendEvent(form.getControl('eClear').id, 0)
+				// С версии 8.3.16.1359 так делать нельзя, и посылать команды нажатия кнопок диалога
+				// можно только после открытия окна.
+				this.inFinalOpen = 1;
                 return
             }
             // Вытащим список подсистем
@@ -167,7 +177,8 @@ SubSystemFilter = stdlib.Class.extend({
             {
                 if(result.mode == 4)    // Отключить
                 {
-                    form.sendEvent(form.getControl('eClear').id, 0)
+                    //form.sendEvent(form.getControl('eClear').id, 0)
+					this.inFinalOpen = 1;
                     return
                 }
                 // Тут осталось с выбором. Ставим галочки если надо
@@ -184,12 +195,11 @@ SubSystemFilter = stdlib.Class.extend({
                 grid.currentRow = result.row
                 // Ставим пометку на выбранной подсистеме
                 grid.checkCell(result.row, 0, 1)
-
 				form.sendEvent(treeSubSystem.id, 17, 1)
-				
                 this.saveChoice(result.row)
-                // Нажмем Ok
-                form.sendEvent(form.getControl('eOK').id, 0)
+                // Нажмем Ok - перенесем в обработку открытия окна диалога
+                // form.sendEvent(form.getControl('eOK').id, 0)
+				this.inFinalOpen = 2;
                 return
             }
             // Сюда попадаем, если выбрали "Открыть стандартный"
@@ -209,6 +219,12 @@ SubSystemFilter = stdlib.Class.extend({
             // checkParents.props.setValue("Подсказка", stdlib.LocalWString("Ctrl + W"))
             // checkParents.props.setValue("Положение заголовка", 1)
             // treeSubSystem.props.setValue("Подсказка", stdlib.LocalWString("Для поиска подсистемы нажмите Ctrl + F"))
+		} else if (dlgInfo.stage == openModalWnd) {
+			// Окно диалога открылось, если нужно, пошлем команду нажатия нужной кнопки
+			if (this.inFinalOpen == 1)
+				form.sendEvent(form.getControl('eClear').id, 0)
+			else if (this.inFinalOpen == 2)
+				form.sendEvent(form.getControl('eOK').id, 0);
         } else if(dlgInfo.stage == afterDoModal) {
             for(var k in this.hotKeys)
                 hotkeys.removeTemp(this.hotKeys[k])

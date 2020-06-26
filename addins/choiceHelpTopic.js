@@ -17,15 +17,20 @@ stdlib.require("SelectValueDialog.js", SelfScript);
     },
 
     onDoModal:function(dlgInfo){
-        if(dlgInfo.caption == "Выбор главы" && dlgInfo.stage == afterInitial)
+        if(dlgInfo.caption == "Выбор главы")
         {
-            var grid = dlgInfo.form.getControl("tblTopics").extInterface
-            var sel = this.choiceNative(grid);
-            if(sel)
-            {
-                grid.currentRow = sel
-                dlgInfo.form.sendEvent(dlgInfo.form.getControl('btnShow').id, 0)
-            }
+			if (dlgInfo.stage == afterInitial) {
+				var grid = dlgInfo.form.getControl("tblTopics").extInterface
+				var sel = this.choiceNative(grid);
+				if(sel)
+				{
+					grid.currentRow = sel
+					this.inFinalOpen = true;
+				} else
+					this.inFinalOpen = false;
+			} else if (dlgInfo.stage == openModalWnd && this.inFinalOpen) {
+				dlgInfo.form.sendEvent(dlgInfo.form.getControl('btnShow').id, 0)
+			}
         }
     },
 

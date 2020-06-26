@@ -66,18 +66,6 @@ stdlib.createMacros(SelfScript.self, "ВыбратьИВыполнитьМакр
     ("\"", "\"", "Alt + Shift + '")
     ("=", "", "Alt + =");
 
-stdlib.createMacros(SelfScript.self, "Разработка\\Создать новую форму (*.ssf)",
-    "Позволяет создать новую форму для скрипта", (<any>PictureLib).Form,
-    function () {
-        newScriptForm();
-    });
-
-stdlib.createMacros(SelfScript.self, "Разработка\\Открыть форму (*.ssf)",
-    "Позволяет выбрать и открыть ssf файл формы скрипта для редактирования", (<any>PictureLib).НастройкиОтчета,
-    function () {
-        changeScriptForm();
-    });
-
 stdlib.createMacros(SelfScript.self, "Разработка\\Сдампить SnegAPI в snegopat.d.ts",
     "Сформировать файл описания SnegAPI в формате TypeScript", undefined,
     function () {
