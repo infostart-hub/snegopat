@@ -212,6 +212,25 @@ IFile&& loadFormFile(string path, string formName) {
     return file;
 }
 
+// Объект, который будем передавать как языковые настройки открываемой форме скрипта.
+class RuLangSettings {
+    int_ptr currentLanguage(v8string& str) {
+        str = "ru";
+        return str.self;
+    }
+    int_ptr defaultLanguage(v8string& str) {
+        str = "ru";
+        return str.self;
+    }
+    int mainLang() {
+        return 1;
+    }
+    void languages(Vector& langs) {
+    }
+};
+
+IUnknown&& oneLangSettings;
+
 bool loadScriptForm(IFile&& file, IDispatch&& eventHandler, const string& eventPrefix, Value& out result, bool epf) {
     if (file is null)
         return false;
@@ -235,9 +254,12 @@ bool loadScriptForm(IFile&& file, IDispatch&& eventHandler, const string& eventP
     IMDContainer&& container = configMngrUI.getMDCont();
     st.setSettings(container, IID_IMDContainer);
     ILangSettings&& lang;
-    if (epf)
-        configMngrUI.getLangSettings(lang);
-    else
+    if (epf) {
+        //configMngrUI.getLangSettings(lang);
+        if (oneLangSettings is null)
+            &&oneLangSettings = AStoIUnknown(RuLangSettings(), IID_ILangSettings);
+        &&lang = oneLangSettings;
+    } else
         currentProcess().createByClsid(CLSID_SimpleLangSettings, IID_ILangSettings, lang);
     st.setSettings(&&lang, IID_ILangSettings);
 
