@@ -10,7 +10,7 @@
 // Скрипт, облегчающий работу в диалоге выбора типа
 
 global.connectGlobals(SelfScript)
-wapi = stdlib.require("winapi.js");
+//wapi = stdlib.require("winapi.js");
 stdlib.require("TextChangesWatcher.js", SelfScript);
 
 events.connect(windows, "onDoModal", SelfScript.self)
@@ -40,7 +40,7 @@ function calcInitName()
 function initForm()
 {
     // Загрузим и настроим форму
-    form = loadScriptForm(SelfScript.fullPath.replace(/js$/, 'ssf'), SelfScript.self)
+    form = loadScriptFormEpf(SelfScript.fullPath.replace(/js$/, 'epf'), "Форма", SelfScript.self)
     form.КлючСохраненияПоложенияОкна = SelfScript.uniqueName
     form.Types.Columns.Add("data")
     form.Types.Columns.Add("picture")
@@ -164,6 +164,8 @@ function PatternНачалоВыбора(Элемент, Стандартная�
 
 // Здесь мы будем отлавливать открытие и закрытие модального диалога
 // редактирования типа.
+var closeInFinalOpen = false;
+
 function onDoModal(dlgInfo)
 {
     // Привязываться к заголовку диалога не очень хорошо, он может быть другим
@@ -191,8 +193,7 @@ function onDoModal(dlgInfo)
         }
         if(quickSel && quickSel.result) // Нажали Ok, закрываем штатный диалог
         {
-            // Посылаем форме нажатие кнопки OK
-            v8Form.sendEvent(v8Form.getControl('OK').id, 0)
+			closeInFinalOpen = true;
         }
         else
         {
@@ -211,8 +212,13 @@ function onDoModal(dlgInfo)
         }
         break
     case openModalWnd:
-        if(quickSel && !quickSel.result)    // Нажали "Показать стандартный"
-            wapi.SetFocus(typeTreeCtrl.hwnd)
+		if (closeInFinalOpen) {
+			closeInFinalOpen = false;
+            v8Form.sendEvent(v8Form.getControl('OK').id, 0)
+			return;
+		}
+        //if(quickSel && !quickSel.result)    // Нажали "Показать стандартный"
+        //    wapi.SetFocus(typeTreeCtrl.hwnd)
         break;
     case afterDoModal:
         // Тут диалог уже закрывается, обнулим данные
@@ -252,8 +258,8 @@ function macrosНайтиТип()
         return false
     calcInitName()
     var res = selectType()
-    if(res && res.result)
-        wapi.SetFocus(typeTreeCtrl.hwnd)
+    //if(res && res.result)
+    //    wapi.SetFocus(typeTreeCtrl.hwnd)
 }
 
 function macrosПоказатьОтмеченныеТипы()
@@ -264,8 +270,8 @@ function macrosПоказатьОтмеченныеТипы()
     fOnlySelected = true
     var res = selectType()
     fOnlySelected = false
-    if(res && res.result)
-        wapi.SetFocus(typeTreeCtrl.hwnd)
+    //if(res && res.result)
+    //    wapi.SetFocus(typeTreeCtrl.hwnd)
 }
 
 function selectType()
