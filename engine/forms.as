@@ -215,10 +215,12 @@ IFile&& loadFormFile(string path, string formName) {
 // Объект, который будем передавать как языковые настройки открываемой форме скрипта.
 class RuLangSettings {
     int_ptr currentLanguage(v8string& str) {
+        str.ctor();
         str = "ru";
         return str.self;
     }
     int_ptr defaultLanguage(v8string& str) {
+        str.ctor();
         str = "ru";
         return str.self;
     }
@@ -226,6 +228,7 @@ class RuLangSettings {
         return 1;
     }
     void languages(Vector& langs) {
+        langs.ctor();
     }
 };
 
