@@ -56,10 +56,11 @@ ToDoListForm = ScriptForm.extend({
 	brСompleted: null,	
 	brRecycle: null,	
 	tbTasks: null,
+	inEdit: false,
 
     construct: function() {
 		this._instance = null;
-        this._super(SelfScript.fullPath.replace(/js$/, 'ssf'));
+        this._super(SelfScript.fullPath.replace(/js$/, 'epf|Форма'));
 		
 		ToDoListForm._instance = this;
 		
@@ -260,8 +261,15 @@ ToDoListForm = ScriptForm.extend({
 		//if (Отказ.val)	Message('Новые задачи добавлять в ветку "Активные"!');
 			
 	},
-	
+	ДеревоЗадач_ПриНачалеРедактирования: function(Элемент, НоваяСтрока, Копирование) {
+		this.inEdit = true;
+	},
+	ДеревоЗадач_ПриОкончанииРедактирования: function(Элемент, НоваяСтрока, ОтменаРедактирования) {
+		this.inEdit = false;
+	},
 	ДеревоЗадач_ПриПолученииДанных: function (Элемент, ОформленияСтрок) {
+		if (this.inEdit)
+			return;
 		
 		for (var i=0; i < ОформленияСтрок.val.Count(); i++)				
 		{
@@ -300,7 +308,6 @@ ToDoListForm = ScriptForm.extend({
 					СтрокаДерева.Иконка = 5;
 			}	
 		}
-		
 	},
 	
 	ДеревоЗадач_НачалоПеретаскивания: function (Элемент, ПараметрыПеретаскивания, Выполнение) {

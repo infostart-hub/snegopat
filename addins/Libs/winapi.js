@@ -11,7 +11,7 @@ var api
     api = new ActiveXObject("DynamicWrapperX")
     }catch(e)
     {
-        Message("winapi.js: не удалось создать DynamicWrapperX. " + e.description)
+        //Message("winapi.js: не удалось создать DynamicWrapperX. " + e.description)
         return
     }
     regs = [

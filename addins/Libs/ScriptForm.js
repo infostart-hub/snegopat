@@ -205,7 +205,11 @@ ScriptForm = stdlib.Class.extend({
     
     //{ Приватные методы
     loadForm: function (path) {
-        this.form = loadScriptForm(path, this);
+		var m = path.match(/^(.+\.epf)\|(.+)$/i);
+		if (m)
+			this.form = loadScriptFormEpf(m[1], m[2], this);
+		else
+			this.form = loadScriptForm(path, this);
         // Автоматически подключим обработчики событий.
         if (!this.disableAutoEvents) 
         {
