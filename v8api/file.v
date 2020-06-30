@@ -73,7 +73,7 @@
 
 :iface IUnpackFile {F10901A0-3BAC-11D4-8A57-008048DA06DF}
 	:virt
-	#if ver < 8.3.10
+	#if ver < 8.3.10 | ver = 8.3.12.1567
 		void init(IFile&& dest)
 	#else
 		void init(IFile&& dest, int t=0)
@@ -98,7 +98,7 @@
 #endif
 	uint64 copy_file(IFile& dst, IFile& src, uint64 size)|?copy_file@core@@YA_KPAVIFile@1@0_K@Z
 
-
+	
 
 :global
 :meths
