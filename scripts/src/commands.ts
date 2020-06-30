@@ -171,7 +171,8 @@ export var CDebug = {
     Performance: new Command(20, "Замер производительности"),
     BreakOnError: new Command(21, "Остановка при ошибке"),
     GoToSource: new Command(22, "Переход к строке, в которой установлена точка останова"),
-    Dettach: new Command(23, "Отключиться")
+    Dettach: new Command(23, "Отключиться"),
+    LocalVars: new Command(28, "Локальные переменные")
 };
 
 export var Frntend = {
