@@ -46,7 +46,11 @@ stdlib.createMacros(SelfScript.self, "ВыбратьИВыполнитьМакр
     var nameOfMacros = "Редактирование\\Вставить " + nameOfinsert;
     stdlib.createMacros(SelfScript.self, nameOfMacros, "Вставить " + nameOfinsert + " в текущей позиции редактируемого текста",
         stdcommands.TextEdit.Templates.info.picture,
-        new Function("return replaceSelInTxtWnd('" + textBefore.replace("'", "\\'") + "', '" + textAfter.replace("'", "\\'") + "', " + (activateHint ? "true" : "false") + ")"),
+        (function (txtBefore, txtAfter, aHint) {
+            return function () {
+                return replaceSelInTxtWnd(txtBefore, txtAfter, aHint);
+            }
+        })(textBefore, textAfter, activateHint),
         hotKey);
     return arguments.callee;
 })("<", "", "Alt + ,")

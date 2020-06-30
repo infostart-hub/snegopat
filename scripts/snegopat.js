@@ -37,7 +37,11 @@ stdlib.createMacros(SelfScript.self, "ВыбратьИВыполнитьМакр
     if (textAfter.length)
         nameOfinsert += "..." + textAfter;
     var nameOfMacros = "Редактирование\\Вставить " + nameOfinsert;
-    stdlib.createMacros(SelfScript.self, nameOfMacros, "Вставить " + nameOfinsert + " в текущей позиции редактируемого текста", stdcommands.TextEdit.Templates.info.picture, new Function("return replaceSelInTxtWnd('" + textBefore.replace("'", "\\'") + "', '" + textAfter.replace("'", "\\'") + "', " + (activateHint ? "true" : "false") + ")"), hotKey);
+    stdlib.createMacros(SelfScript.self, nameOfMacros, "Вставить " + nameOfinsert + " в текущей позиции редактируемого текста", stdcommands.TextEdit.Templates.info.picture, (function (txtBefore, txtAfter, aHint) {
+        return function () {
+            return replaceSelInTxtWnd(txtBefore, txtAfter, aHint);
+        };
+    })(textBefore, textAfter, activateHint), hotKey);
     return arguments.callee;
 })("<", "", "Alt + ,")(">", "", "Alt + .")("@", "", "Alt + 2")("#", "", "Alt + 3", false)("$", "", "Alt + 4")("^", "", "Alt + 6")("&", "", "Alt + 7", false)("Null", "", "Alt + N")("~", "", "Alt + ~")("[", "]", "Alt + [")("{", "}", "Alt + Shift + [")("]", "", "Alt + ]")("}", "", "Alt + Shift + ]")("'", "'", "Alt + '")("\"", "\"", "Alt + Shift + '")("=", "", "Alt + =");
 stdlib.createMacros(SelfScript.self, "Разработка\\Сдампить SnegAPI в snegopat.d.ts", "Сформировать файл описания SnegAPI в формате TypeScript", undefined, function () {

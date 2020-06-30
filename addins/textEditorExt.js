@@ -6,6 +6,7 @@
 //help: inplace
 //addin: global
 //addin: stdlib
+//addin: stdcommands
 
 /*@
 AUTHOR: Василий Фролов aka Палыч, palytsh@mail.ru
@@ -38,7 +39,9 @@ global.connectGlobals(SelfScript);
 stdlib.require('TextWindow.js', SelfScript);
 
 function getPredefinedHotkeys(predef){
-    predef.setVersion(10);
+    predef.setVersion(11);
+	stdlib.getAllPredefHotKeys(SelfScript.self, predef);
+	
     predef.add("НайтиВыделенныйТекстВниз", "Ctrl + Down");
     predef.add("НайтиВыделенныйТекстВверх", "Ctrl + Up");
     predef.add("КлонироватьТекст", "Ctrl + D");
@@ -645,4 +648,88 @@ function macrosOnPressDelInBracket(){
     
 }
 
+function indentLengthInSpaces(indent, tabSize) {
+    var l = 0;
+    for (var i = 0; i < indent.length; i++) {
+        if (indent.charAt(i) == '\t') {
+            l += tabSize - l % tabSize;
+        }
+        else
+            l++;
+    }
+    return l;
+}
 
+function spaceString(count) {
+    return Array(count + 1).join(' ');
+}
+
+stdlib.createMacros(SelfScript.self, "Закомментировать/Раскоментировать строку",
+	"Инвертирует комментарии в выделенном блоке строк модуля",
+	stdcommands.Frntend.AddComments.info.picture, function () {
+    var tw = snegopat.activeTextWindow();
+    if (!tw)
+        return;
+    var tabSize = profileRoot.getValue("ModuleTextEditor/TabSize");
+    var sel = tw.getSelection();
+    var lastLineNotSelected = sel.endRow != sel.beginRow && sel.endCol == 1;
+    if (lastLineNotSelected)
+        sel.endRow--;
+    var lines = [], minIndent = -1, commentLines = [];
+    // Пройдем по выделенным строкам, уберём комментарии, где они есть
+    // А те, которые надо комментировать, пока просто добавим в список, запомнив их номера,
+    // и найдем минимальный отступ в пробелах
+    for (var i = sel.beginRow; i <= sel.endRow; i++) {
+        var line = tw.line(i);
+        if (line.match(/^\s*$/))		// Пустая строка - добавим как есть
+            lines.push(line);
+        else if (/^\s*\/\//.exec(line))	// Комментарий - добавим с убранным комментарием
+            lines.push(line.replace(/^\s*\/\//, function (v) { return v.substr(0, v.length - 2); }));
+        else {
+			// Не комментарий. Посчитаем размер отступа в пробелах, добавим строку как есть и запомним её индекс
+            var indent = /^\s*/.exec(line)[0];
+            var iLength = indentLengthInSpaces(indent, tabSize);
+            if (minIndent == -1 || iLength < minIndent)
+                minIndent = iLength;
+			commentLines.push(lines.length);
+			lines.push(line);
+        }
+    }
+    // Теперь пройдем по строкам, которые надо закомментировать, добавляя в них комментарий на расстоянии
+    // наименьшего найденного отступа, считая в пробелах. Если же минимальный отступ в пробелах попадёт
+    // внутрь таба, придётся заменить его на пробелы
+    for (var k in commentLines) {
+        var idx = commentLines[k];
+        var line = lines[idx];
+        for (var idxInStr = 0, lenOfIndent = 0, lastAddedSpaces = 0; ; idxInStr++) {
+            if (lenOfIndent == minIndent) {
+                line = line.substr(0, idxInStr) + "//" + line.substr(idxInStr);
+                break;
+            }
+            else if (lenOfIndent > minIndent) {
+                // Попали на tab
+				var addSpaces = minIndent - (lenOfIndent - lastAddedSpaces);
+                line = line.substr(0, idxInStr - 1) + spaceString(addSpaces) + "//" + spaceString(lastAddedSpaces - addSpaces) + line.substr(idxInStr);
+                break;
+            }
+            if (line.charAt(idxInStr) == '\t') {
+				lastAddedSpaces = tabSize - lenOfIndent % tabSize;
+                lenOfIndent += lastAddedSpaces;
+            } else
+                lenOfIndent++;
+        }
+        lines[idx] = line;
+    }
+    var text = lines.join('\n');
+    if (lastLineNotSelected) {
+        sel.endRow++;
+        text += "\n";
+    }
+    else
+        sel.endCol = tw.line(sel.endRow).length + 1;
+    tw.setSelection(sel.beginRow, 1, sel.endRow, sel.endCol);
+    tw.selectedText = text;
+    if (!lastLineNotSelected)
+        sel.endCol =  lines[lines.length - 1].length + 1;
+	tw.setSelection(sel.beginRow, 1, sel.endRow, sel.endCol);
+}, "Ctrl + Num-");
