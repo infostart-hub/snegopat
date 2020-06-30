@@ -355,12 +355,12 @@ class IntelliSite : SmartBoxSite {
         hide();
         return true;
     }
-    void hide(SmartBoxInsertableItem&& insert = null) {
+    HWND hide(SmartBoxInsertableItem&& insert = null) {
         if (bInHide)
-            return;
+            return 0;
         bInHide = true;
         if (bCaretCreated) {
-            DestroyCaret();
+            //DestroyCaret();
             bCaretCreated = false;
         }
         DestroyWindow(smartBox.hwnd);
@@ -386,12 +386,13 @@ class IntelliSite : SmartBoxSite {
         &&editor = null;
         // Уведомим текстовый процессор о закрытии списка
         tw.textDoc.tp.itemInserted(tw, insert);
+        HWND hWnd = getHwnd(tw);
+        SetFocus(hWnd);
         &&activeTextWnd = tw;
+        return hWnd;
     }
     private void hideAndSend(uint msg, uint wParam, uint lParam) {
-        HWND hWnd = getHwnd(textWnd);
-        hide();
-        SetFocus(hWnd);
+        HWND hWnd = hide();
         PostMessage(hWnd, msg, wParam, lParam);
     }
     private void moveCaret(int step, int removeSymbols) {
@@ -522,10 +523,16 @@ bool checkCommandAndHideSmartBox(ICommandTarget& tgt, const Command& command, Tr
     //Message("" + command.id.group + " " + command.id.num);
     // При посылании команды текстовому окну открыт список снегопата
     if (oneIntelliSite !is null && oneIntelliSite.isActive()) {
+        if (command.id.group == IID_NULL && command.id.num == 600) {
+            // Это команда показа штатной подсказки, ее не обрабатываем
+            return false;
+        }
         // проверим, будет ли команда обработана
         uint cs = commandState(command.id);
-        if (cs & cmdStateEnabled != 0)
+        if (cs & cmdStateEnabled != 0) {
+            //Print("Hided by cmd " + command.id.group + " " + command.id.num);
             oneIntelliSite.hide();   // спрячем список снегопата
+        }
     }
     TE_onExecute&& orig;
     trap.getOriginal(&&orig);
