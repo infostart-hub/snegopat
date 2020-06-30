@@ -6,6 +6,9 @@
 #include "../../all.h"
 
 Packet stdListIntercept("stdListIntercept", hookStdList, piOnMainEnter);
+string tpstr(const TextPosition& tp) {
+    return "[" + tp.line + ", " + tp.col + "]";
+}
 
 bool enableHookStdList;
 OptionsEntry oeEnableHookStdList("HookStdList", function(v){v = true; },
@@ -193,23 +196,19 @@ bool showAssistList(IAssistList& lst, TextWnd&& wnd, IV8DataSource&& ds, IV8Book
 
 class V8StockItemBase : SmartBoxInsertableItem {
     string insert;
-    IV8Bookmark&& bkmk;
-    IAssistList&& lst;
-    IV8DataSource&& ds;
+    TextPosition tpStart;
 
     V8StockItemBase(const string& d, imagesIdx img, IV8Bookmark&& b, IAssistList&& l, IV8DataSource&& vd) {
         super(d, img);
-        &&bkmk = b;
-        &&lst = l;
-        &&ds = vd;
-    }
-    void updateInsertPosition(TextWnd& wnd, TextPosition& start, TextPosition& end, bool& notIndent) {
         uint caretPos;
         v8string ins;
-        lst.textByBookmark(ds, bkmk, ins, start, caretPos);
+        l.textByBookmark(vd, b, ins, tpStart, caretPos);
         insert = ins;
         if (caretPos < insert.length)
             insert.insert(caretPos, symbCaret);
+    }
+    void updateInsertPosition(TextWnd& wnd, TextPosition& start, TextPosition& end, bool& notIndent) override {
+        start = tpStart;
     }
     void textForInsert(string&out text) {
         text = insert;
@@ -228,7 +227,7 @@ class V8StockKeyword : V8StockItemBase {
         super(d, imgKeyword, b, l, vd);
     }
     string getCategory() { return "Ключевое слово"; }
-    void updateInsertPosition(TextWnd& wnd, TextPosition& start, TextPosition& end, bool& notIndent) {
+    void updateInsertPosition(TextWnd& wnd, TextPosition& start, TextPosition& end, bool& notIndent) override {
         V8StockItemBase::updateInsertPosition(wnd, start, end, notIndent);
         if (d.key == "если") {
             insert = "Если ¦ Тогда\nКонецЕсли;";
@@ -295,7 +294,7 @@ class V8StockMethod : V8StockItemBase {
         }
         return builtinFuncs.contains(d.descr) ? "Встроенная функция" : "Глобальный метод";
     }
-    void updateInsertPosition(TextWnd& wnd, TextPosition& start, TextPosition& end, bool& notIndent) {
+    void updateInsertPosition(TextWnd& wnd, TextPosition& start, TextPosition& end, bool& notIndent) override {
         V8StockItemBase::updateInsertPosition(wnd, start, end, notIndent);
         wchar_t lastSymbol = insert[insert.length - 1];
         if (lastSymbol == '(')
@@ -336,7 +335,7 @@ class V8StockProp : V8StockItemBase {
         }
         return "Глобальное свойство";
     }
-    void updateInsertPosition(TextWnd& wnd, TextPosition& start, TextPosition& end, bool& notIndent) {
+    void updateInsertPosition(TextWnd& wnd, TextPosition& start, TextPosition& end, bool& notIndent) override {
         V8StockItemBase::updateInsertPosition(wnd, start, end, notIndent);
         if (d.image == imgCmnModule)
             insert += ".";
@@ -354,7 +353,7 @@ class V8StockEnum : V8StockItemBase {
     string getCategory() {
         return "Системное перечисление";
     }
-    void updateInsertPosition(TextWnd& wnd, TextPosition& start, TextPosition& end, bool& notIndent) {
+    void updateInsertPosition(TextWnd& wnd, TextPosition& start, TextPosition& end, bool& notIndent) override {
         V8StockItemBase::updateInsertPosition(wnd, start, end, notIndent);
         insert += ".";
     }

@@ -2290,10 +2290,6 @@ class FoldingProcessor {
     }
 };
 
-string tpstr(const TextPosition& tp) {
-    return "[" + tp.line + ", " + tp.col + "]";
-}
-
 uint utf16ToUt8Length(int_ptr& ptr) {
     uint16 s = mem::word[ptr];
     ptr += 2;
