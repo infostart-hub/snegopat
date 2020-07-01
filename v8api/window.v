@@ -280,7 +280,7 @@
 	Rect			unk4
 	int				unk5
 	Size			unk6
-  #if ver < 8.3.15
+  #if ver < 8.3.14.1993
   #else
 	bool			unk7
   #endif
@@ -332,7 +332,7 @@
 		+12
 		ViewPosition	vpOriginal
 		Size			sizeOriginal
-	  #if ver < 8.3.15
+	  #if ver < 8.3.14.1993
 		+4
 	  #endif
 		IUnknown@		parent
@@ -343,7 +343,7 @@
 	44 FocusedViewInCoreFrame
 	48 ActiveViewInCoreFrame
 	96 ViewContextInView
-  #elif ver < 8.3.15
+  #elif ver < 8.3.14.1993
 	56 ViewContextOffset
 	48 FocusedViewInCoreFrame
 	52 ActiveViewInCoreFrame

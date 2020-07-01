@@ -23,7 +23,7 @@
 		bool getConfigMode()
 		void getKey(v8string&out key)
 		const URL& url()
-	  #if ver>=8.3.14
+	  #if ver > 8.3.14.1993
 	    +1
 	  #endif
 		const Guid& getKind()
