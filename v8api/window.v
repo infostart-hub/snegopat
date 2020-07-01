@@ -202,7 +202,19 @@
 
 :iface IViewContext {72B8C79E-ABD1-4FA2-8C3D-7E7F05A0F3ED}
 	:virt
+	  #if ver < 8.3.13
 		uint getID(Guid&out id)
+	  #else
+		const Guid& _getID()
+	  #endif
+	  #if ver >= 8.3.13
+	:meths
+		void getID(Guid& guid)
+		{
+			guid = obj._getID();
+		}
+		---
+	  #endif
 
 :iface IViewLayouter {3A1DACE0-8AD3-11D4-84A6-008048DA06DF}
 	:virt
