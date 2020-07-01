@@ -40,8 +40,8 @@ stdlib.require('TextWindow.js', SelfScript);
 
 function getPredefinedHotkeys(predef){
     predef.setVersion(11);
-	stdlib.getAllPredefHotKeys(SelfScript.self, predef);
-	
+    stdlib.getAllPredefHotKeys(SelfScript.self, predef);
+    
     predef.add("НайтиВыделенныйТекстВниз", "Ctrl + Down");
     predef.add("НайтиВыделенныйТекстВверх", "Ctrl + Up");
     predef.add("КлонироватьТекст", "Ctrl + D");
@@ -57,11 +57,11 @@ function getPredefinedHotkeys(predef){
     predef.add("Установить кавычки 2", "Shift + '");
     predef.add("Установить скобки", "Shift + 9");
     predef.add("Установить скобки 2", "Shift + 0");
-	//<gigabyte-artur@mail.ru 23.03.2017
+    //<gigabyte-artur@mail.ru 23.03.2017
     predef.add("Удалить строку", "Ctrl + Y");
-	predef.add("Переместить строку вниз", "Ctrl + Shift + Down");
-	predef.add("Переместить строку вверх", "Ctrl + Shift + Up");
-	//gigabyte-artur@mail.ru 23.03.2017>
+    predef.add("Переместить строку вниз", "Ctrl + Shift + Down");
+    predef.add("Переместить строку вверх", "Ctrl + Shift + Up");
+    //gigabyte-artur@mail.ru 23.03.2017>
 }
 
 function macrosНайтиВыделенныйТекстВниз(){
@@ -112,53 +112,53 @@ SelfScript.Self['macrosУдалить строку'] = function()
 {
     var w = GetTextWindow();
     if (!w || w.IsReadOnly() || windows.modalMode != msNone) 
-		return false;
-	var sel = w.GetSelection();            
-    var selText = w.GetSelectedText();	
+        return false;
+    var sel = w.GetSelection();            
+    var selText = w.GetSelectedText();  
     var pos = w.getCaretPos();
-	if (selText != '')
-	{            
-		w.setSelection(sel.beginRow, 1, pos.endRow+1, 1);			// Есть выделение - удалим все строки, в которые оно входит.
-		w.SetSelectedText('');
-		w.setCaretPos(sel.beginRow, sel.beginCol);
+    if (selText != '')
+    {            
+        w.setSelection(sel.beginRow, 1, pos.endRow+1, 1);           // Есть выделение - удалим все строки, в которые оно входит.
+        w.SetSelectedText('');
+        w.setCaretPos(sel.beginRow, sel.beginCol);
     }
-	else
-	{	
-		w.setSelection(pos.beginRow, 1, pos.beginRow+1, 1);			// Нет выделения - удалим строку курсора.
-		w.SetSelectedText('');
-		w.setCaretPos(pos.beginRow, pos.beginCol);
-	}
+    else
+    {   
+        w.setSelection(pos.beginRow, 1, pos.beginRow+1, 1);         // Нет выделения - удалим строку курсора.
+        w.SetSelectedText('');
+        w.setCaretPos(pos.beginRow, pos.beginCol);
+    }
 }
 
 SelfScript.Self['macrosПереместить строку вниз'] = function() 
 {
     var w = GetTextWindow();
     if (!w || w.IsReadOnly() || windows.modalMode != msNone) 
-		return false;
+        return false;
     var pos = w.getCaretPos();
-	str_this = w.line(pos.beginRow);
-	str_next = w.line(pos.beginRow+1);
-	w.setSelection(pos.beginRow, 1, pos.beginRow, str_this.length+1);			
-	w.SetSelectedText(str_next);
-	w.setSelection(pos.beginRow+1, 1, pos.beginRow+1, str_next.length+1);			
-	w.SetSelectedText(str_this);
+    str_this = w.line(pos.beginRow);
+    str_next = w.line(pos.beginRow+1);
+    w.setSelection(pos.beginRow, 1, pos.beginRow, str_this.length+1);           
+    w.SetSelectedText(str_next);
+    w.setSelection(pos.beginRow+1, 1, pos.beginRow+1, str_next.length+1);           
+    w.SetSelectedText(str_this);
 }
 
 SelfScript.Self['macrosПереместить строку вверх'] = function() 
 {
     var w = GetTextWindow();
     if (!w || w.IsReadOnly() || windows.modalMode != msNone) 
-		return false;
+        return false;
     var pos = w.getCaretPos();
-	if (pos.beginRow > 1) 
-	{	
-		str_this = w.line(pos.beginRow);
-		str_last = w.line(pos.beginRow-1);
-		w.setSelection(pos.beginRow, 1, pos.beginRow, str_this.length+1);			
-		w.SetSelectedText(str_last);
-		w.setSelection(pos.beginRow-1, 1, pos.beginRow-1, str_last.length+1);			
-		w.SetSelectedText(str_this);
-	}
+    if (pos.beginRow > 1) 
+    {   
+        str_this = w.line(pos.beginRow);
+        str_last = w.line(pos.beginRow-1);
+        w.setSelection(pos.beginRow, 1, pos.beginRow, str_this.length+1);           
+        w.SetSelectedText(str_last);
+        w.setSelection(pos.beginRow-1, 1, pos.beginRow-1, str_last.length+1);           
+        w.SetSelectedText(str_this);
+    }
 }
 
 SelfScript.Self['macrosУстановить кавычки'] = function() {
@@ -305,10 +305,10 @@ SelfScript.Self['macrosВыделить текст в скобках'] = functio
 }
 
 SelfScript.Self['macrosЗаменить табуляцию в отступах на пробелы'] = function() {
-	return replaceTabsToSpacesInSelectedText();
+    return replaceTabsToSpacesInSelectedText();
 }
 
-function replaceTabsToSpacesInSelectedText(doNotRestoreSelection) {	
+function replaceTabsToSpacesInSelectedText(doNotRestoreSelection) { 
     return processSelectedText(function(selText){
         var tabSize = profileRoot.getValue("ModuleTextEditor/TabSize");
         var spaces = ''; for (var i=0; i<tabSize; i++) { spaces += ' ' };
@@ -665,8 +665,8 @@ function spaceString(count) {
 }
 
 stdlib.createMacros(SelfScript.self, "Закомментировать/Раскоментировать строку",
-	"Инвертирует комментарии в выделенном блоке строк модуля",
-	stdcommands.Frntend.AddComments.info.picture, function () {
+    "Инвертирует комментарии в выделенном блоке строк модуля",
+    stdcommands.Frntend.AddComments.info.picture, function () {
     var tw = snegopat.activeTextWindow();
     if (!tw)
         return;
@@ -675,24 +675,24 @@ stdlib.createMacros(SelfScript.self, "Закомментировать/Раск�
     var lastLineNotSelected = sel.endRow != sel.beginRow && sel.endCol == 1;
     if (lastLineNotSelected)
         sel.endRow--;
-    var lines = [], minIndent = -1, commentLines = [];
+    var lines = [], minIndent = 0x7FFFFFFF, commentLines = [];
     // Пройдем по выделенным строкам, уберём комментарии, где они есть
     // А те, которые надо комментировать, пока просто добавим в список, запомнив их номера,
     // и найдем минимальный отступ в пробелах
     for (var i = sel.beginRow; i <= sel.endRow; i++) {
         var line = tw.line(i);
-        if (line.match(/^\s*$/))		// Пустая строка - добавим как есть
+        if (line.match(/^\s*$/))        // Пустая строка - добавим как есть
             lines.push(line);
-        else if (/^\s*\/\//.exec(line))	// Комментарий - добавим с убранным комментарием
-            lines.push(line.replace(/^\s*\/\//, function (v) { return v.substr(0, v.length - 2); }));
+        else if (/^\s*\/\//.exec(line)) // Комментарий - добавим с убранным комментарием
+            lines.push(line.replace(/\/\//, ''));
         else {
-			// Не комментарий. Посчитаем размер отступа в пробелах, добавим строку как есть и запомним её индекс
+            // Не комментарий. Посчитаем размер отступа в пробелах, добавим строку как есть и запомним её индекс
             var indent = /^\s*/.exec(line)[0];
             var iLength = indentLengthInSpaces(indent, tabSize);
-            if (minIndent == -1 || iLength < minIndent)
+            if (iLength < minIndent)
                 minIndent = iLength;
-			commentLines.push(lines.length);
-			lines.push(line);
+            commentLines.push(lines.length);
+            lines.push(line);
         }
     }
     // Теперь пройдем по строкам, которые надо закомментировать, добавляя в них комментарий на расстоянии
@@ -708,12 +708,12 @@ stdlib.createMacros(SelfScript.self, "Закомментировать/Раск�
             }
             else if (lenOfIndent > minIndent) {
                 // Попали на tab
-				var addSpaces = minIndent - (lenOfIndent - lastAddedSpaces);
+                var addSpaces = minIndent - (lenOfIndent - lastAddedSpaces);
                 line = line.substr(0, idxInStr - 1) + spaceString(addSpaces) + "//" + spaceString(lastAddedSpaces - addSpaces) + line.substr(idxInStr);
                 break;
             }
             if (line.charAt(idxInStr) == '\t') {
-				lastAddedSpaces = tabSize - lenOfIndent % tabSize;
+                lastAddedSpaces = tabSize - lenOfIndent % tabSize;
                 lenOfIndent += lastAddedSpaces;
             } else
                 lenOfIndent++;
@@ -731,5 +731,5 @@ stdlib.createMacros(SelfScript.self, "Закомментировать/Раск�
     tw.selectedText = text;
     if (!lastLineNotSelected)
         sel.endCol =  lines[lines.length - 1].length + 1;
-	tw.setSelection(sel.beginRow, 1, sel.endRow, sel.endCol);
+    tw.setSelection(sel.beginRow, 1, sel.endRow, sel.endCol);
 }, "Ctrl + Num-");
