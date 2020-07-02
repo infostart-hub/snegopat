@@ -86,8 +86,8 @@
 Подключаем SnegAPI и типы 1С, файлы должны лежать в этом же каталоге:
 
         ...
-        /// <reference path="./snegopat" />
-        /// <reference path="./v8" />
+        /// <reference path="./snegopat.d.ts" />
+        /// <reference path="./v8.d.ts" />
         ...
 Подключаем глобальные контексты 1С
 
