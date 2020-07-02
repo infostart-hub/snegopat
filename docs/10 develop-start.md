@@ -11,8 +11,11 @@
 Начать его использование для разработки помогут несколько простых шагов. 
 
 1. Скачиваем и устанавливаем Visual Studio Code: https://code.visualstudio.com/
-2. Скачиваем и устанавливаем TypeScript: http://www.typescriptlang.org/#Download  
-    Я брал "TypeScript 1.6 in VS2015"
+2. Скачиваем и устанавливаем TypeScript: http://www.typescriptlang.org/  
+    Снегопат использует для своих скриптов TypeScript 2.6, его можно скачать отсюда:
+	https://www.microsoft.com/en-us/download/details.aspx?id=55258
+	там в разделе Details есть нужный релиз. Чтобы команда `tsc` запускалась отовсюду,
+	можно добавить каталог "c:\Program Files (x86)\Microsoft SDKs\TypeScript\2.6" в PATH.
 3. В папке снегопата, рядом с папками addins и core - создаем папку custom.
     Снегопат там ищет дополнительные пользовательские аддины.
 4. Создаем папку для разработки, например "develop", можно тоже в папке снегопата,
