@@ -24,31 +24,47 @@
 8. В этом файле исправляем путь к каталогу сборки, параметр "outDir". Там надо прописать
     путь к каталогу custom. Если папка develop рядом с ним, просто укажите:
     "outDir": "../custom",
-    И добавьте параметр "emitBOM": true
+    И добавьте параметр "emitBOM": true, "newLine": "LF", "noImplicitUseStrict": true
     Файл будет выглядеть примерно так
-        {
-            "compilerOptions": {
-                "module": "commonjs",
-                "target": "es3",
-                "noImplicitAny": false,
-                "outDir": "../custom",
-                "rootDir": ".",
-                "sourceMap": false,
-                "emitBOM": true
-            },
-            "exclude": [
-                "node_modules"
-            ]
-        }
+		{
+			"compilerOptions": {
+				"module": "commonjs",
+				"newLine": "LF",
+				"noImplicitUseStrict": true,
+				"target": "es3",
+				"noImplicitAny": false,
+				"outDir": "../custom",
+				"rootDir": ".",
+				"sourceMap": false,
+				"emitBOM": true
+			},
+			"exclude": [
+				"node_modules"
+			]
+		}
 9. Запускаем Visual Studio Code:
         code.exe "путь к папке develop"
     
-10. Жмем Ctrl+Shift+P, набираем conf - выбираем "Task - configure task Runner"
-    В открывшемся файле удаляем или комментируем первый пример (с HelloWorld.ts),
-	и раскомментируем второй, который
-        // A task runner that calls the Typescript compiler (tsc) and
-        // compiles based on a tsconfig.json file that is present in
-        // the root of the folder open in VSCode
+10. Жмем Ctrl+Shift+P, набираем conf - выбираем "Tasks: Configure Default Build Task",
+	выбираем tsc: build - tsconfig.json.
+	Откроется окно с настройками сборки
+		{
+			"version": "2.0.0",
+			"tasks": [
+				{
+					"type": "typescript",
+					"tsconfig": "tsconfig.json",
+					"problemMatcher": [
+						"$tsc"
+					],
+					"group": {
+						"kind": "build",
+						"isDefault": true
+					},
+					"label": "tsc: build - tsconfig.json"
+				}
+			]
+		}
 
 11. В окне снегопата в меню "Разработка" выбираем "Сдампить SnegAPI в snegopat.d.ts"
     и "Сдампить типы 1С в v8.d.ts". Файлы создадуться в каталоге снегопата.
@@ -94,8 +110,13 @@
 Иногда TypeScript ругается на несовпадение типов - тогда приводите явно: <ИмяТипа>
 Смотрите примеры, читайте интернеты. Успехов!
 
-По отладке скриптов - смотрите тему https://snegopat.ru/forum/viewtopic.php?f=7&t=419&start=10#p7192
-Вкратце - необходимо установить один или несколько из перечисленных скриптовых отладчиков,
-в тексте скрипта в месте, где хочется подключить отладчик, написать debugger - и при выполнении
+По отладке скриптов.
+Лучше всего установить Visual Studio Community Edition, при установке отметить компоненты
+"Поддержка языков JavaScript и TypeScript" и "Диагностика JavaScript". Далее запустить
+Visual Studio и в меню Tools->Options в разделе Debugging\Just-In-Time поставить галочку на Script.
+В тексте скрипта в месте, где хочется подключить отладчик, написать debugger - и при выполнении
 этой строки всплывёт отладчик. Дальше в нём уже можно выполнять пошагово, ставить точки останова,
-просматривать переменные и т.д. и т.п.
+просматривать переменные и т.д. и т.п. В окне "Solution Explorer" при этом будут видны все
+загруженные скрипты, то есть можно открыть любой скрипт и поставить точку останова.
+Также можно использовать скрипт "Немедленное выполнение кода", там в его окне есть кнопка
+"Вызвать отладчик".
