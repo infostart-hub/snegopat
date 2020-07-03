@@ -7,12 +7,9 @@
 //descr: Скрипт для работы с окном снегопата
 //help: inplace
 var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -20,7 +17,6 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 exports.__esModule = true;
-exports.openWnd = void 0;
 /// <reference path="../snegopat.d.ts"/>
 /// <reference path="../v8.d.ts"/>
 /*@
@@ -131,19 +127,19 @@ var AddinsPage = /** @class */ (function () {
     };
     // Отслеживание загрузки аддинов
     AddinsPage.prototype.onLoadAddin = function (addin) {
-        if (this.loadedGroup == addin.group) { // Это загрузился аддин по нашей команде "Загрузить"
+        if (this.loadedGroup == addin.group) {
             var row = this.form.Controls.LoadedAddins.CurrentRow.Rows.Add();
             row.picture = 2;
             row.Addin = addin.displayName;
             row.object = addin;
             this.form.Controls.LoadedAddins.CurrentRow = row;
         }
-        else if (this.reloadRow) { // Это загрузился аддин по команде "Перезагрузить"
+        else if (this.reloadRow) {
             this.reloadRow.Addin = addin.displayName;
             this.reloadRow.object = addin;
             this.reloadRow = null;
         }
-        else // Аддин типа где-то со стороны загрузился
+        else
             this.fillLoadedAddins();
     };
     AddinsPage.prototype.onUnLoadAddin = function (addin) {
@@ -882,6 +878,7 @@ var UpdatePage = /** @class */ (function () {
             td.Write(this.ntlmIni);
         }
         this.fillRepoList();
+        this.form.VersionsForReport = "[" + env.sVersion + " | " + env.v8Version + " | " + (this.lastLocalDate.toLocaleDateString() + " " + this.lastLocalDate.toLocaleTimeString()) + "]";
     };
     UpdatePage.prototype.enter = function () {
     };
@@ -993,7 +990,7 @@ var UpdatePage = /** @class */ (function () {
                 url += '/';
             url += command;
             if (this.form.useProxy) {
-                if (this.form.proxyAddress.length == 0) // Адрес прокси должен быть задан
+                if (this.form.proxyAddress.length == 0)
                     return;
                 var hp, ntlmStarted = false;
                 if (this.form.proxyNtlm) {
@@ -1050,6 +1047,7 @@ var UpdatePage = /** @class */ (function () {
                 var res = JSON.parse(this.runFossilLocal("json timeline checkin --tag trunk --limit 20 --files 1", false, false));
                 this.fillRepoRow(this.localRepoRow, res);
                 var dt = new Date(res.payload.timeline[0].timestamp * 1000);
+                this.lastLocalDate = dt;
                 var a2 = function (p) { return p < 10 ? '0' : '' + p; };
                 return '' + dt.getFullYear() + '-' + a2(dt.getMonth() + 1) + '-' + a2(dt.getDate()) + '%20' + a2(dt.getHours()) + ':' + a2(dt.getMinutes()) + ':' + a2(dt.getSeconds());
             }
@@ -1130,6 +1128,9 @@ var UpdatePage = /** @class */ (function () {
     };
     UpdatePage.prototype.handlerCmdBarUpdatebtnDownloadSnegopat = function () {
         RunApp('https://snegopat.ru/spnew.php?login=' + this.form.snegopatLogin);
+    };
+    UpdatePage.prototype.handlerCmdBarUpdateBugsForum = function () {
+        RunApp('https://snegopat.ru/forum/viewforum.php?f=8');
     };
     UpdatePage.prototype.handlerbtnFillRepoНажатие = function () {
         this.fillRepoList();

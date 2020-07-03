@@ -831,7 +831,7 @@ type UpdateTree = { Get(p: number): UpdateTreeRow } & ValueTree;
 type UpdateForm = {
 	Controls: UpdateControls, vtRepoList: UpdateTree, localRepoPath: string,
 	remoteRepoURL: string, snegopatLogin: string, useProxy: boolean, proxyAddress: string, proxyUser: string,
-	proxyPass: string, notStorePass: boolean, proxyNtlm: boolean, ntlmPort: number, ntlmAuth: string
+	proxyPass: string, notStorePass: boolean, proxyNtlm: boolean, ntlmPort: number, ntlmAuth: string, VersionsForReport: string
 } & Form;
 
 class UpdatePage implements Page {
@@ -849,6 +849,7 @@ class UpdatePage implements Page {
 	remoteRepoRow: UpdateTreeRow;
 	profilePath = env.pathes.data + "proxy.cmd";
 	ntlmIni: string;
+	lastLocalDate: Date;
 
 	connect(form) {
 		this.form = form;
@@ -899,6 +900,7 @@ class UpdatePage implements Page {
 			td.Write(this.ntlmIni);
 		}
 		this.fillRepoList();
+		this.form.VersionsForReport = `[${env.sVersion} | ${env.v8Version} | ${this.lastLocalDate.toLocaleDateString() + " " + this.lastLocalDate.toLocaleTimeString()}]`;
 	}
 	enter() {
 	}
@@ -1059,6 +1061,7 @@ class UpdatePage implements Page {
 				var res = JSON.parse(this.runFossilLocal("json timeline checkin --tag trunk --limit 20 --files 1", false, false));
 				this.fillRepoRow(this.localRepoRow, res);
 				var dt = new Date(res.payload.timeline[0].timestamp * 1000)
+				this.lastLocalDate = dt;
 				var a2 = (p: number) => p < 10 ? '0' : '' + p
 				return '' + dt.getFullYear() + '-' + a2(dt.getMonth() + 1) + '-' + a2(dt.getDate()) + '%20' + a2(dt.getHours()) + ':' + a2(dt.getMinutes()) + ':' + a2(dt.getSeconds());
 			} else {
@@ -1132,6 +1135,9 @@ class UpdatePage implements Page {
 	}
 	handlerCmdBarUpdatebtnDownloadSnegopat() {
 		RunApp('https://snegopat.ru/spnew.php?login=' + this.form.snegopatLogin);
+	}
+	handlerCmdBarUpdateBugsForum() {
+		RunApp('https://snegopat.ru/forum/viewforum.php?f=8');
 	}
 	handlerbtnFillRepoНажатие() {
 		this.fillRepoList();
