@@ -36,7 +36,7 @@ SelfScript.self['macrosМаркер "Удалено"'] = function() {
 
 SelfScript.self['macrosНастройка'] = function() {
     // form - неявно определяемая глобальная переменная.
-    form = loadScriptForm(SelfScript.fullPath.replace(/js$/, 'ssf'), SelfScript.self);
+    form = loadScriptFormEpf(SelfScript.fullPath.replace(/js$/, 'epf'), "Форма", SelfScript.self);
     form.DoModal();
     form = null;
 }
