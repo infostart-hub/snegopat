@@ -78,7 +78,11 @@ function SnippetsManager() {
     SnippetsManager._instance = this;
 
     this.settings = SettingsManagement.CreateManager(SelfScript.uniqueName, {'TemplateFilesList':getDefaultTemplatesList()});
-    this.settings.LoadSettings();    
+    this.settings.LoadSettings();
+	if (this.settings.current.TemplateFilesList.Count() == 0) {
+		var row = this.settings.current.TemplateFilesList.Add();
+		row.Value = ".\\core\\addins\\snippets.st";
+	}
     
     this._snippets = {};
     this._snippetNames = new Array();
@@ -533,7 +537,7 @@ Snippet.prototype.getSelection = function (textWindow) {
 
 function SettingsManagerDialog(settings) {
     this.settings = settings;
-    this.form = loadScriptForm(SelfScript.fullPath.replace(/js$/, 'settings.ssf'), this);
+    this.form = loadScriptFormEpf(SelfScript.fullPath.replace(/\.js$/, '_settings.epf'), "Форма", this);
     this.settings.ApplyToForm(this.form);
 }
 
