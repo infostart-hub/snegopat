@@ -54,9 +54,9 @@ SelfScript.self['macrosОткрыть окно'] = function() {
 function BookMarkers(){
 
 	BookMarkers._instance = this;
-	var pathToForm = SelfScript.fullPath.replace(/js$/, 'ssf');
+	var pathToForm = SelfScript.fullPath.replace(/js$/, 'epf');
 	this.targetWindow = GetTextWindow();
-	this.form = loadScriptForm(pathToForm, this)
+	this.form = loadScriptFormEpf(pathToForm, "Форма", this)
 	this.form.КлючСохраненияПоложенияОкна = SelfScript.uniqueName;
 	this.watcher = new TextWindowsWatcher();
 	this.OpenWindow = false;
@@ -531,7 +531,7 @@ BookMarkers.prototype.updategl = function(){
 	vtMD = readMdToVt();
 	ВсегоОбъектов = vtMD.Count();
 
-	form = this.form;
+	var form = this.form;
 	container = metadata.current;
 	ДеревоЗакладок = v8New("ДеревоЗначений");
 	ДеревоЗакладок.Колонки.Добавить("ИмяЗакладки");
@@ -800,8 +800,8 @@ TextWindowsWatcherGoToLine = stdlib.Class.extend({
 //} end of TextWindowsWatcherGoToLine class
 
 BookMarkers.prototype.КоманднаяПанель1Настройки = function(Элемент) {
-    var pathToForm=SelfScript.fullPath.replace(/.js$/, 'param.ssf')
-    мФормаНастройки=loadScriptForm(pathToForm, SelfScript.self) // Обработку событий формы привяжем к самому скрипту
+    var pathToForm=SelfScript.fullPath.replace(/.js$/, '.epf')
+    мФормаНастройки=loadScriptFormEpf(pathToForm, "Настройка", SelfScript.self) // Обработку событий формы привяжем к самому скрипту
     мФормаНастройки.ОткрытьМодально()
 }
 
@@ -851,8 +851,8 @@ function СформироватьТзГруппПоУмолчанию() {
 	}
 
     НоваяГруппа("Закладки", "//Закладка{([^}]+)}", false);
-	НоваяГруппа("FIXME", "//\s*FIXME:(.*)", true);
-	НоваяГруппа("TODO", "//\s*TODO:(.*)", true);
+	НоваяГруппа("FIXME", "//\\s*FIXME:(.*)", true);
+	НоваяГруппа("TODO", "//\\s*TODO:(.*)", true);
 
 ;
 
@@ -878,7 +878,7 @@ function getPredefinedHotkeys(predef) {
 var pflBookMarkersOpenOnStart  = "BookMarkers/OpenOnStart"
 var pflBookMarkersEmptyGroups  = "BookMarkers/EmptyGroups "
 var pflBookMarkersTab     = "BookMarkers/Tab"
-var pflBookMarkersTabGl    = "BookMarkersGl/Tab"
+var pflBookMarkersTabGl    = "BookMarkers/TabGl"
 
 // Восстановим настройки
 profileRoot.createValue(pflBookMarkersOpenOnStart, false, pflSnegopat)
@@ -896,6 +896,12 @@ if(мГруппыЗакладок.Колонки.Найти("Использов�
     мГруппыЗакладок.Колонки.Добавить("ИспользоватьВГлобальномПоиске");
 try{
     мГруппыЗакладокГл.Колонки.Добавить("СтрокаСортировки");
+    мГруппыЗакладокГл.Колонки.Добавить("ИмяЗакладкиБезСчетчика");
+    мГруппыЗакладокГл.Колонки.Добавить("ИмяЗакладки");
+    мГруппыЗакладокГл.Колонки.Добавить("ИмяОбъекта");
+    мГруппыЗакладокГл.Колонки.Добавить("НомерСтроки");
+    мГруппыЗакладокГл.Колонки.Добавить("UUID");
+    мГруппыЗакладокГл.Колонки.Добавить("propId");
 }catch(e){}
 
 if(мАвтозапуск==true){
