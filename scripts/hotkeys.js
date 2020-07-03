@@ -6,6 +6,7 @@
 //help: inplace
 //author: orefkov
 exports.__esModule = true;
+exports.SelectHotKey = exports.PredefinedHotKeyReceiver = exports.AddHotKey = exports.applyKeysFromValueTable = exports.ProfileExchanger = exports.KeyCodes = void 0;
 exports.KeyCodes = (function () {
     var _KeyCodes = {
         "Ctrl": hkCtrl, "Shift": hkShift, "Alt": hkAlt, "BkSpace": 0x8, "Tab": 0x9, "Enter": 0x0D, "Esc": 0x1B, "Space": 0x20,

@@ -182,7 +182,7 @@ function macros_getSettings() {
 }
 function getColorSheme(num) {
     switch (num) {
-        case 0://стандартная цветовая схема
+        case 0: //стандартная цветовая схема
             var defaultFont = v8New("Шрифт", "Courier New", 10, false, false, false);
             var defaultBGColor = v8New("Цвет", 255, 255, 255);
             return {

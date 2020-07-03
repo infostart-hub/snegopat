@@ -7,6 +7,7 @@
 //help: inplace
 //addin: global
 exports.__esModule = true;
+exports.getHelpSystem = void 0;
 /// <reference path="../snegopat.d.ts"/>
 /// <reference path="../v8.d.ts"/>
 global.connectGlobals(SelfScript);
@@ -158,13 +159,13 @@ var HelpSystem = /** @class */ (function () {
         // Переберём вложенные папки
         for (var i in folders) {
             var f = folders[i];
-            if (f.Name.charAt(0) != ".")
+            if (f.Name.charAt(0) != ".") // каталоги с точки пропускаем
                 this.processFolder(baseFolder, typeOfFolder, relPath + f.Name, f.Name.replace(/^\d+\s*/, ""), me);
         }
         // переберём файлы
         for (var i in files) {
             var f = files[i];
-            if (f.Name.charAt(0) != "." && /\.md|\.markdown|\.txt|\.html/.test(f.Extension))
+            if (f.Name.charAt(0) != "." && /\.md|\.markdown|\.txt|\.html/.test(f.Extension)) // В папках автоматически включаем файлы только этих типов
                 this.processFile(baseFolder, typeOfFolder, f, f.BaseName.replace(/^\d+\s*/, ""), me);
         }
         if (me.topics.length)

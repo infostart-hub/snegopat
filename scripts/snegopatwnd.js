@@ -7,9 +7,12 @@
 //descr: Скрипт для работы с окном снегопата
 //help: inplace
 var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -17,6 +20,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 exports.__esModule = true;
+exports.openWnd = void 0;
 /// <reference path="../snegopat.d.ts"/>
 /// <reference path="../v8.d.ts"/>
 /*@
@@ -127,19 +131,19 @@ var AddinsPage = /** @class */ (function () {
     };
     // Отслеживание загрузки аддинов
     AddinsPage.prototype.onLoadAddin = function (addin) {
-        if (this.loadedGroup == addin.group) {
+        if (this.loadedGroup == addin.group) { // Это загрузился аддин по нашей команде "Загрузить"
             var row = this.form.Controls.LoadedAddins.CurrentRow.Rows.Add();
             row.picture = 2;
             row.Addin = addin.displayName;
             row.object = addin;
             this.form.Controls.LoadedAddins.CurrentRow = row;
         }
-        else if (this.reloadRow) {
+        else if (this.reloadRow) { // Это загрузился аддин по команде "Перезагрузить"
             this.reloadRow.Addin = addin.displayName;
             this.reloadRow.object = addin;
             this.reloadRow = null;
         }
-        else
+        else // Аддин типа где-то со стороны загрузился
             this.fillLoadedAddins();
     };
     AddinsPage.prototype.onUnLoadAddin = function (addin) {
@@ -989,7 +993,7 @@ var UpdatePage = /** @class */ (function () {
                 url += '/';
             url += command;
             if (this.form.useProxy) {
-                if (this.form.proxyAddress.length == 0)
+                if (this.form.proxyAddress.length == 0) // Адрес прокси должен быть задан
                     return;
                 var hp, ntlmStarted = false;
                 if (this.form.proxyNtlm) {

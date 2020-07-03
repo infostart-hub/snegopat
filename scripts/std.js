@@ -7,6 +7,7 @@
 //help: inplace
 //addin: global
 exports.__esModule = true;
+exports.isFolderExist = exports.isFileExist = exports.getAllPredefHotKeys = exports.createMacros = exports.TextChangesWatcher = exports.toArray = exports.forAllMdObjects = exports.LocalWString = exports.v8hotkey = exports.Class = exports.setTimeout = exports.getSnegopatMainFolder = exports.getUuidFomMDRef = exports.isConfigsDifferent = exports.isConfigModified = exports.isConfigOpen = exports.openFileIn1C = exports.DocKinds = void 0;
 /*@
 В данном скрипте собраны несколько методов, полезных для сторонних разработчиков аддинов, чтобы
 им не приходилось "изобретать велосипед", а также более "бесшовно" встраиваться в существующую
@@ -34,7 +35,7 @@ exports.DocKinds = {
  * Если тип файла не задан, то используется Auto
 **/
 function openFileIn1C(path, docKind) {
-    if (arguments.length < 2)
+    if (arguments.length < 2) // docKind не указан
         docKind = exports.DocKinds.Auto;
     if (path.match(/\.ssf$/)) {
         designScriptForm(path);
@@ -387,7 +388,7 @@ var TextChangesWatcher = /** @class */ (function () {
         else {
             // Текст не изменился. Если мы еще не сигнализировали об этом, то увеличим счетчик тиков
             if (this.noChangesTicks <= this.ticks) {
-                if (++this.noChangesTicks > this.ticks)
+                if (++this.noChangesTicks > this.ticks) // Достигли заданного количества тиков.
                     this.invoker(newText); // Отрапортуем
             }
         }
