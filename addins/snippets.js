@@ -538,6 +538,9 @@ Snippet.prototype.getSelection = function (textWindow) {
 function SettingsManagerDialog(settings) {
     this.settings = settings;
     this.form = loadScriptFormEpf(SelfScript.fullPath.replace(/\.js$/, '_settings.epf'), "Форма", this);
+	if (!this.form) {
+		throw "Шаблоны кода не смогли загрузить форму";
+	}
     this.settings.ApplyToForm(this.form);
 }
 

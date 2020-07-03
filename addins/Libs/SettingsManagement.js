@@ -44,6 +44,8 @@ _SettingsManager = stdlib.Class.extend({
     },
 
     ApplyToForm : function(form) {
+		if (!form)
+			throw "Не задан объект формы";
 
         for(var setting in this.current)
         {
@@ -51,8 +53,12 @@ _SettingsManager = stdlib.Class.extend({
             
             if (value === undefined || value === null)
                 value = this.DefaultSettings[setting];
-                
-            form[setting] = value;
+			
+			try {
+				form[setting] = value;
+			} catch (e) {
+				throw "Не удалось установить свойство " + setting + " при загрузке настроек формы";
+			}
         }
     },
 
