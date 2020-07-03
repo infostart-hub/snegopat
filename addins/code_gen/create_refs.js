@@ -67,6 +67,7 @@ function genarateNewRefsElement(param)
         if(tabPartsCount > 1)
             text += "//}  Заполнение табличных частей\n"
     }
+    text += varName + ".Записать();"
     text += "//} Создание справочника " + docKind + " в " + varName
     param.text = text
     return true

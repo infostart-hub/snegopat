@@ -71,6 +71,7 @@ function genarateNewDoc(param)
     lines.push('%% = Документы.' + docKind + '.СоздатьДокумент();')
     for(var k in res.items)
         processItem(lines, res.items[k], res.comments)
+    lines.push('%%.Записать();')
     if(res.comments)
         lines.push('//} Конец создания документа "' + syn + '" в %%')
     param.text = lines.join('\n').replace(/%%/g, res.VarName) + '\n'
