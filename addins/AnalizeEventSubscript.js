@@ -16,7 +16,7 @@
 
 global.connectGlobals(SelfScript)
 
-var form = loadScriptForm(SelfScript.fullPath.replace(/js$/, 'ssf'), SelfScript.self);
+var form = loadScriptFormEpf(SelfScript.fullPath.replace(/js$/, 'epf'), "Форма", SelfScript.self);
 form.Результат.Columns.Add("mdobj");
 
 function ТаблицаПодписок() {
