@@ -39,7 +39,7 @@ global.connectGlobals(SelfScript);
 stdlib.require('TextWindow.js', SelfScript);
 
 function getPredefinedHotkeys(predef){
-    predef.setVersion(12);
+    predef.setVersion(13);
     stdlib.getAllPredefHotKeys(SelfScript.self, predef);
     
     predef.add("НайтиВыделенныйТекстВниз", "Ctrl + Down");
@@ -732,4 +732,4 @@ stdlib.createMacros(SelfScript.self, "Закомментировать/Раск�
     if (!lastLineNotSelected)
         sel.endCol =  lines[lines.length - 1].length + 1;
     tw.setSelection(sel.beginRow, 1, sel.endRow, sel.endCol);
-}, "Ctrl + Num*");
+}, "Ctrl + /");
