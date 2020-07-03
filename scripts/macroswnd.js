@@ -6,7 +6,6 @@
 //author: orefkov
 //help: inplace
 exports.__esModule = true;
-exports.MacrosWnd = void 0;
 /// <reference path="../snegopat.d.ts"/>
 /// <reference path="../v8.d.ts"/>
 var stdlib = require("./std");

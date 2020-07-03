@@ -20,8 +20,6 @@ global.connectGlobals(SelfScript);
 import * as macroswnd   from "./macroswnd";
 import * as stdlib      from "./std";
 import * as stdcommands from "./commands";
-//import * as hks         from "./hotkeys";
-//import * as snegopatwnd from "./snegopatwnd";
 
 stdlib.createMacros(SelfScript.self, "ВыбратьИВыполнитьМакрос",
     "Выбрать макрос из списка и выполнить его", stdcommands.CDebug.Start.info.picture,
@@ -56,10 +54,10 @@ stdlib.createMacros(SelfScript.self, "ВыбратьИВыполнитьМакр
 })("<", "", "Alt + ,")
     (">", "", "Alt + .")
     ("@", "", "Alt + 2")
-    ("#", "", "Alt + 3", false)
+    ("#", "", "Alt + 3", true)
     ("$", "", "Alt + 4")
     ("^", "", "Alt + 6")
-    ("&", "", "Alt + 7", false)
+    ("&", "", "Alt + 7", true)
     ("Null", "", "Alt + N")
     ("~", "", "Alt + ~")
     ("[", "]", "Alt + [")
@@ -67,7 +65,7 @@ stdlib.createMacros(SelfScript.self, "ВыбратьИВыполнитьМакр
     ("]", "", "Alt + ]")
     ("}", "", "Alt + Shift + ]")
     ("'", "'", "Alt + '")
-    ("\"", "\"", "Alt + Shift + '")
+    ('"', '"', "Alt + Shift + '")
     ("=", "", "Alt + =");
 
 stdlib.createMacros(SelfScript.self, "Разработка\\Сдампить SnegAPI в snegopat.d.ts",

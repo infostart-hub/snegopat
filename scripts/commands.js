@@ -6,7 +6,6 @@
 //help: inplace
 //descr: Аддин для работы со стандартными командами 1С
 exports.__esModule = true;
-exports.TestForm = exports.CfgStore = exports.TableEdit = exports.ModulePass = exports.MngFormEdt = exports.TextEdit = exports.Frntend = exports.CDebug = exports.Config = exports.Frame = void 0;
 /*@
 Описание различных стандартных команд Конфигуратора.
 Список не полон, и пополняется по мере исследований.
