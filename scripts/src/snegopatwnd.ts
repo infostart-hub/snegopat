@@ -1384,7 +1384,7 @@ class AboutPage implements Page {
 		} catch (e) {
 			var data = JSON.stringify({
 				"BuildDateTime": env.BuildDateTime,
-				"sVersion": env.BuildDateTime,
+				"sVersion": env.sVersion,
 				"ownerName": env.ownerName,
 				"snMainFolder": env.snMainFolder,
 				"v8Version": env.v8Version

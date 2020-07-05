@@ -150,11 +150,16 @@ class IdleHandler {
         }
         for (uint i = 0, im = idleHandlers.length; i < im; i++)
             idleHandlers[i]();
+        // Обработаем ровно столько элементов, сколько было в массиве на начало вызова
+        // Если в процессе обработки в массив будут добавлены элементы, они будут
+        // обработаны в следующий раз.
         uint im = idleHandlersSingle.length;
-        for (uint i = 0; i < im; i++) {
-            idleHandlersSingle[0]();
-            idleHandlersSingle.removeAt(0);
-        }
+        for (uint i = 0; i < im; i++)
+            idleHandlersSingle[i]();
+        if (im == idleHandlersSingle.length)
+            idleHandlersSingle.resize(0);
+        else
+            idleHandlersSingle.removeRange(0, im);
         return false;
     }
     int unknown() {

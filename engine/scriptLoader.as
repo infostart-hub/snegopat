@@ -6,12 +6,10 @@
 Packet ScriptInit("ScriptInit", initScripts, piOnMainWindow);
 
 bool initScripts() {
-    //debugger();
-    IWindow&& w = cast<IUnknown>(mainFrame);
     string nameOfInstance = getDefaultInfoBase().connectString();
-    //dumpVtable(getDefaultInfoBase());
-    //Print(nameOfInstance);
-    initActiveScriptSubsystem(w.hwnd(), nameOfInstance);
+    // Получим хэндл основного окна
+    hRealMainWnd = FindWindow("V8TopLevelFrame".cstr, 0);
+    initActiveScriptSubsystem(hRealMainWnd, nameOfInstance);
     return true;
 }
 
@@ -50,6 +48,7 @@ class AddinScript : Addin, ScriptSite {
     IUnknown&& object() {
         return script.getObject();
     }
+    // Вызывается из snegopat.dll при ошибке в скрипте
     bool onScriptError(const ScriptError& err) {
         errorsCount++;
         if (errorsCount > 5) {
@@ -63,7 +62,6 @@ class AddinScript : Addin, ScriptSite {
             "\nСтрока: " + err.line +
             "\nКолонка: " + err.col +
             "\nИсточник: " + err.source +
-            "\nИсходный код: " + err.sourceCode +
             "\nОшибка: " + err.description;
         uint type = mbOK;
         if (err.bDebugPossible) {
@@ -72,6 +70,15 @@ class AddinScript : Addin, ScriptSite {
         }
         return MsgBox(msg, type) == mbaYes;
     }
+    // Вызывается из snegopat.dll при входе в выполнение скрипта
+    void enter() {
+        oneAddinMgr.enterInAddinRun(this);
+    }
+    // Вызывается из snegopat.dll при выходе из выполнения скрипта
+    void leave() {
+        oneAddinMgr.leaveAddinRun(this);
+    }
+
     void _unload() {
         &&selfScript.__addin = null;
         script.stop();
@@ -122,7 +129,7 @@ class ScriptLoader : AddinLoader {
         // Теперь надо получить уникальное имя и т.п.
         string uName = fullPath.extract(extractFileNameRex), dName, engine;
         array<array<any>&&> connectedAddins;
-        bool noDebug = false;
+        bool attachDebuger = true;
 
         for (uint it = 0; it < tags.length; it++) {
             string tag = tags[it][0], val = tags[it][1];
@@ -134,7 +141,7 @@ class ScriptLoader : AddinLoader {
             else if (tag == "dname")
                 dName = val;
             else if (tag == "nodebug" || (tag == "debug" && val == "no"))
-                noDebug = true;
+                attachDebuger = false;
             else if (tag == "addin") {
                 array<string>&& tail = val.split(whiteSpaceRex);
                 if (tail.length > 0) {
@@ -177,13 +184,13 @@ class ScriptLoader : AddinLoader {
         AddinScript ads(uName, dName, fullPath);
         &&ads.__loader = this;
         ActiveScript&& script = ads._script();
-        //noDebug = false;
         if (engine == "JScript" && firstLine > 0) {
             source.replace("(this && this.__extends) ||", "");
+            // Функцию require добавляем как переменную, потому что в stdlib она потом меняется на другую реализацию
             source.insert(0, "var exports=SelfScript.self;var require=function(s){return builtin_require(s);};\n");
             firstLine--;
         }
-        if (script.prepare(engine, source, firstLine, noDebug ? "" : uName, ads) != 0)
+        if (script.prepare(engine, source, firstLine, uName, attachDebuger, ads) != 0)
             return null;
         ads._connectSelf();
         // Подключим аддины, которые скрипт просил

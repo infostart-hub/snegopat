@@ -155,15 +155,16 @@ class IV8Form {
         }
         uint ctrlCount = form.controlsCount();
         uint ctrlID = uint(-1);
+        string ctrlName = "-";
         if (IdxOrCode.vt == VT_BSTR) {
-            string name = stringFromAddress(IdxOrCode.dword);
-            if (!name.isEmpty()) {
+            ctrlName = stringFromAddress(IdxOrCode.dword);
+            if (!ctrlName.isEmpty()) {
                 for (uint i = 0; i < ctrlCount; i++) {
                     uint idc = form.getControlID(i);
                     IFormCtrl&& fctrl;
                     form.getControl(fctrl, idc, IID_IFormCtrl);
                     //Print("i=" + i + " idc=" + idc + " ctrl=" + (fctrl is null ? 0 : fctrl.self));
-                    if (fctrl !is null && name == fctrl.getCode().str) {
+                    if (fctrl !is null && ctrlName == fctrl.getCode().str) {
                         ctrlID = idc;
                         break;
                     }
@@ -173,6 +174,7 @@ class IV8Form {
             if (IdxOrCode.vt != VT_UI4)
                 IdxOrCode.changeType(VT_UI4);
             if (IdxOrCode.vt == VT_UI4) {
+                ctrlName = IdxOrCode.dword;
                 if (IdxOrCode.dword < ctrlCount)
                     ctrlID = form.getControlID(IdxOrCode.dword);
                 else if (uint(-1) == IdxOrCode.dword)
@@ -180,7 +182,7 @@ class IV8Form {
             }
         }
         if (uint(-1) == ctrlID) {
-            setComException("Элемент управления не найден");
+            setComException("Элемент управления не найден: " + ctrlName);
             return null;
         }
         return _getControl(ctrlID);

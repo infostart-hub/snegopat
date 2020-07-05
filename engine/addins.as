@@ -106,6 +106,7 @@ class AddinMgr {
     private array<Addin&&> addins;
     private NoCaseMap<Addin&&> mapUniqueName;
     private NoCaseMap<Addin&&> mapFullPath;
+    private array<Addin&&> runnedAddins;
     // Корневая группа
     AddinGroup _root;
     AddinGroup&& _libs;
@@ -253,6 +254,15 @@ class AddinMgr {
             return false;
         }
         return addin.__loader.canUnload(addin);
+    }
+    void enterInAddinRun(Addin&& addin) {
+        runnedAddins.insertLast(addin);
+        activeAddin = addin.get_uniqueName();
+    }
+    void leaveAddinRun(Addin&& addin) {
+        if (runnedAddins.length > 0 && runnedAddins[runnedAddins.length - 1] is addin)
+            runnedAddins.removeLast();
+        activeAddin = runnedAddins.length > 0 ? runnedAddins[runnedAddins.length - 1].get_uniqueName() : "";
     }
 };
 

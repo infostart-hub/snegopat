@@ -457,8 +457,6 @@ class TextWnd {
             trWindowDetach.setTrapByName("wbase83.dll", "?detach@Window@wbase@@QAEXXZ", asCALL_THISCALL, Window_DetachTrap);
             // Ставим перехват на роутинг виндовых сообщений для работы контекстной подсказки.
             trDispatchMsg.setTrapByName("wbase83.dll", "?dispatch_msg@wbase@@YAXABUtagMSG@@PAVIMsgDispHook@1@@Z", asCALL_CDECL, DispatchMessagesTrap);
-            // Получим хэндл основного окна
-            hRealMainWnd = FindWindow("V8TopLevelFrame".cstr, 0);
         }
     #endif
 
