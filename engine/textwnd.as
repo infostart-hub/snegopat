@@ -354,6 +354,8 @@ class TextDoc {
     }
 };
 
+HWND hRealMainWnd;
+
 #if ver < 8.3.12
 
 HWND getHwnd(TextWnd&& tw) {
@@ -365,8 +367,6 @@ HWND getHwnd(TextWnd&& tw) {
 HWND getHwnd(TextWnd&& tw) {
     return hRealMainWnd;
 }
-
-HWND hRealMainWnd;
 
 TrapSwap trDispatchMsg;
 funcdef void FuncDispatchMessagesTrap(MSG&, int_ptr);
