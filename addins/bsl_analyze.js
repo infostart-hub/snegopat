@@ -56,14 +56,24 @@ function runAnalyses(td) {
     try {
         var tmpPath = GetTempFileName() + "\\";
         CreateDirectory(tmpPath);
-        td.Write(tmpPath + "text.bsl");
+        var fPath = tmpPath + "text.bsl";
+        td.Write(fPath);
+        if (!v8New("File", fPath).Exist()) {
+            MessageBox("Не удалось записать текст модуля во временный файл");
+            return undefined;
+        }
         var wsh = new ActiveXObject("Wscript.Shell");
         // todo - разобраться с путями с пробелами
         var cmd = '"' + pathToServer + '" -a -s ' + tmpPath + ' -o ' + tmpPath + ' -r json';
         //Message(cmd);
         wsh.Run(cmd, 1, 1);
+        fPath = tmpPath + "bsl-json.json";
+        if (!v8New("File", fPath).Exist()) {
+            MessageBox("Файл с результатом работы не найден");
+            return undefined;
+        }
         td = v8New("TextDocument");
-        td.Read(tmpPath + "bsl-json.json", TextEncoding.UTF8);
+        td.Read(fPath, TextEncoding.UTF8);
         DeleteFiles(tmpPath);
         return JSON.parse(td.GetText());
     }
@@ -156,19 +166,19 @@ function CommandBarSaveClose(Кнопка) {
 function CmdBarOpenSettings(Кнопка) {
     openFormSettings();
 }
-function msgListВыбор(Элемент, ВыбраннаяСтрока, Колонка, СтандартнаяОбработка) {
+function activateLastTextView() {
     if (!parsedTextWindow || !parsedTextWindow.isAlive) {
         // Закрыли окно, попробуем восстановить
         if (mdObjId != '') {
             var mdObj = mdCont.findByUUID(mdObjId);
             if (!mdObjId) {
                 MessageBox("Не удалось найти объект метаданных");
-                return;
+                return false;
             }
             parsedTextWindow = mdObj.openModule(mdPropId);
             if (!parsedTextWindow) {
                 MessageBox("Не удалось открыть модуль метаданных");
-                return;
+                return false;
             }
         }
         else {
@@ -179,12 +189,12 @@ function msgListВыбор(Элемент, ВыбраннаяСтрока, Ко�
                     parsedTextWindow = tw;
                 else {
                     MessageBox("Не удалось открыть файл " + filePath);
-                    return;
+                    return false;
                 }
             }
             else {
                 MessageBox("Неизвестно, какой файл открывать");
-                return;
+                return false;
             }
         }
         lastView = windows.getActiveView();
@@ -192,6 +202,11 @@ function msgListВыбор(Элемент, ВыбраннаяСтрока, Ко�
     else {
         lastView.activate();
     }
+    return true;
+}
+function msgListВыбор(Элемент, ВыбраннаяСтрока, Колонка, СтандартнаяОбработка) {
+    if (!activateLastTextView())
+        return;
     var range = /(\d+):(\d+) - (\d+):(\d+)/.exec(ВыбраннаяСтрока.val.Позиция);
     var startLine = parseInt(range[1]), startCol = parseInt(range[2]), endLine = parseInt(range[3]), endCol = parseInt(range[4]);
     parsedTextWindow.setCaretPos(startLine, startCol);
