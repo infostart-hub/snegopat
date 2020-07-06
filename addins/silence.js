@@ -83,6 +83,22 @@ logger.debug("onMessageBox param.text" + param.text);
         return;
     }
 	
+	if (DebugModeHelper._instance && DebugModeHelper._instance.settings.current.use) {
+		if (param.text == "Приложение запущено. Перезапустить?") {
+			DebugModeHelper._instance.first = true;
+			param.result = mbaYes;
+			param.cancel = true;
+			Message(param.text);
+			return;
+		// } else if(text == "Редактируемая конфигурация отличается от конфигурации базы данных.\nОбновить конфигурацию базы данных?" && this.first) {
+		} else if(param.text.indexOf("отличается от конфигурации базы данных.\nОбновить конфигурацию базы данных?") != -1 && DebugModeHelper._instance.first) {
+			DebugModeHelper._instance.first = false;
+			param.result = mbaNo;
+			param.cancel = true;
+			Message(param.text);
+			return;
+		}
+	}
 }
 // Перехватываем модальное окошко и если в первом контроле в тексте содержиться 
 // фраза "При проверке модуля обнаружены ошибки!" тогда подавляем данно сообщение с выводом в трее неблокируюещего 
