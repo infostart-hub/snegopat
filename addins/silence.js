@@ -93,7 +93,7 @@ logger.debug("onMessageBox param.text" + param.text);
 		// } else if(text == "Редактируемая конфигурация отличается от конфигурации базы данных.\nОбновить конфигурацию базы данных?" && this.first) {
 		} else if(param.text.indexOf("отличается от конфигурации базы данных.\nОбновить конфигурацию базы данных?") != -1 && DebugModeHelper._instance.first) {
 			DebugModeHelper._instance.first = false;
-			param.result = mbaNo;
+			param.result = mbaYes;
 			param.cancel = true;
 			Message(param.text);
 			return;
