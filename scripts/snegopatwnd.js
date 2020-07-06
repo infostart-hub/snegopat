@@ -878,6 +878,9 @@ var UpdatePage = /** @class */ (function () {
             td.Write(this.ntlmIni);
         }
         this.fillRepoList();
+        this.updateVersionInfo();
+    };
+    UpdatePage.prototype.updateVersionInfo = function () {
         this.form.VersionsForReport = "[" + env.sVersion + " | " + env.v8Version + " | " + (this.lastLocalDate.toLocaleDateString() + " " + this.lastLocalDate.toLocaleTimeString()) + "]";
     };
     UpdatePage.prototype.enter = function () {
@@ -1124,6 +1127,7 @@ var UpdatePage = /** @class */ (function () {
                 }
             }
             this.fillRepoList();
+            this.updateVersionInfo();
         }
     };
     UpdatePage.prototype.handlerCmdBarUpdatebtnDownloadSnegopat = function () {

@@ -900,6 +900,9 @@ class UpdatePage implements Page {
 			td.Write(this.ntlmIni);
 		}
 		this.fillRepoList();
+		this.updateVersionInfo();
+	}
+	updateVersionInfo() {
 		this.form.VersionsForReport = `[${env.sVersion} | ${env.v8Version} | ${this.lastLocalDate.toLocaleDateString() + " " + this.lastLocalDate.toLocaleTimeString()}]`;
 	}
 	enter() {
@@ -1131,6 +1134,7 @@ class UpdatePage implements Page {
 				}
 			}
 			this.fillRepoList();
+			this.updateVersionInfo();
 		}
 	}
 	handlerCmdBarUpdatebtnDownloadSnegopat() {
