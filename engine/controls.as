@@ -360,7 +360,7 @@ bool onFrameViewInitialUpdate_trap(IFramedView& pView) {
 void onFrameViewFinalOpen_trap(IFramedView& pView) {
     ModalDialogInfo&& info = mapDialogsToInfo.find(pView.self).value;
     info.originals.real_fo(pView);
-  #if ver < 8.3.16.1359
+  #if ver < 8.3.16.1359 & ver != 8.3.15.1958
     info.doFinalOpen();
   #else
     idleHandlersSingle.insertLast(PVV(info.doFinalOpen));
