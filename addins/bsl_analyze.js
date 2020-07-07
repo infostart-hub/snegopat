@@ -64,7 +64,7 @@ function runAnalyses(td) {
         }
         var wsh = new ActiveXObject("Wscript.Shell");
         // todo - разобраться с путями с пробелами
-        var cmd = '"' + pathToServer + '" -a -s ' + tmpPath + ' -o ' + tmpPath + ' -r json';
+        var cmd = '"' + pathToServer + '" -a -s ' + tmpPath + ' -w ' + tmpPath + ' -o ' + tmpPath + ' -r json';
         //Message(cmd);
         wsh.Run(cmd, 1, 1);
         fPath = tmpPath + "bsl-json.json";
