@@ -96,6 +96,12 @@ export var ProfileExchanger = (function () {
 
 export function applyKeysFromValueTable(vt: ValueTable): void {
     hotkeys.clearAll();
+    // Открытие окна Снегопата всегда на Ctrl+Shift+M
+    if (!vt.Найти('SnegopatMainScript::Открыть окно Снегопата', "Команда")) {
+        var row = <HKRow><any>vt.Вставить(0);
+        row.Команда = 'SnegopatMainScript::Открыть окно Снегопата';
+        row.СочетаниеКлавиш = "Ctrl + Shift + M";
+    }
     // Окошко макросов должно быть всегда
     if (!vt.Найти('SnegopatMainScript::ВыбратьИВыполнитьМакрос', "Команда")) {
         var row = <HKRow><any>vt.Вставить(0);

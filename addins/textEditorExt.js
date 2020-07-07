@@ -25,10 +25,8 @@ COMMENT:
 OnPressDeleteInComment предназначены для более удобного редактирования 
 многострочных комментариев. Вызываются неявно при нажатии соответствующих 
 клавиш.
-
-   4. Макрос Удалить строку. Удаляет целиком строку, где находится курсор. Горячие клавиши Ctrl + Y.
    
-   5. Макросы Переместить строку вниз/Переместить строку вверх. Меняет 
+   4. Макросы Переместить строку вниз/Переместить строку вверх. Меняет 
 местами строку, где находится курсор со строкой ниже/выше без 
 использования буфера обмена.
 
@@ -39,7 +37,7 @@ global.connectGlobals(SelfScript);
 stdlib.require('TextWindow.js', SelfScript);
 
 function getPredefinedHotkeys(predef){
-    predef.setVersion(13);
+    predef.setVersion(14);
     stdlib.getAllPredefHotKeys(SelfScript.self, predef);
     
     predef.add("НайтиВыделенныйТекстВниз", "Ctrl + Down");
@@ -57,11 +55,8 @@ function getPredefinedHotkeys(predef){
     predef.add("Установить кавычки 2", "Shift + '");
     predef.add("Установить скобки", "Shift + 9");
     predef.add("Установить скобки 2", "Shift + 0");
-    //<gigabyte-artur@mail.ru 23.03.2017
-    predef.add("Удалить строку", "Ctrl + Y");
     predef.add("Переместить строку вниз", "Ctrl + Shift + Down");
     predef.add("Переместить строку вверх", "Ctrl + Shift + Up");
-    //gigabyte-artur@mail.ru 23.03.2017>
 }
 
 function macrosНайтиВыделенныйТекстВниз(){
@@ -108,7 +103,7 @@ SelfScript.Self['macrosПреобразовать регистр: ПРОПИСН
     return processSelectedText(function(selText){ return selText.toUpperCase(); });
 }
 
-SelfScript.Self['macrosУдалить строку'] = function() 
+SelfScript.Self['macrosУдалить строку(уст)'] = function() 
 {
     var w = GetTextWindow();
     if (!w || w.IsReadOnly() || windows.modalMode != msNone) 
