@@ -1,7 +1,7 @@
 //engine: JScript
 //uname: alteditors
 //dname: Настройка альтернативных редакторов
-//debug: yes
+//debug: no
 //descr: Скрипт для выбора текстовых редакторов
 //author: orefkov
 //help: inplace

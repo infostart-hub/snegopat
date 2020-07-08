@@ -1,7 +1,7 @@
 ﻿//engine: JScript
 //uname: scintilla
 //dname: Редактор Scintilla
-//debug: yes
+//debug: no
 //descr: Скрипт для настройки редактора Scintilla
 //author: orefkov
 //help: inplace

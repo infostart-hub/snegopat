@@ -41,7 +41,7 @@ stdlib.createMacros(SelfScript.self, "ВыбратьИВыполнитьМакр
         };
     })(textBefore, textAfter, activateHint), hotKey);
     return arguments.callee;
-})("<", "", "Alt + ,")(">", "", "Alt + .")("@", "", "Alt + 2")("#", "", "Alt + 3", true)("$", "", "Alt + 4")("^", "", "Alt + 6")("&", "", "Alt + 7", true)("Null", "", "Alt + N")("~", "", "Alt + ~")("[", "]", "Alt + [")("{", "}", "Alt + Shift + [")("]", "", "Alt + ]")("}", "", "Alt + Shift + ]")("'", "'", "Alt + '")('"', '"', "Alt + Shift + '")("=", "", "Alt + =");
+})("<", "", "Alt + ,")(">", "", "Alt + .")("@", "", "Alt + 2")("#", "", "Alt + 3", false)("$", "", "Alt + 4")("^", "", "Alt + 6")("&", "", "Alt + 7", false)("Null", "", "Alt + N")("~", "", "Alt + ~")("[", "]", "Alt + [")("{", "}", "Alt + Shift + [")("]", "", "Alt + ]")("}", "", "Alt + Shift + ]")("'", "'", "Alt + '")('"', '"', "Alt + Shift + '")("=", "", "Alt + =");
 stdlib.createMacros(SelfScript.self, "Разработка\\Сдампить SnegAPI в snegopat.d.ts", "Сформировать файл описания SnegAPI в формате TypeScript", undefined, function () {
     develop.dumpSnegApiToDts();
     MessageBox("Готово");
