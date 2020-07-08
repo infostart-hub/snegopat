@@ -46,6 +46,7 @@ uint maxHotOrderItems() {
 // Какие языки использовать
 enum UseLangFlags{ useLangEng = 1, useLangRus = 2 };
 uint useLangs = useLangRus;
+bool insertOnDot = true;
 
 OptionsEntry oeUseLangs("UseLangs", function(v){v = uint(useLangRus); },
     function(v) {Numeric n; v.getNumeric(n); useLangs = n; },
@@ -58,6 +59,10 @@ OptionsEntry oeListWidth("ListWidth", function(v){v = 250; },
 OptionsEntry oeAllowMultyFilter("AllowFilterInSmartList", function(v){v = true; },
     function(v){v.getBoolean(allowMultyFilter); },
     function(v){v.getBoolean(allowMultyFilter); return false; });
+
+OptionsEntry oeInsertTextOnDot("InsertTextOnDot", function(v){v = true; },
+    function(v){v.getBoolean(insertOnDot); },
+    function(v){v.getBoolean(insertOnDot); return false; });
 
 funcdef void AfterSelect(bool bCancel);
 
@@ -199,6 +204,7 @@ class IntelliSite : SmartBoxSite {
         textWnd.editor.getFontSize(fontSize);
     }
 
+    array<SmartBoxItem&&>&& currentList;
     // Метод фильтрует существующие элементы, создавая массив с удовлетворяющему фильтру элементами
     array<SmartBoxItem&&>&& filter() {
         if (smartBox.hwnd != 0)
@@ -233,6 +239,7 @@ class IntelliSite : SmartBoxSite {
             }
         }
         sortItemsArray(result, boxIsUnderLine);
+        &&currentList = result;
         return result;
     }
 
@@ -336,6 +343,20 @@ class IntelliSite : SmartBoxSite {
                 hideAndSend(WM_CHAR, wParam, lParam);
                 return;
             }
+        } else if ('.' == symbol && insertOnDot) {
+            TextWnd&& tw = textWnd;
+            onDoSelect(currentList[smartBox.currentIdx]);
+            if (!isActive()) {
+                TextPosition caret;
+                tw.ted.getCaretPosition(caret);
+                string lastChar = getTextLine(tw.textDoc.tm, caret.line).substr(0, caret.col - 1).substr(-1);
+                if (lastChar != ".") {
+                    PostMessage(getHwnd(tw), WM_CHAR, '.', 0);
+                    //tw.ted.setSelectionText(".");
+                    //show(tw, "");
+                }
+            }
+            return;
         }
         string text;
         text.insert(0, symbol);
