@@ -114,6 +114,9 @@
 		IMDObject@+ child(const Guid& childMdKind, const Guid& id)
 		IMDObject@+ childAt(const Guid& childMdKind, uint index)
 		+9
+	 #if ver = 8.3.9.2309
+	   +1
+	 #endif
 	 #if ver >= 8.3.10.2639
 		+1
 	#endif
@@ -145,7 +148,7 @@
 		50
 	  #elif ver <8.3.7.1759
 	    54
-	  #elif ver = 8.3.10.2772 | ver = 8.3.10.2639
+	  #elif ver = 8.3.10.2772 | ver = 8.3.10.2639 | ver = 8.3.9.2309
 	    56
 	  #elif ver < 8.3.11
 		55
