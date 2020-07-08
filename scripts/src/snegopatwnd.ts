@@ -811,7 +811,7 @@ class HotkeysPage implements Page {
 		}
 	}
 	getCommandDescr(row: HKRow) {
-		if (row.RealCmd) {
+		if (row.RealCmd && typeof(row.RealCmd) == "string") {
 			var info = { picture: undefined, hotkey: "", descr: "" };
 			var cmd: string[] = row.RealCmd.split("::");
 			var a = addins.byUniqueName(cmd[0]);
