@@ -41,6 +41,7 @@ class Designer {
     Develop&&			_develop;
     EnvironmentData&&	_env;
     CommandService&&	_cmdService;
+    WinApi&&            _winApi;
     //IV8Debugger     _v8debug;
     
     Designer() {
@@ -56,6 +57,7 @@ class Designer {
         &&_develop = Develop();
         &&_env = EnvironmentData();
         &&_cmdService = CommandService();
+        &&_winApi = WinApi();
         //dumpVtable(&&getBkEndUI());
         // Инициализирем всякую всячину
         setTrapOnComExportCount();

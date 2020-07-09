@@ -111,3 +111,12 @@ enum CodePages {
     CP_UTF7        = 65000,       // UTF-7 translation
     CP_UTF8        = 65001,       // UTF-8 translation
 };
+
+class WinApi {
+    HWND getFocus() {
+        return GetFocus();
+    }
+    LRESULT sendMessage(HWND hWnd, UINT message, WPARAM w, LPARAM l) {
+        return SendMessage(hWnd, message, w, l);
+    }
+};

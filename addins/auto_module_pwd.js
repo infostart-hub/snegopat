@@ -109,9 +109,12 @@ function onIdle() {
         // Попробуем ввести пароль, если еще не пробовали
         if (!processedViews[view.id]) {
             processedViews[view.id] = true
-            new ActiveXObject("WScript.Shell").SendKeys(savedPassword.replace(/[\+\^\%\~\(\)\{\}\[\]]/g, "{$&}") + "~");
+            var hwnd = winApi.GetFocus();
+            for(var i = 0; i < savedPassword.length; i++)
+                winApi.sendMessage(hwnd, WM_CHAR, savedPassword.charCodeAt(i), 0);
+			winApi.sendMessage(hwnd, WM_KEYDOWN, 13, 0);
             if (profileRoot.getValue(pflShowMessage))    // Информируем пользователя, если он хочет
-                Message("Введен пароль на модуль")
+                Message("Введен пароль на модуль");
         }
     }
 }
