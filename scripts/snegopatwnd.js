@@ -632,7 +632,8 @@ var SettingsPage = /** @class */ (function () {
             InsertTextOnDot: new Param("InsertTextOnDot"),
             UseLangs: new ParamFlags("фАнглийский", "фРусский"),
             EnableBkColorForMultyLine: new Param("EnableBkColorForMultyLine"),
-            MultiLineBackground: new ParamColor("ЦветФонаМногострочныхСтрок")
+            MultiLineBackground: new ParamColor("ЦветФонаМногострочныхСтрок"),
+            GroupMultiLine: new Param("GroupMultiLine")
         };
     }
     SettingsPage.prototype.connect = function (form) {

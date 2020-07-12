@@ -64,8 +64,11 @@ stdlib.createMacros(SelfScript.self, "Перейти вперёд", "Перей�
 stdlib.createMacros(SelfScript.self, "ПоказатьВыпадающийСписокСнегопата", "Принудительно вызвать список снегопата, всё перепарсив", stdcommands.Config.SyntaxHelper.info.picture, function () { return snegopat.showSmartBox(); }, "Ctrl+Alt+Space");
 function replaceSelInTxtWnd(textBefore, textAfter, activateHint) {
     var txtWnd = snegopat.activeTextWindow();
-    if (!txtWnd)
+    if (!txtWnd) {
+        if (textBefore.length == 1 && !textAfter)
+            winApi.sendMessage(winApi.getFocus(), WM_CHAR, textBefore.charCodeAt(0), 0);
         return false;
+    }
     var oldText = txtWnd.selectedText;
     var newText = textBefore;
     if (textAfter.length)

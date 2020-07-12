@@ -124,8 +124,11 @@ stdlib.createMacros(SelfScript.self, "ПоказатьВыпадающийСпи
 
 function replaceSelInTxtWnd(textBefore: any, textAfter: string, activateHint: any) {
     var txtWnd = snegopat.activeTextWindow()
-    if (!txtWnd)
+    if (!txtWnd) {
+        if (textBefore.length == 1 && !textAfter)
+            winApi.sendMessage(winApi.getFocus(), WM_CHAR, textBefore.charCodeAt(0), 0);
         return false
+    }
     var oldText = txtWnd.selectedText
     var newText = textBefore
     if (textAfter.length)

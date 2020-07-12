@@ -35,24 +35,30 @@ OptionsEntry oeEnableCustomGrouping("EnableCustomGrouping", function(v) {v = tru
     function(v){v.getBoolean(usersGrouping); initGroupingAndColoring(); return false; });
 
 // Раскрашивать мульти-строки в цвета запросов.
-bool colorizedMultyLines;
+bool colorizedMultiLines;
 OptionsEntry oeQueryColors("QueryColors", function(v) {v = true; },
-    function(v){v.getBoolean(colorizedMultyLines); },
-    function(v){v.getBoolean(colorizedMultyLines); initGroupingAndColoring(); return false; });
+    function(v){v.getBoolean(colorizedMultiLines); },
+    function(v){v.getBoolean(colorizedMultiLines); initGroupingAndColoring(); return false; });
 
 // Менять фон для мульти-строк при раскраске в цвета запроса.
-bool enableBkColorForMultyLine;
+bool enableBkColorForMultiLine;
 OptionsEntry oeEnableBkColorForMultyLine("EnableBkColorForMultyLine", function(v) {v = true; },
-    function(v){v.getBoolean(enableBkColorForMultyLine); },
-    function(v){v.getBoolean(enableBkColorForMultyLine); initGroupingAndColoring(); return false; });
+    function(v){v.getBoolean(enableBkColorForMultiLine); },
+    function(v){v.getBoolean(enableBkColorForMultiLine); initGroupingAndColoring(); return false; });
 
 // Цвет фона для мульти-строк при смене фона при их раскраске в цвета запроса.
-uint colorBgForMultyLine = 0xE0E0E0;
-OptionsEntry oeMultiLineBackground("MultiLineBackground", &&defvalBgColorForMultyLine,
-    function(v){colorFromV8(v, colorBgForMultyLine); },
-    function(v){colorFromV8(v, colorBgForMultyLine); return false; });
+uint colorBgForMultiLine = 0xE0E0E0;
+OptionsEntry oeMultiLineBackground("MultiLineBackground", &&defvalBgColorForMultiLine,
+    function(v){colorFromV8(v, colorBgForMultiLine); },
+    function(v){colorFromV8(v, colorBgForMultiLine); return false; });
 
-void defvalBgColorForMultyLine(Value& val) {
+// Сворачивать многострочные литералы.
+bool groupMultiLine = true;
+OptionsEntry oeGroupMultiLine("GroupMultiLine", function(v) {v = true; },
+    function(v){v.getBoolean(groupMultiLine); },
+    function(v){v.getBoolean(groupMultiLine); initGroupingAndColoring(); return false; });
+
+void defvalBgColorForMultiLine(Value& val) {
     IV8Color&& clr;
     currentProcess().createByClsid(V8Color, IID_IV8Color, clr);
     Color c(0xE0, 0xE0, 0xE0);
@@ -80,7 +86,7 @@ int bgColorTrapType = 0;
 // Инициализация перехвата
 bool initGroupingAndColoring() {
     getEventService().notify(eTxtEdtOptionChanged);
-    if (!usersGrouping && !colorizedMultyLines) {
+    if (!usersGrouping && !colorizedMultiLines) {
         // Не нужны ни группировки, ни раскраска запросов
         // Поверим, если перехваты уже установлены, снимем их
         if (trITextExtColors_getColors.state == trapEnabled)
@@ -112,8 +118,8 @@ bool initGroupingAndColoring() {
     } else if (trITextExtColors_getColors.state == trapDisabled)
         trITextExtColors_getColors.swap();
     // Если включена раскраска строк в цвета запросов, надо разобраться с фоном
-    if (colorizedMultyLines) {
-        if (enableBkColorForMultyLine) {
+    if (colorizedMultiLines) {
+        if (enableBkColorForMultiLine) {
             // Надо устанавливать или восстанавливать перехват на получение фона строки
             // Для начала выясним, какой тип перехвата нужно делать
             if (bgColorTrapType == 0) {	// Еще не выясняли, надо узнать
@@ -179,26 +185,32 @@ void ITextExtColors_getColorsTrap(ITextExtColors& pThis, const v8string& sourceL
     SyntaxItemInfoRef&& sInfo = toSyntaxItemInfo(infos.start);
     if (usersGrouping && checkForGroupingRemark(srcLine, infos))
         return;
-    if (!colorizedMultyLines)
+    if (!colorizedMultiLines && !groupMultiLine)
         return;
     // Дополнительно парсить языком запросов будем, если первый токен - строковая константа, начинающаяся с |,
     // либо последний токен - открытая строковая константа
     if (!((vlString == sInfo.ref.lexemCategory && '|' == srcLine[sInfo.ref.start])
         || isLineEndWithOpenQuote(srcLine)))
         return;
-    // распарсим дополнительно все строковые константы в строке текста языком запросов
-    uint newCount;
-    array<SQLBlockInfo&&>&& newBlocks = parseQuoteLexemAsSQL(srcLine, infos, newCount);
-    // Теперь все полученные блоки нужно слить в один вектор
-    infos.dtor();
-    uint pWrite = infos.allock(newCount, SyntaxItemInfo_size);
-    for (uint idx = 0, m = newBlocks.length; idx < m; idx++) {
-        SQLBlockInfo&& pBlock = newBlocks[idx];
-        uint size = pBlock.tokens.size();
-        if (size != 0) {
-            mem::memcpy(pWrite, pBlock.tokens.start, size);
-            pWrite += size;
+    if (colorizedMultiLines) {
+        // распарсим дополнительно все строковые константы в строке текста языком запросов
+        // При этом если включена группировка, то там еще сгруппирует
+        uint newCount;
+        array<SQLBlockInfo&&>&& newBlocks = parseQuoteLexemAsSQL(srcLine, infos, newCount);
+        // Теперь все полученные блоки нужно слить в один вектор
+        infos.dtor();
+        uint pWrite = infos.allock(newCount, SyntaxItemInfo_size);
+        for (uint idx = 0, m = newBlocks.length; idx < m; idx++) {
+            SQLBlockInfo&& pBlock = newBlocks[idx];
+            uint size = pBlock.tokens.size();
+            if (size != 0) {
+                mem::memcpy(pWrite, pBlock.tokens.start, size);
+                pWrite += size;
+            }
         }
+    } else {
+        // Просто группировка, без раскраски
+        checkForGroupingMultiLine(srcLine, infos);
     }
 }
 
@@ -264,7 +276,7 @@ array<SQLBlockInfo&&>&& parseQuoteLexemAsSQL(const string& srcLine, Vector& toke
                 // Для него цвет фона будем менять только если он не пустой,
                 // либо первый токен в строке - |
                 if (srcLine[toSyntaxItemInfo(tokens.start).ref.start] != '|') {
-                    isBlock = groupBlockBegin;
+                    isBlock = groupMultiLine ? groupBlockBegin : bmNone;
                     blockKind = groupBlockKind;
                     if (sInfo.ref.len == 1 ||
                         srcLine.substr(sInfo.ref.start + 1, sInfo.ref.len - 1).trim().isEmpty()) {
@@ -273,10 +285,10 @@ array<SQLBlockInfo&&>&& parseQuoteLexemAsSQL(const string& srcLine, Vector& toke
                 }
             }
             if (withoutBegin && !withoutEnd && !isLineEndWithOpenQuote(srcLine)) {
-                isBlock = groupBlockEnd;
+                isBlock = groupMultiLine ? groupBlockEnd : bmNone;
                 blockKind = groupBlockKind;
             }
-            if (enableBkColorForMultyLine && needChangeBG) {
+            if (enableBkColorForMultiLine && needChangeBG) {
                 sCopy.ref.color.value.uuid.data1 = bgMagic;
                 sCopy.ref.color.value.uuid.data2 = withoutEnd ? 777 : sInfo.ref.len - 2;
             }
@@ -324,6 +336,39 @@ array<SQLBlockInfo&&>&& parseQuoteLexemAsSQL(const string& srcLine, Vector& toke
     }
     return sqlBlocks;
 }
+
+// Проверка на группирующий комментарий
+void checkForGroupingMultiLine(const string& srcLine, Vector& infos) {
+    if (infos.start > 0) {
+        SyntaxItemInfoRef&& sInfo = toSyntaxItemInfo(infos.start);
+        while (sInfo < infos.end) {
+            bool needProcess = false, withoutBegin, withoutEnd;
+            if (vlString == sInfo.ref.lexemCategory) {
+                withoutBegin = srcLine[sInfo.ref.start] == '|';
+                withoutEnd = isLineEndWithOpenQuote(srcLine.substr(sInfo.ref.start, sInfo.ref.len));
+                if ((withoutBegin || withoutEnd) /*&& !(sInfo.ref.len == 2 && !withoutEnd)*/)
+                    needProcess = true;
+            }
+            if (needProcess) {
+                BlockMarker isBlock = bmNone;
+                if (withoutEnd && !withoutBegin) {
+                    if (srcLine[toSyntaxItemInfo(infos.start).ref.start] != '|')
+                        isBlock = groupBlockBegin;
+                }else if (withoutBegin && !withoutEnd && !isLineEndWithOpenQuote(srcLine))
+                    isBlock = groupBlockEnd;
+                if (isBlock != bmNone) {
+                    sInfo.ref.isBlock = isBlock;
+                    sInfo.ref.blockKind = groupBlockKind;
+                    sInfo.ref.blockMode = 0;
+                    sInfo.ref.lexemCategory = vlUnknown;
+                    sInfo.ref.lexemType = 999;
+                }
+            }
+            &&sInfo = sInfo + 1;
+        }
+    }
+}
+
 
 // Для хранения массивов токенов от разбора строковых литералов парсером языка запросов
 class SQLBlockInfo {
@@ -394,7 +439,7 @@ void processGetColorInfo(Vector& items, Vector& res) {
                 if (p.ref.color.value.uuid.data1 == bgMagic) {
                     ptr.ref.start = p.ref.start + 1;
                     ptr.ref.len = p.ref.color.value.uuid.data2;
-                    ptr.ref.color = colorBgForMultyLine;
+                    ptr.ref.color = colorBgForMultiLine;
                     &&ptr = ptr + 1;
                 }
                 &&p = p + 1;
