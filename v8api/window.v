@@ -368,3 +368,46 @@
   #endif
 
 :guid gMDIClientID	{33ECE94C-5FB9-4540-9B97-C874FD45AE08}
+
+
+:struct tagRECT
+:props
+	long left
+	long top
+	long right
+	long bottom
+
+#if ver >= 8.3.12
+:service Window {00000000-0000-0000-0000-000000000000}
+:dlls
+	wbase83.dll
+
+	void GetClientRect(tagRECT&)|?GetClientRect@BaseWindow@wbase@@QBEXPAUtagRECT@@@Z
+	void GetWindowRect(tagRECT&)|?GetWindowRect@BaseWindow@wbase@@QBEXPAUtagRECT@@@Z
+	int_ptr getClientRectWithoutScrollers(Rect&)|?getClientRectWithoutScrollers@Window@wbase@@QBE?AURect@core@@XZ
+	int getScrollerHeight(void)|?getScrollerHeight@Window@wbase@@QBEHXZ
+	int getScrollerWidth(void)|?getScrollerWidth@Window@wbase@@QBEHXZ
+	int_ptr getNCSize(Size&)|?getNCSize@Window@wbase@@QAE?AUSize@core@@XZ
+	void clientToWindow(Point&)|?clientToWindow@Window@wbase@@IAEXAAUPoint@core@@@Z
+	void clientToWindow(Rect&)|?clientToWindow@Window@wbase@@IAEXAAURect@core@@@Z
+	void windowToClient(Point&)|?windowToClient@Window@wbase@@IAEXAAUPoint@core@@@Z
+	void windowToClient(Rect&)|?windowToClient@Window@wbase@@IAEXAAURect@core@@@Z
+	IWindow@ getParent(void)|?getParent@BaseWindow@wbase@@UAGPAVIWindow@2@XZ
+	int_ptr getParentIntPtr(void)|?getParent@BaseWindow@wbase@@UAGPAVIWindow@2@XZ
+	int_ptr calcShadowRect(Rect&)|?calcShadowRect@BaseWindow@wbase@@QAE?AURect@core@@XZ
+	int_ptr calcInBorderRect(Rect&, Rect&)|?calcInBorderRect@Window@wbase@@IAE?AURect@core@@ABU34@@Z
+	void getWindowRects(Rect& windowRect,Rect& withoutScrollers,Rect& clientArea)|?getWindowRects@BaseWindow@wbase@@QBEXPAURect@core@@00@Z
+	int_ptr calcWindowTopRightPos(Rect& out, IWindow&, IWindow&,int,int)|?calcWindowTopRightPos@@YA?AURect@core@@PAVIWindow@wbase@@0HH@Z
+
+	IWindow@ getFirstChild(void)|?getFirstChild@BaseWindow@wbase@@UAGPAVIWindow@2@XZ
+	int_ptr getFirstChildIntPtr(void)|?getFirstChild@BaseWindow@wbase@@UAGPAVIWindow@2@XZ
+
+	int SetCaretPos(int,int)|?SetCaretPos@BaseWindow@wbase@@QAEHHH@Z
+
+:global
+:dlls
+	wbase83.dll
+
+	IWindow@ get_focus(void)|?get_focus@wbase@@YAPAVIWindow@1@XZ
+	int_ptr get_focus_int_ptr(void)|?get_focus@wbase@@YAPAVIWindow@1@XZ
+#endif

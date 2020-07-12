@@ -375,6 +375,15 @@ void DispatchMessagesTrap(MSG& msg, int_ptr p1) {
     FuncDispatchMessagesTrap&& orig;
     
     if (activeTextWnd !is null) {
+        if (msg.message == WM_KEYDOWN || msg.message == WM_KEYUP || msg.message == WM_SYSKEYDOWN || msg.message == WM_SYSKEYUP || msg.message == WM_CHAR) {
+            if (activeTextWnd.editor.dispatchMessage(msg, p1)) {
+                TranslateMessage(msg);
+                return;
+            }
+        }
+    }
+
+    if (activeTextWnd !is null) {
         if (msg.message == WM_KEYDOWN || msg.message == WM_SYSKEYDOWN) {
             if (activeTextWnd.onKeyDown(msg.wParam, msg.lParam))
                 return;
@@ -399,11 +408,17 @@ void DispatchMessagesTrap(MSG& msg, int_ptr p1) {
 TrapVirtualStdCall trFrameViewActivate;
 funcdef void FuncTextWnd_Activate(IFramedView&& view, ActivateType action, IFramedView&& otherView);
 void TextWnd_Activate(IFramedView&& view, ActivateType action, IFramedView&& otherView) {
-    if (action == atDeactivate)
+    if (action == atDeactivate) {
+        if (activeTextWnd !is null) {
+            activeTextWnd.onDeactivate();
+        }
         &&activeTextWnd = null;
-    else if (action == atActivate) {
+    } else if (action == atActivate) {
         IWindowView&& wv = view.unk;
         &&activeTextWnd = textDocStorage.find(wv.hwnd());
+        if (activeTextWnd !is null) {
+            activeTextWnd.onActivate();
+        }
     }
     FuncTextWnd_Activate&& orig;
     trFrameViewActivate.getOriginal(&&orig);
@@ -512,11 +527,18 @@ class TextWnd {
         return iwnd;
     }
     void onDestroy() {
+        editor.onDestroy();
         if (textDoc !is null)
             textDoc.detachView(this);
         if (iwnd !is null)		 // Если есть скриптовая обёртка
             iwnd._disconnect();  // отвяжемся от неё
         &&ted = null;
+    }
+    void onActivate() {
+        editor.onActivate();
+    }
+    void onDeactivate() {
+        editor.onDeactivate();
     }
 };
 
@@ -562,6 +584,12 @@ class TextEditorWindow {
     uint getTextWidth(const string& text, const Size& fontSize) {
         return fontSize.cx * text.length;
     }
+    void onActivate() {}
+    void onDeactivate() {}
+    void onDestroy() {}
+    bool dispatchMessage(MSG& msg, int_ptr p1) {
+        return false;
+    }
 };
 
 // Интерфейс получателя уведомлений об изменениях в тексте документа
@@ -590,6 +618,7 @@ interface EditorInfo {
     void activate();				// Вызывается при назначении этого типа редактора активным
     void doSetup();					// Вызов настройки редактора
     TextEditorDocument&& create();	// Создание редактора
+    bool supportsNewWindowSystem();
 };
 
 // Обёртка вокруг EditorInfo для работы через SnegAPI
@@ -631,6 +660,10 @@ class EditorsManager {
     void _registerEditor(EditorInfo&& editorInfo) {
     #if ver <= 8.3.12
         editors.insertLast(editorInfo);
+    #else
+        if (editorInfo.supportsNewWindowSystem()) {
+            editors.insertLast(editorInfo);
+        }
     #endif
     }
     // Подписка на изменения в окне редактора

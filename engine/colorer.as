@@ -446,6 +446,9 @@ class ScintillaInfo : EditorInfo {
     TextEditorDocument&& create() override {
         return ScintillaDocument();
     }
+    bool supportsNewWindowSystem() {
+        return false;
+    }
 
     void connectEvents() {
         oneDesigner._events.addCommandHandler("{DE680E96-5826-4E22-834D-692E307A1D9C}", 11, sciEventsHandlerDisp, "OnToggleBreakPoint"); //точка останова уст/снять    

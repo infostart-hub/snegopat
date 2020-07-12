@@ -32,13 +32,18 @@
 	0x100	WM_KEYDOWN
 	0x101	WM_KEYUP
 	0x102	WM_CHAR
+	0x103	WM_DEADCHAR
 	0x104	WM_SYSKEYDOWN
+	0x105	WM_SYSKEYUP
+	0x107	WM_SYSDEADCHAR
+	0x109	WM_UNICHAR
 	0x110	WM_INITDIALOG
 	0x111	WM_COMMAND
 	0x201	WM_LBUTTONDOWN
 	0x0204	WM_RBUTTONDOWN
 	0x214	WM_SIZING
 	0x300	EN_CHANGE
+	0x0312	WM_HOTKEY
 
 :enum WinConstants
 	17		DEFAULT_GUI_FONT
@@ -240,6 +245,8 @@
 	stdcall BOOL GetClientRect(HWND hWnd, Rect& lpRect)|GetClientRect
 	stdcall BOOL AdjustWindowRectEx(Rect& lpRect, DWORD dwStyle, BOOL bMenu, DWORD dwExStyle)|AdjustWindowRectEx
 	stdcall LONG GetWindowLong(HWND hWnd, int nIndex)|GetWindowLongW
+	stdcall LONG DefWindowProc(HWND hWnd, UINT msg, long wParam, long lParam)|DefWindowProcW
+	stdcall BOOL TranslateMessage(MSG& lpMsg)|TranslateMessage
 
 :global
 :dlls gdi32.dll
