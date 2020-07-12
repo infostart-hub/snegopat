@@ -54,9 +54,12 @@ stdlib.createMacros(SelfScript.self, "Разработка\\Переключит
     develop.cmdTrace = !develop.cmdTrace;
     MessageBox("Трассировка команд в" + (develop.cmdTrace ? "" : "ы") + "ключена", mbOK, "Снегопат", 1);
 });
-stdlib.createMacros(SelfScript.self, "Разработка\\TestCommand", "Открыть форму для исследования команд", undefined, function () {
-    stdcommands.TestForm.open();
-});
+/*stdlib.createMacros(SelfScript.self, "Разработка\\TestCommand",
+    "Открыть форму для исследования команд", undefined,
+    function () {
+        stdcommands.TestForm.open();
+    });
+*/
 stdlib.createMacros(SelfScript.self, "Открыть окно Снегопата", "Открытие основного окна Снегопата", PictureLib.НастройкаСписка, function () { addins.byUniqueName("snegopatwnd").object().openWnd(); });
 stdlib.createMacros(SelfScript.self, "Показать список методов модуля", "Открыть диалог со списком методов редактируемого модуля", stdcommands.Frntend.MDReport.info.picture, function () { snegopat.showMethodsList; }, "Ctrl + 1|Ctrl + Alt + P");
 stdlib.createMacros(SelfScript.self, "Вернуться назад", "Перейти назад по истории окон", stdcommands.Frame.GotoBack.info.picture, function () { stdcommands.Frame.GotoBack.send(); }, "Alt+Left");
@@ -84,19 +87,6 @@ function replaceSelInTxtWnd(textBefore, textAfter, activateHint) {
     if (activateHint)
         snegopat.showSmartBox();
     return true;
-}
-function newScriptForm() {
-    designScriptForm();
-    MessageBox("При сохранении новой формы скрипта обязательно указывайте расширение файла .ssf, иначе 1С зависнет!!!", mbOK | mbIconInformation, "Снегопат", 5);
-}
-function changeScriptForm() {
-    var selDlg = v8New("ДиалогВыбораФайла", РежимДиалогаВыбораФайла.Открытие);
-    selDlg.Заголовок = "Выберите файл формы скрипта";
-    selDlg.ПолноеИмяФайла = "";
-    selDlg.ПредварительныйПросмотр = false;
-    selDlg.Фильтр = "Формы скриптов (*.ssf)|*.ssf";
-    if (selDlg.Выбрать())
-        designScriptForm(selDlg.ПолноеИмяФайла);
 }
 stdlib.createMacros(SelfScript.self, "Перейти к определению", "Перейти к определению символа под курсором (аналог F12)", stdcommands.Frntend.GoToDefinition.info.picture, function () {
     if (snegopat.activeTextWindow() && windows.modalMode == msNone) {

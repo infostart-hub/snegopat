@@ -89,11 +89,12 @@ stdlib.createMacros(SelfScript.self, "Разработка\\Переключит
         MessageBox("Трассировка команд в" + (develop.cmdTrace ? "" : "ы") + "ключена", mbOK, "Снегопат", 1)
     });
 
-stdlib.createMacros(SelfScript.self, "Разработка\\TestCommand",
+/*stdlib.createMacros(SelfScript.self, "Разработка\\TestCommand",
     "Открыть форму для исследования команд", undefined,
     function () {
         stdcommands.TestForm.open();
     });
+*/
 
 stdlib.createMacros(SelfScript.self, "Открыть окно Снегопата",
     "Открытие основного окна Снегопата", (<any>PictureLib).НастройкаСписка,
@@ -144,21 +145,6 @@ function replaceSelInTxtWnd(textBefore: any, textAfter: string, activateHint: an
     if (activateHint)
         snegopat.showSmartBox();
     return true
-}
-
-function newScriptForm() {
-    designScriptForm();
-    MessageBox("При сохранении новой формы скрипта обязательно указывайте расширение файла .ssf, иначе 1С зависнет!!!", mbOK | mbIconInformation, "Снегопат", 5);
-}
-
-function changeScriptForm() {
-    var selDlg = v8New("ДиалогВыбораФайла", РежимДиалогаВыбораФайла.Открытие);
-    selDlg.Заголовок = "Выберите файл формы скрипта";
-    selDlg.ПолноеИмяФайла = "";
-    selDlg.ПредварительныйПросмотр = false;
-    selDlg.Фильтр = "Формы скриптов (*.ssf)|*.ssf";
-    if (selDlg.Выбрать())
-        designScriptForm(selDlg.ПолноеИмяФайла);
 }
 
 stdlib.createMacros(SelfScript.self, "Перейти к определению",

@@ -1068,7 +1068,7 @@ class UpdatePage implements Page {
 				this.fillRepoRow(this.localRepoRow, res);
 				var dt = new Date(res.payload.timeline[0].timestamp * 1000)
 				this.lastLocalDate = dt;
-				var a2 = (p: number) => p < 10 ? '0' : '' + p
+				var a2 = (p: number) => (p < 10 ? '0' : '') + p
 				return '' + dt.getFullYear() + '-' + a2(dt.getMonth() + 1) + '-' + a2(dt.getDate()) + '%20' + a2(dt.getHours()) + ':' + a2(dt.getMinutes()) + ':' + a2(dt.getSeconds());
 			} else {
 				this.fillRepoRow(this.localRepoRow, { payload: { timeline: [{ timestamp: 0, comment: "История локального репозитария отсутствует" }] } });
