@@ -11,6 +11,12 @@ IDispatch&& addinObj;
 
 array<TextWnd&&> synEditEditors;
 
+int WM_USER = 0x400;
+int WM_TEXTWND_CHANGED = WM_USER + 665;
+int WM_ACTIVE_CHANGED = WM_USER + 667;
+int WM_DO_DESTROY = WM_USER + 668;
+int LM_DO_RESIZE = WM_USER + 2004;
+
 class SynEditInfo : EditorInfo {
     string name() override {
         return "SynEdit";
@@ -198,11 +204,6 @@ bool synEditWndProcInitDone = false;
 int_ptr focusedWindow = 0;
 
 class SynEditEditor : TextEditorWindow, SelectionChangedReceiver {
-    int WM_USER = 0x400;
-    int WM_TEXTWND_CHANGED = WM_USER + 665;
-    int WM_ACTIVE_CHANGED = WM_USER + 667;
-    int WM_DO_DESTROY = WM_USER + 668;
-    int LM_DO_RESIZE = WM_USER + 2004;
     HWND synEditHwnd;
     HWND synEditEditorHwnd;
 
@@ -305,6 +306,14 @@ class SynEditEditor : TextEditorWindow, SelectionChangedReceiver {
         } else if (isEditorFocused()) {
             sendToEditor = true;
             SendMessage(synEditHwnd, WM_SETFOCUS, 0, 0);
+        }
+        if (sendToEditor && msg.message != WM_CHAR) {
+            if (msg.message == WM_KEYDOWN || msg.message == WM_KEYUP) {
+                if (msg.wParam == VK_APPS) {
+                    SendMessage(hRealMainWnd, WM_SETFOCUS, 0, 0);
+                    sendToEditor = false;
+                }
+            }
         }
         if (sendToEditor && (msg.message == WM_CHAR)) {
             if (synEditWindowProc(synEditEditorHwnd, msg.message, msg.wParam, msg.lParam) > 0) {
@@ -480,6 +489,10 @@ void notifyTextAreaModified(TextManager& tm, bool b, Selection&& before, Selecti
 }
 
 TrapSwap trCaretSelection;
+#if ver >= 8.3.12
+funcdef int FuncSetCaretPos(HWND w, int i1, int i2);
+TrapSwap trSetCaretPos;
+#endif
 
 void initCaretSelectionTraps() {
     if (trCaretSelection.state == trapNotActive) {
@@ -492,6 +505,14 @@ void initCaretSelectionTraps() {
     } else if (trCaretSelection.state == trapDisabled) {
         trCaretSelection.swap();
     }
+#if ver >= 8.3.12
+    if (trSetCaretPos.state == trapNotActive) {
+        string dll = "wbase83.dll";
+        trSetCaretPos.setTrapByName(dll, "?SetCaretPos@BaseWindow@wbase@@QAEHHH@Z", asCALL_THISCALL, SetCaretPos_trap);
+    } else if (trSetCaretPos.state == trapDisabled) {
+        trSetCaretPos.swap();
+    }
+#endif
 }
 
 void disableCaretSelectionTrap() {
@@ -509,3 +530,24 @@ void onSelectionRecalculateFinished_trap(TextManager& tm) {
     tm.onSelectionRecalculateFinished();
     trCaretSelection.swap();
 }
+
+#if ver >= 8.3.12
+int SetCaretPos_trap(HWND w, int i1, int i2) {
+    FuncSetCaretPos&& orig;
+
+    trSetCaretPos.getOriginal(&&orig);
+    trSetCaretPos.swap();
+    int ret = orig(w, i1, i2);
+    trSetCaretPos.swap();
+
+    for (uint idx = 0, size = synEditEditors.length; idx < size; idx++) {
+        if (synEditEditors[idx].hWnd == w) {
+            SynEditEditor&& editor = cast<SynEditEditor>(synEditEditors[idx].editor);
+            if (editor !is null) {
+                SendMessage(editor.synEditHwnd, WM_TEXTWND_CHANGED, 1, 0);
+            }
+        }
+    }
+    return ret;
+}
+#endif

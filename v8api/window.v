@@ -402,6 +402,8 @@
 	IWindow@ getFirstChild(void)|?getFirstChild@BaseWindow@wbase@@UAGPAVIWindow@2@XZ
 	int_ptr getFirstChildIntPtr(void)|?getFirstChild@BaseWindow@wbase@@UAGPAVIWindow@2@XZ
 
+	int SetCaretPos(int,int)|?SetCaretPos@BaseWindow@wbase@@QAEHHH@Z
+
 :global
 :dlls
 	wbase83.dll
