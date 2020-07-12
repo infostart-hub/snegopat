@@ -616,6 +616,7 @@ var SettingsPage = /** @class */ (function () {
     function SettingsPage() {
         this.optMap = {};
         this.params = {
+            // Название опции в движке снегопата : связь с полем формы
             EnableCustomGrouping: new Param("ПользовательскиеГруппировки"),
             QueryColors: new Param("РаскрашиватьСтроки"),
             EnableTextWork: new Param("EnableTextWork"),
@@ -628,6 +629,7 @@ var SettingsPage = /** @class */ (function () {
             QuickActivateCharsCount: new Param("СимволовДляАктивации"),
             //ParamsAutoShow: new Param("ParamsAutoShow"),
             AllowFilterInSmartList: new Param("AllowFilterInSmartList"),
+            InsertTextOnDot: new Param("InsertTextOnDot"),
             UseLangs: new ParamFlags("фАнглийский", "фРусский"),
             EnableBkColorForMultyLine: new Param("EnableBkColorForMultyLine"),
             MultiLineBackground: new ParamColor("ЦветФонаМногострочныхСтрок")
@@ -722,7 +724,7 @@ var SettingsPage = /** @class */ (function () {
         var ctrls = ['Автозамены', 'SmartEnter', 'SmartList'];
         for (var k in ctrls)
             form.ЭлементыФормы[ctrls[k]].Доступность = form.EnableTextWork;
-        ctrls = ['ШиринаСписка', 'СимволовДляАктивации', 'AllowFilterInSmartList', 'фРусский', 'фАнглийский'];
+        ctrls = ['ШиринаСписка', 'СимволовДляАктивации', 'AllowFilterInSmartList', 'фРусский', 'фАнглийский', 'InsertTextOnDot'];
         for (var k in ctrls)
             form.ЭлементыФормы[ctrls[k]].Доступность = form.SmartList;
         this.enableButtons(this.isParamChanged());

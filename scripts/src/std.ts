@@ -193,6 +193,11 @@ SelfScript.self['require'] = function(filename: string, scriptCaller, strict?:bo
     return lib.object;
 }
 
+export function ts_require(filename: string, scriptCaller, strict?: boolean) {
+    (<any>SelfScript.self).require(filename, scriptCaller, strict);
+}
+
+
 /**
  * Возвращает UUID объекта метаданных из объекта - ссылки на объект метаданных
  */

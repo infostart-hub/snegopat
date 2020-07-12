@@ -174,6 +174,10 @@ SelfScript.self['require'] = function (filename, scriptCaller, strict) {
     // require() должен вести себя как и директива $addin
     return lib.object;
 };
+function ts_require(filename, scriptCaller, strict) {
+    SelfScript.self.require(filename, scriptCaller, strict);
+}
+exports.ts_require = ts_require;
 /**
  * Возвращает UUID объекта метаданных из объекта - ссылки на объект метаданных
  */
