@@ -508,6 +508,10 @@ ExtSearch = ScriptForm.extend({
     },
         
     getWindowObject : function (view) {
+		try {
+			if (!view || !view.isAlive())
+				return null;
+		} catch(e){}
        
         if (view.mdObj && view.mdProp) 
             return new MdObject(view.mdObj, view.mdProp, view.title);
