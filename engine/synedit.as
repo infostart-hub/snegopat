@@ -28,7 +28,7 @@ class SynEditInfo : EditorInfo {
         return array<string> = {string(gTextExtModule), string(gTextExtModule1)};
     }
     void activate() override {
-        Addin&& a = oneDesigner._addins.byUniqueName("SynEditV8");
+        Addin&& a = oneDesigner._addins.byUniqueName("SynEdit");
         if (a is null)
             &&a = oneDesigner._addins.loadAddin("dll:<addins>SynEdit\\SynEditV8.dll", oneDesigner._addins._libs);
             //&&a = oneDesigner._addins.loadAddin("dll:d:\\Misha\\Projects\\Lazarus\\Snegopat\\synedit\\SynEditV8.dll", oneDesigner._addins._libs);
