@@ -665,3 +665,16 @@ void showV8Assist() {
     if ((commandState(assist) & cmdStateEnabled) != 0)
         sendCommandToMainFrame(assist);
 }
+
+#if ver >= 8.3.4
+void showV8MethodsParams() {
+    bool isAutoParams = true;
+    Value vAutoParams;
+    if (getProfileRoot().getValue("TextAssist/BracketAutoAssist", vAutoParams) &&
+        vAutoParams.getBoolean(isAutoParams) && isAutoParams) {
+        CommandID assist(cmdFrameGroup, cmdFrameShowParams);
+        if ((commandState(assist) & cmdStateEnabled) != 0)
+            sendCommandToMainFrame(assist);
+    }
+}
+#endif

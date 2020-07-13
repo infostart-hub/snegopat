@@ -533,6 +533,11 @@ mixin class MethodInsertable {
         if (!isFunction)
             text += ";";
     }
+#if ver >= 8.3.4
+    void afterInsert(TextWnd&& editor) {
+        showV8MethodsParams();
+    }
+#endif
 };
 bool compareUcaseLetters(const string& test, const string& pattern) {
     return test.extract(ucaseLetterRex).beginFrom(pattern);

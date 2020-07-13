@@ -306,7 +306,7 @@ class V8StockMethod : V8StockItemBase {
     }
 #if ver >= 8.3.4
     void afterInsert(TextWnd&& editor) {
-        sendCommandToMainFrame(CommandID(cmdFrameGroup, cmdFrameShowParams));
+        showV8MethodsParams();
     }
 #endif
 };
