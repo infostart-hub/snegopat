@@ -350,7 +350,7 @@ class IntelliSite : SmartBoxSite {
                 TextPosition caret;
                 tw.ted.getCaretPosition(caret);
                 string lastChar = getTextLine(tw.textDoc.tm, caret.line).substr(0, caret.col - 1).substr(-1);
-                if (lastChar != ".") {
+                if (is_name_symbol(lastChar[0])) {
                     PostMessage(getHwnd(tw), WM_CHAR, '.', 0);
                     //tw.ted.setSelectionText(".");
                     //show(tw, "");
