@@ -264,9 +264,29 @@ settings.LoadSettings();
     var changed = false;
     var store = getModuleProfileStore();
     // "Для Каждого Из" по СпискуЗначений
+    var deletedThemes = [];
     for (var it = new Enumerator(form.ListForProfileColors); !it.atEnd(); it.moveNext()) {
         var val = it.item();
         var vt = val.Value;
+        // В прошлой версии скрипта если пользователь выбирал "Редактировать схему", а потом закрывал окно редактора без записи,
+        // то в настройках под именем схемы вместо ТаблицыЗначений сохранялось пустое значение.
+        // В этом случае если это одна из стандартных схем, восстановим настройки по умолчанию.
+        // Иначе удалим эту схему.
+        var isVt = false;
+        try {
+            isVt = !!vt.Columns.Find("Категория");
+        }
+        catch (e) { }
+        if (!isVt) {
+            var defThemes = getDefaultThemeSettings();
+            var theme = defThemes.FindByID(val.GetID());
+            if (theme)
+                val.Value = theme.Value;
+            else
+                deletedThemes.push(val);
+            changed = true;
+            continue;
+        }
         for (var k in colorsCatgories) {
             if (!vt.Find(k, "Категория")) {
                 var row = vt.Add();
@@ -276,6 +296,8 @@ settings.LoadSettings();
             }
         }
     }
+    for (var i = 0; i < deletedThemes.length; i++)
+        form.ListForProfileColors.Delete(deletedThemes[i]);
     if (changed) {
         settings.ReadFromForm(form);
         settings.SaveSettings();
