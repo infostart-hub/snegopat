@@ -484,6 +484,9 @@ class IntelliSite : SmartBoxSite {
     bool isLineTailEmpty() {
         return getTextLine(textWnd.textDoc.tm, caretPos.line).substr(caretPos.col - 1).replace(indentRex, "").isEmpty();
     }
+    string getCurrentLine() {
+        return getTextLine(textWnd.textDoc.tm, caretPos.line);
+    }
 
     private void testForTemplate() {
         ITemplateProcessor&& tp;

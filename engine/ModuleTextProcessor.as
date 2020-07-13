@@ -420,20 +420,18 @@ class ModuleTextProcessor : TextProcessor, ModuleTextSource {
         // Теперь переберём общие модули.
         for (uint i = 0, im = rootObj.childCount(mdClassCmnModule); i < im; i++) {
             IMDObject&& obj = rootObj.childAt(mdClassCmnModule, i);
-            if (mdInfo is null || obj.id != mdInfo.object.id) {
-                Value val;
-                obj.mdPropVal(gcmIsGlobal, val);
-                bool isGlobal;
-                val.getBoolean(isGlobal);
-                if (isGlobal) {
-                    ModuleElements&& me = getModuleElementsParser(obj, gModule);
-                    me.parse();
-                    me.processParseResultForOtherModule(result, isite, methNames, propNames);
-                } else {
-                    string nameOfModule = mdObjName(obj);
-                    if (propNames.insert(nameOfModule))
-                        isite.addItem(CommonModuleItem(nameOfModule));
-                }
+            Value val;
+            obj.mdPropVal(gcmIsGlobal, val);
+            bool isGlobal;
+            val.getBoolean(isGlobal);
+            if (isGlobal) {
+                ModuleElements&& me = getModuleElementsParser(obj, gModule);
+                me.parse();
+                me.processParseResultForOtherModule(result, isite, methNames, propNames);
+            } else {
+                string nameOfModule = mdObjName(obj);
+                if (propNames.insert(nameOfModule))
+                    isite.addItem(CommonModuleItem(nameOfModule));
             }
         }
     }

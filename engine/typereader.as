@@ -48,25 +48,101 @@ class TypeNameItem : SmartBoxInsertableItem {
             }
         }
         text = d.descr;
-        if (d.descr == "Запрос")
-            text += "(\n¦);";
-        else {
-            if (hasCtorParams > 0)
-                text += "(¦)";
-            if (getIntelliSite().isLineTailEmpty())
-                text += ";";
-        }
+        if (hasCtorParams > 0)
+            text += "¦";
+        if (getIntelliSite().isLineTailEmpty())
+            text += ";";
     }
     void textForTooltip(string& text) {
         text = "Тип §" + d.descr;
     }
     void afterInsert(TextWnd&& editor) override {
-        if (d.descr == "Запрос")
-            sendCommandToMainFrame(CommandID(cmdFrntend, cmdQueryWizard));
+        if (hasCtorParams > 0) {
+            IntelliSite&& isite = getIntelliSite();
+            isite.addItem(ItemAfterType());
+            if (d.descr == "Запрос") {
+                isite.addItem(ItemAfterQueryType(0));
+                isite.addItem(ItemAfterQueryType(1));
+                isite.addItem(ItemAfterQueryType(2));
+            }
+            isite.show(editor, "");
+        }
+    }
+};
+
+class ItemAfterType : SmartBoxInsertableItem {
+    ItemAfterType() {
+        super("(...)", imgParenthesis);
+        d.hotOrder = uint(-1);
+    }
+    void textForTooltip(string& text) {
+        text = "Вставить скобки";
+    }
+    void textForInsert(string& out text) {
+        text = "(¦)";
+    }
+    void afterInsert(TextWnd&& editor) {
     #if ver >= 8.3.4
-        else if (hasCtorParams > 0)
-            sendCommandToMainFrame(CommandID(cmdFrameGroup, cmdFrameShowParams));
+        showV8MethodsParams();
     #endif
+    }
+};
+
+class ItemAfterQueryType : SmartBoxInsertableItem {
+    int type;
+    ItemAfterQueryType(int t) {
+        type = t;
+        string name = "Конструктор запроса";
+        if (type == 1)
+            name += " + Выполнить + Выбрать";
+        else if (type == 2)
+            name += " + Выполнить + Выгрузить";
+        super(name, imgParenthesis);
+        d.hotOrder = uint(-1);
+    }
+    void textForTooltip(string& text) {
+        text = "Вставить скобки и вызвать конструктор запроса";
+    }
+    void textForInsert(string& out text) {
+        if (type == 0)
+            text = "(¦)";
+        else
+            text = "(";
+        d.descr = getIntelliSite().getCurrentLine();
+    }
+    void afterInsert(TextWnd&& editor) {
+        string text;
+        string queryText = oneDesigner._snegopat.parseTemplateString("<?"", ТекстЗапроса>", "Введите запрос");
+        if (queryText.length > 0) {
+            auto res = d.descr.match(RegExp("(?i)^\\s*(\\S+)\\s*=\\s*(?:Новый|New)\\s+(?:Запрос|Query)"));
+            string varName, setParams;
+            if (res.matches > 0)
+                varName = res.text(0, 1);
+            if (type == 1) {
+                text = ");setParams\n"
+                    "varNameРезультат = varName.Выполнить();\n"
+                    "varNameВыборка = varNameРезультат.Выбрать();\n"
+                    "Пока varNameВыборка.Следующий() Цикл\n"
+                    "КонецЦикла";
+            } else if (type == 2) {
+                text = ");setParams\n"
+                    "varNameРезультат = varName.Выполнить().Выгрузить()";
+            }
+            &&res = queryText.match(RegExp("&(\\S+)"));
+            if (res.matches > 0) {
+                NoCaseMap<int> params;
+                for (uint i = 0; i < res.matches; i++) {
+                    params.insert(res.text(i, 1), 0);
+                }
+                for (auto it = params.begin(); it++; )
+                    setParams += "\nvarName.УстановитьПараметр(\"" + it.key + "\", );";
+            }
+            text.replace("setParams", setParams);
+            text.replace("varName", varName);
+            text = "\"" + queryText + "\"" + text;
+        } else
+            text += ")";
+        insertInSelection(editor.ted, editor.textDoc.tm, editor.textDoc.itm, text, true, true);
     }
 };
 
