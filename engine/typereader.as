@@ -139,7 +139,7 @@ class ItemAfterQueryType : SmartBoxInsertableItem {
             }
             text.replace("setParams", setParams);
             text.replace("varName", varName);
-            text = "\"" + queryText + "\"" + text;
+            text = "\n\"" + queryText + "\"" + text;
         } else
             text += ")";
         insertInSelection(editor.ted, editor.textDoc.tm, editor.textDoc.itm, text, true, true);
