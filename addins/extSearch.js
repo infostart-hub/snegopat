@@ -1242,7 +1242,7 @@ ExtSearchGlobal = ExtSearch.extend({
         } else {
             var activeView = activeWindow.GetView();
             var obj = this.getWindowObject(activeView);
-            if (obj!=null){
+            if (obj!=null && this.re){
                 objTitle = obj.getTitle();
                 var matches = this.re.exec(objTitle);
                 if (matches!=null){
