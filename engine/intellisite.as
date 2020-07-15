@@ -369,11 +369,14 @@ class IntelliSite : SmartBoxSite {
     }
     bool onKillFocus(HWND hNewWnd) {
         if (!bInHide) {
+        #if ver < 8.3.12
             if (hNewWnd == getHwnd(textWnd)) {
                 SetFocus(smartBox.hwnd);
                 return true;
-            } else if (hNewWnd == smartBox.hwnd)
+            } else if (hNewWnd == smartBox.hwnd) {
                 return false;
+            }
+        #endif
         }
         hide();
         return true;
