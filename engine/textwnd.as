@@ -383,6 +383,8 @@ void DispatchMessagesTrap(MSG& msg, int_ptr p1) {
         }
     }
 
+    trDispatchMsg.getOriginal(&&orig);
+    
     if (activeTextWnd !is null) {
         if (msg.message == WM_KEYDOWN || msg.message == WM_SYSKEYDOWN) {
             if (activeTextWnd.onKeyDown(msg.wParam, msg.lParam))
@@ -390,15 +392,22 @@ void DispatchMessagesTrap(MSG& msg, int_ptr p1) {
         } else if (msg.message == WM_CHAR) {
             if (activeTextWnd.beforeChar(msg.wParam))
                 return;
-            trDispatchMsg.getOriginal(&&orig);
             trDispatchMsg.swap();
             orig(msg, p1);
-            activeTextWnd.afterChar(msg.wParam);
             trDispatchMsg.swap();
+            activeTextWnd.afterChar(msg.wParam);
             return;
+        } else if (msg.message == WM_LBUTTONDOWN) {
+            trDispatchMsg.swap();
+            orig(msg, p1);
+            trDispatchMsg.swap();
+            activeTextWnd.afterClick();
+            return;
+        } else if (msg.message == WM_RBUTTONDOWN || msg.message == WM_RBUTTONUP) {
+            if (activeTextWnd.onContextMenu(msg.message == WM_RBUTTONUP))
+                return;
         }
     }
-    trDispatchMsg.getOriginal(&&orig);
     trDispatchMsg.swap();
     orig(msg, p1);
     trDispatchMsg.swap();
@@ -477,7 +486,7 @@ class TextWnd {
 
     }
     array<uint>&& defaultMessages() {
-        return array<uint> = { WM_KEYDOWN, WM_SYSKEYDOWN, WM_CHAR, WM_DESTROY, WM_SETFOCUS, WM_KILLFOCUS };
+        return array<uint> = { WM_KEYDOWN, WM_SYSKEYDOWN, WM_CHAR, WM_DESTROY, WM_SETFOCUS, WM_KILLFOCUS, WM_LBUTTONDOWN, WM_RBUTTONDOWN, WM_RBUTTONUP };
     }
 #if ver < 8.3.12
     LRESULT WndProc(uint msg, WPARAM w, LPARAM l) {
@@ -503,6 +512,17 @@ class TextWnd {
             afterChar(w);
             return res;
             }
+        case WM_LBUTTONDOWN: {
+            LRESULT res = wnd.doDefault();
+            afterClick();
+            return res;
+            }
+        case WM_RBUTTONDOWN:
+        case WM_RBUTTONUP:
+            if (onContextMenu(msg == WM_RBUTTONUP)) {
+                return 0;
+            }
+            break;
         }
         return editor.wndProc(msg, w, l);
     }
@@ -539,6 +559,20 @@ class TextWnd {
     }
     void onDeactivate() {
         editor.onDeactivate();
+    }
+    void afterClick() {
+        if ((GetKeyState(VK_CONTROL) & 0x8000) > 0) {
+            SendMessage(getHwnd(this), WM_LBUTTONUP, 0, 0);
+            oneAddinMgr.byUniqueName("SnegopatMainScript").invokeMacros("Перейти к определению");
+        }
+    }
+    bool onContextMenu(bool up) {
+        if ((GetKeyState(VK_CONTROL) & 0x8000) > 0) {
+            if (up)
+                sendCommandToMainFrame(CommandID(cmdFrameGroup, 324));
+            return true;
+        }
+        return false;
     }
 };
 
