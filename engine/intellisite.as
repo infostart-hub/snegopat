@@ -264,10 +264,12 @@ class IntelliSite : SmartBoxSite {
             ins.updateInsertPosition(textWnd, tpStart, tpEnd, notIndent);
             string text;
             ins.textForInsert(text);
-            while ('\x8' == text[0]) {
-                if (tpStart.col > 1)
-                    tpStart.col--;
-                text.remove(0);
+            if (text.length > 0) {
+                while ('\x8' == text[0]) {
+                    if (tpStart.col > 1)
+                        tpStart.col--;
+                    text.remove(0);
+                }
             }
             if ((GetKeyState(VK_CONTROL) & 0x8000) > 0) {
                 if (text[text.length - 1] != ';')

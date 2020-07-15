@@ -83,6 +83,16 @@ class Snegopat {
     void updateAllEditorsSettings() {
         getEventService().notify(eTxtEdtOptionChanged);
     }
+    string getStockTextIndent() {
+        bool bval;
+        getProfileService().getBool("ModuleTextEditor/ReplaceTabOnInput", bval);
+        if (bval) {
+            int i;
+            getProfileService().getInt("ModuleTextEditor/TabSize", i);
+            return string(" ", i);
+        } else
+            return "\t";
+    }
     /*
         [helpstring("Показать подсказку о параметрах метода")] HRESULT
     showParams(_ret VARIANT_BOOL* result);

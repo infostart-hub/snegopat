@@ -81,11 +81,11 @@ class ItemAfterType : SmartBoxInsertableItem {
     void textForInsert(string& out text) {
         text = "(¦)";
     }
+#if ver >= 8.3.4
     void afterInsert(TextWnd&& editor) {
-    #if ver >= 8.3.4
         showV8MethodsParams();
-    #endif
     }
+#endif
 };
 
 class ItemAfterQueryType : SmartBoxInsertableItem {
@@ -96,53 +96,55 @@ class ItemAfterQueryType : SmartBoxInsertableItem {
         if (type == 1)
             name += " + Выполнить + Выбрать";
         else if (type == 2)
-            name += " + Выполнить + Выгрузить";
+            name += " + Выполнить.Выгрузить";
         super(name, imgParenthesis);
         d.hotOrder = uint(-1);
     }
     void textForTooltip(string& text) {
-        text = "Вставить скобки и вызвать конструктор запроса";
+        text = "Вызвать конструктор запроса";
     }
     void textForInsert(string& out text) {
-        if (type == 0)
-            text = "(¦)";
-        else
-            text = "(";
+        text = "";
         d.descr = getIntelliSite().getCurrentLine();
     }
     void afterInsert(TextWnd&& editor) {
-        string text;
         string queryText = oneDesigner._snegopat.parseTemplateString("<?"", ТекстЗапроса>", "Введите запрос");
         if (queryText.length > 0) {
             auto res = d.descr.match(RegExp("(?i)^\\s*(\\S+)\\s*=\\s*(?:Новый|New)\\s+(?:Запрос|Query)"));
-            string varName, setParams;
+            string varName, setParams, text = ";\nvarName.Текст = \"\n|%query%\"setParams";
             if (res.matches > 0)
                 varName = res.text(0, 1);
-            if (type == 1) {
-                text = ");setParams\n"
-                    "varNameРезультат = varName.Выполнить();\n"
-                    "varNameВыборка = varNameРезультат.Выбрать();\n"
-                    "Пока varNameВыборка.Следующий() Цикл\n"
-                    "КонецЦикла";
-            } else if (type == 2) {
-                text = ");setParams\n"
-                    "varNameРезультат = varName.Выполнить().Выгрузить()";
-            }
+            bool hasParams = false;
             &&res = queryText.match(RegExp("&(\\S+)"));
             if (res.matches > 0) {
                 NoCaseMap<int> params;
-                for (uint i = 0; i < res.matches; i++) {
+                for (uint i = 0; i < res.matches; i++)
                     params.insert(res.text(i, 1), 0);
+                for (auto it = params.begin(); it++; ) {
+                    setParams += ";\nvarName.УстановитьПараметр(\"" + it.key + "\", ";
+                    if (!hasParams) {
+                        setParams += "¦";
+                        hasParams = true;
+                    }
+                    setParams += ")";
                 }
-                for (auto it = params.begin(); it++; )
-                    setParams += "\nvarName.УстановитьПараметр(\"" + it.key + "\", );";
+            }
+
+            if (type == 1) {
+                text += ";\nvarNameРезультат = varName.Выполнить();\n"
+                    "varNameВыборка = varNameРезультат.Выбрать();\n"
+                    "Пока varNameВыборка.Следующий() Цикл\n\t";
+                if (!hasParams)
+                    text += "¦";
+                text += "\nКонецЦикла";
+            } else if (type == 2) {
+                text += ";\nvarNameРезультат = varName.Выполнить().Выгрузить()";
             }
             text.replace("setParams", setParams);
             text.replace("varName", varName);
-            text = "\n\"" + queryText + "\"" + text;
-        } else
-            text += ")";
-        insertInSelection(editor.ted, editor.textDoc.tm, editor.textDoc.itm, text, true, true);
+            text.replace("%query%", queryText);
+            insertInSelection(editor.ted, editor.textDoc.tm, editor.textDoc.itm, text, true, true);
+        }
     }
 };
 
