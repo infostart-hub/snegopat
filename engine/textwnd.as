@@ -401,7 +401,9 @@ void DispatchMessagesTrap(MSG& msg, int_ptr p1) {
             trDispatchMsg.swap();
             orig(msg, p1);
             trDispatchMsg.swap();
-            activeTextWnd.afterClick();
+            if (activeTextWnd !is null) {
+                activeTextWnd.afterClick();
+            }
             return;
         } else if (msg.message == WM_RBUTTONDOWN || msg.message == WM_RBUTTONUP) {
             if (activeTextWnd.onContextMenu(msg.message == WM_RBUTTONUP))
