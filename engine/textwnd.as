@@ -6,6 +6,11 @@
 #include "../../all.h"
 
 TextWnd&& activeTextWnd;
+bool useCtrlClicks = false;
+
+OptionsEntry oeUseCtrlClicks("UseCtrlClicks", function(v){v = useCtrlClicks; },
+    function(v) {v.getBoolean(useCtrlClicks); },
+    function(v){v.getBoolean(useCtrlClicks); return false; });
 
 // Это интерфейс обработчика событий в тексте.
 // В-зависимости от назначенного текстовому документу расширения (встроенный язык, язык запросов и т.п.)
@@ -563,13 +568,13 @@ class TextWnd {
         editor.onDeactivate();
     }
     void afterClick() {
-        if ((GetKeyState(VK_CONTROL) & 0x8000) > 0) {
+        if (useCtrlClicks && (GetKeyState(VK_CONTROL) & 0x8000) > 0) {
             SendMessage(getHwnd(this), WM_LBUTTONUP, 0, 0);
             oneAddinMgr.byUniqueName("SnegopatMainScript").invokeMacros("Перейти к определению");
         }
     }
     bool onContextMenu(bool up) {
-        if ((GetKeyState(VK_CONTROL) & 0x8000) > 0) {
+        if (useCtrlClicks &&(GetKeyState(VK_CONTROL) & 0x8000) > 0) {
             if (up)
                 sendCommandToMainFrame(CommandID(cmdFrameGroup, 324));
             return true;

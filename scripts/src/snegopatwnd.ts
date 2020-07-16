@@ -632,6 +632,7 @@ class SettingsPage implements Page {
 		EnableBkColorForMultyLine: new Param("EnableBkColorForMultyLine"),
 		MultiLineBackground: new ParamColor("ЦветФонаМногострочныхСтрок"),
 		GroupMultiLine: new Param("GroupMultiLine"),
+		UseCtrlClicks: new Param("UseCtrlClicks"),
 		//ActionOnSelectScript: new Param("ВариантДействияПриВыбореСкрипта"),
 		//EditScriptCommand: new Param("КомандаЗапускаРедактора"),
 	};
