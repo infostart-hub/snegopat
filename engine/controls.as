@@ -324,7 +324,7 @@ class IDoModalHook {
         &&_view = v;
     }
     string get_caption() {
-        return _view.title();
+        return _view is null ? "" : _view.title().str;
     }
     IV8Form&& get_form() {
         if (_form is null) {
