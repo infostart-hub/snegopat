@@ -110,11 +110,11 @@ function _SpellChecker(settings) {
     var pathToFormSettings = SelfScript.fullPath.replace(/js$/, 'param.ssf');
     this.formParams = loadScriptForm(pathToFormSettings, this) // Обработку событий формы привяжем к самому скрипту
     
-    this.extSearch = stdlib.require(mainFolder+'scripts\\extSearch.js').GetExtSearch();
+    this.extSearch = stdlib.require(env.pathes.addins + 'extSearch.js').GetExtSearch();
     this.wnd = GetTextWindow();
     
     if (this.provider==null)
-        Message("Не удалось подключиться к "+this.settings.provider + " проверьте настройки! \n (клацните 2 раза на этой сообщении)", mmExc1, (function(param){
+        Message("Не удалось подключиться к "+this.settings.provider + " проверьте настройки! \n (клацните 2 раза на этой сообщении)", mExc1, (function(param){
             
         }), this)
 }
@@ -267,7 +267,7 @@ _SpellChecker.prototype.SpellModule = function(text, wnd) {
             param['LineNo'] = i;
             param['str'] = str;
 
-            Message(errorstr, mmExc1, (function(param){
+            Message(errorstr, mExc1, (function(param){
             
     if (!param['wnd']) {
         return }
@@ -360,7 +360,7 @@ _SpellChecker.prototype.SpellLine = function(text, wnd, i) {
             param['LineNo'] = i;
             param['str'] = str;
 
-            Message(errorstr, mmExc1, (function(param){
+            Message(errorstr, mExc1, (function(param){
             
     if (!param['wnd']) {
         return }

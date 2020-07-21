@@ -115,7 +115,7 @@ class ItemAfterQueryType : SmartBoxInsertableItem {
             if (res.matches > 0)
                 varName = res.text(0, 1);
             bool hasParams = false;
-            &&res = queryText.match(RegExp("&(\\S+)"));
+            &&res = queryText.match(RegExp("&(\\w+)"));
             if (res.matches > 0) {
                 NoCaseMap<int> params;
                 for (uint i = 0; i < res.matches; i++)
