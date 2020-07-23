@@ -801,7 +801,7 @@ function КомандыРедактировать(Кнопка)
 function КомандыCaptureIntoCfgStore(Кнопка){
     doAction(function(mdObj){
         try {
-            var cfgStore = stdlib.require(stdlib.getSnegopatMainFolder()+"scripts\\CfgStore.js");    
+            var cfgStore = stdlib.require(env.pathes.addins+"CfgStore.js");
             cfgStore.CaptureIntoCfgStore(mdObj);
         } catch (e){
             Message(""+e.description())
