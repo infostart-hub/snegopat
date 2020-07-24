@@ -305,7 +305,7 @@ class SynEditEditor : TextEditorWindow, SelectionChangedReceiver {
             sendToEditor = true;
         } else if (isEditorFocused()) {
             sendToEditor = true;
-            SendMessage(synEditHwnd, WM_SETFOCUS, 0, 0);
+            PostMessage(synEditHwnd, WM_SETFOCUS, 0, 0);
         }
         if (sendToEditor && msg.message != WM_CHAR) {
             if (msg.message == WM_KEYDOWN || msg.message == WM_KEYUP) {
@@ -315,7 +315,7 @@ class SynEditEditor : TextEditorWindow, SelectionChangedReceiver {
                 }
             }
         }
-        if (sendToEditor && (msg.message == WM_CHAR)) {
+        if (sendToEditor && (msg.message == WM_CHAR || msg.message == WM_KEYDOWN || msg.message == WM_KEYUP)) {
             if (synEditWindowProc(synEditEditorHwnd, msg.message, msg.wParam, msg.lParam) > 0) {
                 return true;
             }
@@ -523,9 +523,13 @@ void disableCaretSelectionTrap() {
 
 void onSelectionRecalculateFinished_trap(TextManager& tm) {
     trCaretSelection.swap();
-    SynEditEditor&& e = seInfo.activeEditor();
-    if (e !is null) {
-        e.selectionChanged();
+    for (uint idx = 0, size = synEditEditors.length; idx < size; idx++) {
+        if (&&synEditEditors[idx].textDoc.tm == &&tm) {
+            SynEditEditor&& editor = cast<SynEditEditor>(synEditEditors[idx].editor);
+            if (editor !is null) {
+                editor.selectionChanged();
+            }
+        }
     }
     tm.onSelectionRecalculateFinished();
     trCaretSelection.swap();
@@ -544,7 +548,7 @@ int SetCaretPos_trap(HWND w, int i1, int i2) {
         if (synEditEditors[idx].hWnd == w) {
             SynEditEditor&& editor = cast<SynEditEditor>(synEditEditors[idx].editor);
             if (editor !is null) {
-                SendMessage(editor.synEditHwnd, WM_TEXTWND_CHANGED, 1, 0);
+                PostMessage(editor.synEditHwnd, WM_TEXTWND_CHANGED, 1, 0);
             }
         }
     }

@@ -382,7 +382,6 @@ void DispatchMessagesTrap(MSG& msg, int_ptr p1) {
     if (activeTextWnd !is null) {
         if (msg.message == WM_KEYDOWN || msg.message == WM_KEYUP || msg.message == WM_SYSKEYDOWN || msg.message == WM_SYSKEYUP || msg.message == WM_CHAR) {
             if (activeTextWnd.editor.dispatchMessage(msg, p1)) {
-                TranslateMessage(msg);
                 return;
             }
         }
