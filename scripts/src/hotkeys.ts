@@ -20,7 +20,7 @@ type PredefRow = ValueTableRow & { Addin: string, Version: number };
 
 export var KeyCodes = (function () {
     var _KeyCodes = {
-        "Ctrl": hkCtrl, "Shift": hkShift, "Alt": hkAlt, "BkSpace": 0x8, "Tab": 0x9, "Enter": 0x0D, "Esc": 0x1B, "Space": 0x20,
+        "Ctrl": hkCtrl, "Shift": hkShift, "Alt": hkAlt, "BkSpace": 0x8, "Tab": 0x9, "Enter": 0x0D, "Pause": 0x13, "Esc": 0x1B, "Space": 0x20,
         "PgUp": 0x21, "PgDn": 0x22, "End": 0x23, "Home": 0x24, "Left": 0x25, "Up": 0x26, "Right": 0x27, "Down": 0x28,
         "Ins": 0x2D, "Del": 0x2E, "Num0": 0x60, "Num1": 0x61, "Num2": 0x62, "Num3": 0x63, "Num4": 0x64, "Num5": 0x65, "Num6": 0x66,
         "Num7": 0x67, "Num8": 0x68, "Num9": 0x69, "Num*": 0x6A, "NumAdd": 0x6B, "Num-": 0x6D, "Num.": 0x6E, "Num/": 0x6F, "F1": 0x70,
@@ -223,8 +223,6 @@ export class SelectHotKey {
         for (var k in KeyCodes.code2str) {
             if (<any>k < 256) {
                 var str = KeyCodes.code2str[k];
-                if (str.substr(0, 2) == "v8")
-                    continue;
                 this.form.Controls.Key.СписокВыбора.Добавить(str);
                 if (<any>k == hk)
                     this.form.key = str;
