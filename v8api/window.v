@@ -292,7 +292,7 @@
 	Rect			unk4
 	int				unk5
 	Size			unk6
-  #if ver < 8.3.14.1976
+  #if ver < 8.3.14.1565
   #else
 	bool			unk7
   #endif
@@ -344,7 +344,7 @@
 		+12
 		ViewPosition	vpOriginal
 		Size			sizeOriginal
-	  #if ver < 8.3.14.1976
+	  #if ver < 8.3.14.1565
 		+4
 	  #endif
 		IUnknown@		parent
@@ -355,7 +355,7 @@
 	44 FocusedViewInCoreFrame
 	48 ActiveViewInCoreFrame
 	96 ViewContextInView
-  #elif ver < 8.3.14.1976
+  #elif ver < 8.3.14.1565
 	56 ViewContextOffset
 	48 FocusedViewInCoreFrame
 	52 ActiveViewInCoreFrame
@@ -403,6 +403,7 @@
 	int_ptr getFirstChildIntPtr(void)|?getFirstChild@BaseWindow@wbase@@UAGPAVIWindow@2@XZ
 
 	int SetCaretPos(int,int)|?SetCaretPos@BaseWindow@wbase@@QAEHHH@Z
+	int_ptr getTopLevelHWND()|?getTopLevelHWND@BaseWindow@wbase@@UAGPAUHWND__@@XZ
 
 :global
 :dlls

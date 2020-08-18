@@ -137,8 +137,10 @@
 	    +7
 	  #elif ver < 8.3.15
 		+7
-	  #else
+	  #elif ver < 8.3.18
 	    +8
+	  #else
+	    +10
 	  #endif
 		IMDObject@+ objById(const Guid& objId)
 		+4
@@ -154,8 +156,10 @@
 		55
 	  #elif ver < 8.3.15
 	    56
-	  #else
+	  #elif ver < 8.3.18
 	    57
+	  #else
+	    59
 	  #endif
 		IConfigMngr@+ getConfigMngr()
 	  +1
@@ -240,14 +244,16 @@
 	    54
 	  #elif ver <= 8.3.12.1567
 	    53
-	  #elif ver < 8.3.13 | ver = 8.3.14.1993 | ver = 8.3.14.1976
+	  #elif ver < 8.3.13 | ver = 8.3.14.1993 | ver = 8.3.14.1976 | ver = 8.3.14.1565
 	    54
 	  #elif ver < 8.3.15
 	    53
 	  #elif ver < 8.3.17
 	    55
-	  #else
+	  #elif ver < 8.3.18
 		56
+	  #else
+	    57
 	  #endif
 		IConfigMngr@+ getConfigMgr()
 
@@ -291,7 +297,9 @@
 :iface IMDBaseObj {D3624077-1010-45F0-A596-77ADD399D777}
 	:base IMDObject
 	:virt
-	  #if ver >= 8.3.15
+	  #if ver >= 8.3.18
+	    47
+	  #elif ver >= 8.3.15
 	    45
 	  #elif ver > 8.3.10.1877
 	    44
