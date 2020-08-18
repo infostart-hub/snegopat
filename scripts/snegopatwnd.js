@@ -634,7 +634,8 @@ var SettingsPage = /** @class */ (function () {
             EnableBkColorForMultyLine: new Param("EnableBkColorForMultyLine"),
             MultiLineBackground: new ParamColor("ЦветФонаМногострочныхСтрок"),
             GroupMultiLine: new Param("GroupMultiLine"),
-            UseCtrlClicks: new Param("UseCtrlClicks")
+            UseCtrlClicks: new Param("UseCtrlClicks"),
+            CamelSearchOnUpperOnly: new Param("CamelSearchOnUpperOnly")
         };
     }
     SettingsPage.prototype.connect = function (form) {

@@ -47,6 +47,7 @@ uint maxHotOrderItems() {
 enum UseLangFlags{ useLangEng = 1, useLangRus = 2 };
 uint useLangs = useLangRus;
 bool insertOnDot = true;
+bool camelSearchOnUpperOnly = false;
 
 OptionsEntry oeUseLangs("UseLangs", function(v){v = uint(useLangRus); },
     function(v) {Numeric n; v.getNumeric(n); useLangs = n; },
@@ -63,6 +64,11 @@ OptionsEntry oeAllowMultyFilter("AllowFilterInSmartList", function(v){v = true; 
 OptionsEntry oeInsertTextOnDot("InsertTextOnDot", function(v){v = true; },
     function(v){v.getBoolean(insertOnDot); },
     function(v){v.getBoolean(insertOnDot); return false; });
+
+OptionsEntry oeCamelSearchOnUpperOnly("CamelSearchOnUpperOnly", function(v){v = false; },
+    function(v){v.getBoolean(camelSearchOnUpperOnly); },
+    function(v){v.getBoolean(camelSearchOnUpperOnly); return false; });
+
 
 funcdef void AfterSelect(bool bCancel);
 
@@ -228,12 +234,13 @@ class IntelliSite : SmartBoxSite {
                 cmp.setPattern(pattern.replace(spaceSymbol, ' '), cmContain);
             else
                 cmp.setPattern(pattern, cmBeginWithOtherLangs);
+            bool checkCamelCase = !camelSearchOnUpperOnly || pattern.extract(ucaseLetterRex) == pattern;
             pattern.makeUpper();
             for (uint g = 0, gm = itemsGroup.length; g < gm; g++) {
                 array<SmartBoxItem&&>&& group = itemsGroup[g];
                 for (uint i = 0, im = group.length; i < im; i++) {
                     SmartBoxItem&& item = group[i];
-                    if (!item.d.exclude && (cmp.match(item.d.key) || compareUcaseLetters(item.d.descr, pattern)))
+                    if (!item.d.exclude && (cmp.match(item.d.key) || (checkCamelCase && compareUcaseLetters(item.d.descr, pattern))))
                         result.insertLast(item);
                 }
             }

@@ -633,6 +633,7 @@ class SettingsPage implements Page {
 		MultiLineBackground: new ParamColor("ЦветФонаМногострочныхСтрок"),
 		GroupMultiLine: new Param("GroupMultiLine"),
 		UseCtrlClicks: new Param("UseCtrlClicks"),
+		CamelSearchOnUpperOnly: new Param("CamelSearchOnUpperOnly"),
 		//ActionOnSelectScript: new Param("ВариантДействияПриВыбореСкрипта"),
 		//EditScriptCommand: new Param("КомандаЗапускаРедактора"),
 	};
