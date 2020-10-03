@@ -131,7 +131,7 @@ class ItemAfterQueryType : SmartBoxInsertableItem {
             }
 
             if (type == 1) {
-                text += ";\nВыборкаvarName = varName.Выполнить().Выбрать;\n"                    
+                text += ";\nВыборкаvarName = varName.Выполнить().Выбрать();\n"                    
                     "Пока ВыборкаvarName.Следующий() Цикл\n\t";
                 if (!hasParams)
                     text += "¦";
