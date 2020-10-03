@@ -111,7 +111,7 @@ class ItemAfterQueryType : SmartBoxInsertableItem {
         string queryText = oneDesigner._snegopat.parseTemplateString("<?"", ТекстЗапроса>", "Введите запрос");
         if (queryText.length > 0) {
             auto res = d.descr.match(RegExp("(?i)^\\s*(\\S+)\\s*=\\s*(?:Новый|New)\\s+(?:Запрос|Query)"));
-            string varName, setParams, text = ";\nvarName.Текст = \"\n|%query%\"setParams";
+            string varName, setParams, text = ";\nvarName.Текст = \n\"%query%\"setParams";
             if (res.matches > 0)
                 varName = res.text(0, 1);
             bool hasParams = false;
@@ -121,7 +121,7 @@ class ItemAfterQueryType : SmartBoxInsertableItem {
                 for (uint i = 0; i < res.matches; i++)
                     params.insert(res.text(i, 1), 0);
                 for (auto it = params.begin(); it++; ) {
-                    setParams += ";\nvarName.УстановитьПараметр(\"" + it.key + "\", ";
+                    setParams += ";\nvarName.УстановитьПараметр(\"" + it.key + "\", " + it.key;
                     if (!hasParams) {
                         setParams += "¦";
                         hasParams = true;
@@ -131,14 +131,13 @@ class ItemAfterQueryType : SmartBoxInsertableItem {
             }
 
             if (type == 1) {
-                text += ";\nvarNameРезультат = varName.Выполнить();\n"
-                    "varNameВыборка = varNameРезультат.Выбрать();\n"
-                    "Пока varNameВыборка.Следующий() Цикл\n\t";
+                text += ";\nВыборкаvarName = varName.Выполнить().Выбрать;\n"                    
+                    "Пока ВыборкаvarName.Следующий() Цикл\n\t";
                 if (!hasParams)
                     text += "¦";
                 text += "\nКонецЦикла";
             } else if (type == 2) {
-                text += ";\nvarNameРезультат = varName.Выполнить().Выгрузить()";
+                text += ";\nРезультатvarName = varName.Выполнить().Выгрузить()";
             }
             text.replace("setParams", setParams);
             text.replace("varName", varName);
