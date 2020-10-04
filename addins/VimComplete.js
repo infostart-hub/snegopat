@@ -99,8 +99,6 @@ function Line(str)
     this.reset = function () 
     {
         words = s.split(/[^\wА-я]+/);
-        if (!words.length || words.length == 1 && !words[0])
-            words = new Array;
     }
     
     this.assert = function (ix) 
@@ -234,8 +232,6 @@ function VimAutoCompletionTool()
                 return;
             }
             words = this.nextLine();
-            if (!words.collection.count())
-                return;
         }
     }
     
