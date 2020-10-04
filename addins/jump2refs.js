@@ -111,6 +111,8 @@ function doJump(command, forceShow)
     {
         refs.splice(0, 1)
         var dlg = new SelectValueDialog("Выберите объект для перехода!", refs);
+        dlg.form.SortByName = true;
+        dlg.sortValuesList(true);
         if (dlg.selectValue())
             choice = dlg.selectedValue;
         else
