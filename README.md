@@ -1,7 +1,7 @@
 # Снегопат — расширение конфигуратора 1С:Предприятия 8.х
 
 <p align="center">
-  <img src="https://github.com/kuntashov/snegopat/blob/readme/www/img/snegologo.png?raw=true" alt="Снегопат — расширение конфигуратора 1С:Предприятия 8.х"/>
+  <img src="https://github.com/infostart-hub/snegopat/blob/readme/www/img/snegologo.png?raw=true" alt="Снегопат — расширение конфигуратора 1С:Предприятия 8.х"/>
 </p>
 
 - [Снегопат — расширение конфигуратора 1С:Предприятия 8.х](#снегопат--расширение-конфигуратора-1спредприятия-8х)
