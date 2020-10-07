@@ -194,7 +194,18 @@ exports.Frntend = {
     QueryWizard: new Command(63, "Конструктор запроса"),
     QueryWizardParam: new Command(217, "Конструктор запроса с обработкой результата"),
     TextBlockEscapeNewline: new Command(106, "Добавить перенос строки"),
-    TextBlockUnescapeNewline: new Command(107, "Удалить перенос строки")
+    TextBlockUnescapeNewline: new Command(107, "Удалить перенос строки"),
+    // Группа команд "Рефакторинг"
+    RefactoringExtractMethod: new Command(255, "Рефакторинг: Выделить фрагмент"),
+    RefactoringRename: new Command(256, "Рефакторинг: Переименовать"),
+    RefactoringСonvertCall: new Command(257, "Рефакторинг: Преобразовать вызов"),
+    RefactoringCreateMethodDescription: new Command(258, "Рефакторинг: Создать описание процедуры/функции"),
+    RefactoringFindModuleCalls: new Command(259, "Рефакторинг: Найти вызовы модуля"),
+    RefactoringConvertModuleCalls: new Command(260, "Рефакторинг: Преобразовать вызовы модуля"),
+    RefactoringConvertToAsyncProcedure: new Command(264, "Рефакторинг: Преобразовать в асинхронную процедуру"),
+    RefactoringExtractToAsyncProcedure: new Command(266, "Рефакторинг: Выделить в асинхронную процедуру"),
+    RefactoringCreateNotificationProcessing: new Command(269, "Рефакторинг: Создать обработку оповещения"),
+
 };
 exports.TextEdit = {
     groupID: "{FFE26CB2-322B-11D5-B096-008048DA0765}",

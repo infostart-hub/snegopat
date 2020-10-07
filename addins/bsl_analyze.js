@@ -63,9 +63,8 @@ function runAnalyses(td) {
             return undefined;
         }
         var wsh = new ActiveXObject("Wscript.Shell");
-        // todo - разобраться с путями с пробелами
-        var cmd = '"' + pathToServer + '" -a -s ' + tmpPath + ' -w ' + tmpPath + ' -o ' + tmpPath + ' -r json';
-        //Message(cmd);
+        var escPath = tmpPath.replace(/\\/g, "\\\\");
+        var cmd = '"' + pathToServer + '" -a -s "' + escPath + '" -w "' + escPath + '" -o "' + escPath + '" -r json';
         wsh.Run(cmd, 1, 1);
         fPath = tmpPath + "bsl-json.json";
         if (!v8New("File", fPath).Exist()) {
