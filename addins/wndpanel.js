@@ -135,12 +135,15 @@ WndList = stdlib.Class.extend({
             var removed = false
                 for (var i = this.list.length; i--; ) {
                     var item = this.list[i]
-
                         if (!item.isAlive()) {
                             //debugger
                             try { // попытаемся получить Родителя если не сможем значит строки уже нет
                                 var test = item.rowInVt.Родитель
                             } catch (e) {
+								//???
+								this.list.splice(i, 1)
+								removed = true
+							
                                 return true
                             }
                             if (item.rowInVt) {
@@ -173,13 +176,10 @@ WndList = stdlib.Class.extend({
                                         }
                                 }
                             } catch(e)
-{
-//debugger
-}
-
-
+					{
+					//debugger
+					}
                 }
-
                 return removed
         },
         // Функция для добавления новых окон в список.
@@ -410,6 +410,7 @@ function withSelected(func) {
 
 function WndListВыбор(Элемент, ВыбраннаяСтрока, Колонка, СтандартнаяОбработка) {
     СтандартнаяОбработка.val = false;
+	//debugger
     if (Элемент.val.ТекущаяСтрока != undefined && Элемент.val.ТекущаяСтрока.Окно != undefined && Элемент.val.ТекущаяСтрока.Окно.view.visible) {
         if(!мАктивироватьПриВыбореСтроки)
             needActivate = ВыбраннаяСтрока.val.Окно.view
@@ -418,8 +419,10 @@ function WndListВыбор(Элемент, ВыбраннаяСтрока, Ко�
         if(Элемент.val.ТекущаяСтрока.Строки.Количество()>0){
             if(!Элемент.val.ТекущаяСтрока.Строки.Получить(0).Окно.view)
                 return
-        Элемент.val.ТекущаяСтрока.Строки.Получить(0).Окно.view.mdObj.parent.openEditor()
-        Элемент.val.ТекущаяСтрока.Строки.Получить(0).Окно.view.mdObj.openEditor()
+			лТекущаяВью=Элемент.val.ТекущаяСтрока.Строки.Получить(0).Окно.view
+			if(!лТекущаяВью.isAlive()) return
+			лТекущаяВью.mdObj.parent.openEditor()
+			лТекущаяВью.mdObj.openEditor()
         }
     }
 
@@ -556,9 +559,7 @@ function CmdsActivate(Кнопка) {
 }
 
 function closeSelected() {
-
     try{withSelected(function(item){item.view.close()})} catch (e){}
-
 }
 
 function closewindows() {
@@ -862,7 +863,6 @@ function loadSessionManager() {
 }
 
 function macrosОткрытьОкно() {
-
     мФормаСкрипта = null;
     var pathToForm = SelfScript.fullPath.replace(/js$/, 'ssf')
         if (!мФормаСкрипта) {
