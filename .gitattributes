@@ -1,0 +1,27 @@
+* text=auto
+*.htm text eol=crlf
+*.html text eol=crlf
+renames.txt text eol=crlf
+
+*.v text eol=lf
+*.as text eol=lf
+*.js text eol=lf
+
+*.feature text
+*.md text
+*.json text eol=lf
+
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1      text eol=crlf
+
+*.sh text eol=lf
+*.groovy text eol=lf
+
+# Archives
+# 1C
+*.xml  text eol=crlf
+
+*.bsl  text eol=crlf
+*.os text eol=crlf
+
