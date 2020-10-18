@@ -275,7 +275,6 @@ var RE = {
 	METHOD_END		: /((?:EndProcedure)|(?:EndFunction)|(?:КонецПроцедуры)|(?:КонецФункции))/i
 }
 
-//[+] Павлюков
 var ProcessAreas = {
 	PROCESS_DIRECTIVE			: /^\s*&/i,
 	PROCESS_ATCLIENT			: /^\s*(&AtClient|&НаКлиенте)\s*$/i,
@@ -292,7 +291,6 @@ var ProcessAreaValues = {
 	'AtServer'		: 2, // НаСервере
 	'AtServerNC'	: 3  // НаСервереБезКонекста
 }
-// Павлюков
 
 var SearchAreas = {
 	'ActiveWindow'		: 0, // В текущем модуле
@@ -396,7 +394,6 @@ ExtSearchDialog = ScriptForm.extend({
 
 	settingsRootPath : SelfScript.uniqueName,
 
-	//Павлюков - переиначил логику работы с RegExpEditor
 	reEditorPresent : false,
 
 	settings : {
@@ -406,8 +403,8 @@ ExtSearchDialog = ScriptForm.extend({
 			'WholeWords'	: false, // Поиск слова целиком.
 			'SearchHistory'	: v8New('ValueList'), // История поиска.
 			'HistoryDepth'	: 15, // Количество элементов истории поиска.
-			'ProcessArea'	: 0, // Павлюков - Область поиска (0 - везде).
-			'threadCount'	: 25, // Павлюков - К-во потоков : не стал менять логику автора по к-ву по-умолчанию
+			'ProcessArea'	: 0, // Область поиска (0 - везде).
+			'threadCount'	: 25, // К-во потоков : не стал менять логику автора по к-ву по-умолчанию
 			'TreeView'		: false, // Группировать результаты поиска по методам.
 			'ShowReplace'	: false  // Показывать замену
 		}
@@ -421,7 +418,7 @@ ExtSearchDialog = ScriptForm.extend({
 		this.loadSettings();
 		this.form.Query = query;
 		this.form.SearchArea = initSearchArea;
-		this.form.threadCount = this.settings.pflSnegopat.current.threadCount; // Павлюков
+		this.form.threadCount = this.settings.pflSnegopat.current.threadCount;
 	},
 
 	getSearchQueryParams: function () {
@@ -430,8 +427,8 @@ ExtSearchDialog = ScriptForm.extend({
 		params.Insert('WholeWords',		this.form.WholeWords);
 		params.Insert('CaseSensetive',	this.form.CaseSensetive);
 		params.Insert('IsRegExp',		this.form.IsRegExp);
-		params.Insert('ProcessArea',	this.form.ProcessArea); // Павлюков
-		params.Insert('threadCount',	this.form.threadCount); // Павлюков
+		params.Insert('ProcessArea',	this.form.ProcessArea);
+		params.Insert('threadCount',	this.form.threadCount);
 		return params;
 	},
 
@@ -439,7 +436,6 @@ ExtSearchDialog = ScriptForm.extend({
 		return this.form.SearchArea;
 	},
 
-	//Павлюков
 	getRegExpEditorScriptPath : function () {
 		var scriptPath = env.pathes.addins + "RegExpEditor.js";
 		var f = v8New('File', scriptPath);
@@ -448,7 +444,7 @@ ExtSearchDialog = ScriptForm.extend({
 		return '';
 	},
 
-	//Павлюков - почему бы и в основном окне регулярки не использовать
+	//почему бы и в основном окне регулярки не использовать
 	Form_OnOpen : function () {
 		this.reEditorPresent = (this.getRegExpEditorScriptPath() != '');
 		this.form.Controls.Query.ChoiceButton = (this.form.IsRegExp ? this.reEditorPresent : false);
@@ -467,7 +463,7 @@ ExtSearchDialog = ScriptForm.extend({
 		control.val.ChoiceList = this.form.ReplaceHistory;
 	},
 
-	//Павлюков - открыть форму RegExp
+	//открыть форму RegExp
 	Query_StartChoice : function (Control, DefaultHandler) {
 		var reEditorPath = this.getRegExpEditorScriptPath();
 		if (reEditorPath)
@@ -493,14 +489,12 @@ ExtSearchDialog = ScriptForm.extend({
 	IsRegExp_OnChange : function(Элемент) {
 		if (this.form.IsRegExp)
 			this.form.WholeWords = false;
-		//Павлюков
 		this.form.Controls.Query.ChoiceButton = (this.form.IsRegExp ? this.reEditorPresent : false);
 	},
 
 	WholeWords_OnChange : function(Элемент) {
 		if (this.form.WholeWords)
 			this.form.IsRegExp = false;
-		//Павлюков
 		this.form.Controls.Query.ChoiceButton = (this.form.IsRegExp ? this.reEditorPresent : false);
 	}
 }); // end of ExtSearchDialog
@@ -509,7 +503,6 @@ ExtSearch = ScriptForm.extend({
 
 	settingsRootPath : SelfScript.uniqueName,
 
-	//Павлюков - переиначил логику работы с RegExpEditor
 	reEditorPresent : false,
 
 	settings : {
@@ -520,8 +513,8 @@ ExtSearch = ScriptForm.extend({
 			'SearchHistory'		: v8New('ValueList'), // История поиска.
 			'ReplaceHistory'	: v8New('ValueList'), // История замены.
 			'HistoryDepth'		: 15, // Количество элементов истории поиска.
-			'ProcessArea'		: 0, // Павлюков
-			'threadCount'		: 25, // Павлюков
+			'ProcessArea'		: 0, // Область поиска (0 - везде).
+			'threadCount'		: 25, // к-во потоков
 			'TreeView'			: false, // Группировать результаты поиска по методам.
 			'ShowReplace'		: false  // Показывать замену
 		}
@@ -573,8 +566,8 @@ ExtSearch = ScriptForm.extend({
 		this.form.IsRegExp 		= searchQueryParams.IsRegExp;
 		this.form.CaseSensetive = searchQueryParams.CaseSensetive;
 		this.form.WholeWords	= searchQueryParams.WholeWords;
-		this.form.ProcessArea	= searchQueryParams.ProcessArea;    // Павлюков
-		this.form.threadCount	= searchQueryParams.threadCount;    // Павлюков
+		this.form.ProcessArea	= searchQueryParams.ProcessArea;
+		this.form.threadCount	= searchQueryParams.threadCount;
 		this.addToHistory(this.form.Query);
 	},
 
@@ -673,7 +666,6 @@ ExtSearch = ScriptForm.extend({
 		this.showSearchResult(docRow, fromHotKey);
 	},
 
-	//Павлюков
 	makeTranslit : function (str) {
 		var Chars = {
 			'Q': 'Й', 'q': 'й', 'W': 'Ц', 'w': 'ц', 'E': 'У', 'e': 'у', 'R': 'К', 'r': 'к', 'T': 'Е', 't': 'е', 'Y': 'Н', 'y': 'н', 'U': 'Г', 'u': 'г', 'I': 'Ш', 'i': 'ш', 'O': 'Щ', 'o': 'щ', 'P': 'З', 'p': 'з', '{': 'Х', '\\[': 'х', '}': 'Ъ', '\\]': 'ъ', 'A': 'Ф', 'a': 'ф', 'S': 'Ы', 's': 'ы', 'D': 'В', 'd': 'в', 'F': 'А', 'f': 'а', 'G': 'П', 'g': 'п', 'H': 'Р', 'h': 'р', 'J': 'О', 'j': 'о', 'K': 'Л', 'k': 'л', 'L': 'Д', 'l': 'д', ':': 'Ж', ';': 'ж', '"': 'Э', '\'': 'э', 'Z': 'Я', 'z': 'я', 'X': 'Ч', 'x': 'ч', 'C': 'С', 'c': 'с', 'V': 'М', 'v': 'м', 'B': 'И', 'b': 'и', 'N': 'Т', 'n': 'т', 'M': 'Ь', 'm': 'ь', '<': 'Б', ',': 'б', '>': 'Ю', '\\.': 'ю'
@@ -689,12 +681,11 @@ ExtSearch = ScriptForm.extend({
 
 		if (!this.form.IsRegExp)
 		{
-			//Павлюков - добавить транслитерацию как вариант
+			//добавить транслитерацию как вариант
 			translitPattern = this.makeTranslit(pattern);
 
 			pattern = StringUtils.addSlashes(pattern);
 
-			//Павлюков
 			translitPattern = StringUtils.addSlashes(translitPattern);
 			if (pattern !=  translitPattern)
 				pattern = pattern + "|" + translitPattern;
@@ -725,7 +716,7 @@ ExtSearch = ScriptForm.extend({
 		return re;
 	},
 
-	// Павлюков - функция определения подходящей области
+	//функция определения подходящей области
 	isLineSuitable : function (line, curArea, curProps, isSuitableArea) {
 
 		currProcessArea = this.form.ProcessArea;
@@ -814,15 +805,15 @@ ExtSearch = ScriptForm.extend({
 		docRow.groupsCache = v8New('Map');
 		if(!re.multiline)
 		{
-			var curArea = "В общем"; // Павлюков
+			var curArea = "В общем";
 			var curMethod = {
 				'Name'	  : 'Раздел описания переменных',
 				'IsProc'	: undefined,
 				'StartLine' : 0,
-				'Area'	  : curArea // Павлюков
+				'Area'	  : curArea
 			}
 
-			//[+] Павлюков - определение области и свойств модуля
+			//определение области и свойств модуля
 			checkModule	= true;
 			checkArea	= false;
 			defSuit		= true;
@@ -863,7 +854,6 @@ ExtSearch = ScriptForm.extend({
 			}
 
 			if (checkModule)
-			// Павлюков
 			{
 				isSuitableArea = defSuit;
 				isInside = false;
@@ -872,13 +862,11 @@ ExtSearch = ScriptForm.extend({
 				{
 					var line = lines[lineIx];
 
-					//[+] Павлюков
 					if (checkArea && !isInside) {
 						resSuite = this.isLineSuitable(line, curArea, curProps, isSuitableArea);
 						isSuitableArea = resSuite.isSuitableArea;
 						curArea = resSuite.curArea;
 					}
-					//
 
 					// Проверим, не встретилось ли начало метода.
 					var matches = line.match(RE.METHOD_START);
@@ -888,7 +876,7 @@ ExtSearch = ScriptForm.extend({
 							'Name'	  : matches[2],
 							'IsProc'	: matches[1].toLowerCase() == 'процедура' || matches[1].toLowerCase() == 'procedure',
 							'StartLine' : lineIx,
-							'Area'	  : curArea // Павлюков
+							'Area'	  : curArea
 						};
 						isInside = true;
 					}
@@ -905,7 +893,7 @@ ExtSearch = ScriptForm.extend({
 							'Name'	  : '<Текст вне процедур и функций>',
 							'IsProc'	: undefined,
 							'StartLine' : lineIx,
-							'Area'	  : curArea // Павлюков
+							'Area'	  : curArea
 						};
 						isSuitableArea = defSuit;//надо сбросить на по-умолчанию
 						curArea = (curProps == undefined ? curArea : this.defArea(curProps));
@@ -1052,7 +1040,7 @@ ExtSearch = ScriptForm.extend({
 		if(undefined != methodData)
 		{
 			resRow.Method = methodData.Name;
-			resRow.Area = methodData.Area; // Павлюков
+			resRow.Area = methodData.Area;
 		}
 
 		resRow._method = methodData;
@@ -1252,7 +1240,6 @@ ExtSearch = ScriptForm.extend({
 	},
 
 	Form_OnOpen : function () {
-		//Павлюков - логика сменилась
 		this.reEditorPresent = (this.getRegExpEditorScriptPath() != '');
 		this.form.Controls.Query.ChoiceButton = (this.form.IsRegExp ? this.reEditorPresent : false);
 		this.form.Controls.CmdBar.Buttons.btShowReplace.СочетаниеКлавиш = stdlib.v8hotkey("H".charCodeAt(0), 16);
@@ -1503,7 +1490,7 @@ ExtSearch = ScriptForm.extend({
 	},
 
 	CmdBar_BtAbout : function (control) {
-		RunApp('http://snegopat.ru/scripts/wiki?name=extSearch.js'); // Павлюков
+		RunApp('http://snegopat.ru/scripts/wiki?name=extSearch.js');
 	},
 
 	SearchResults_Selection : function (control, selectedRow, selectedCol, defaultHandler) {
@@ -1518,7 +1505,6 @@ ExtSearch = ScriptForm.extend({
 	IsRegExp_OnChange : function(Элемент) {
 		if (this.form.IsRegExp)
 			this.form.WholeWords = false;
-		//Павлюков
 		this.form.Controls.Query.ChoiceButton = (this.form.IsRegExp ? this.reEditorPresent : false);
 
 		this.SetControlsVisible()
@@ -1527,7 +1513,6 @@ ExtSearch = ScriptForm.extend({
 	WholeWords_OnChange : function(Элемент) {
 		if (this.form.WholeWords)
 			this.form.IsRegExp = false;
-		//Павлюков
 		this.form.Controls.Query.ChoiceButton = (this.form.IsRegExp ? this.reEditorPresent : false);
 
 		this.SetControlsVisible();
@@ -1690,8 +1675,8 @@ ExtSearchGlobal = ExtSearch.extend({
 			'SearchHistory'		: v8New('ValueList'), // История поиска.
 			'ReplaceHistory'	: v8New('ValueList'), // История замены.
 			'HistoryDepth'		: 15, // Количество элементов истории поиска.
-			'ProcessArea'		: 0, // Павлюков
-			'threadCount'		: 25, // Павлюков
+			'ProcessArea'		: 0, // текущая область
+			'threadCount'		: 25, // к-во потоков
 			'TreeView'			: false // Группировать результаты поиска по методам.
 		}
 	},
@@ -1704,7 +1689,6 @@ ExtSearchGlobal = ExtSearch.extend({
 
 		this.form.КлючСохраненияПоложенияОкна = "extGlobalSearch.js";
 
-		// Павлюков - иначе значения по умолчанию
 		this.loadSettings();
 
 		this.isGlobalFind = true;
@@ -1723,7 +1707,7 @@ ExtSearchGlobal = ExtSearch.extend({
 		this.expandetRows = {};
 
 		this.SetControlsVisible();
-		this.countRowsInIdleSearch = this.settings.pflSnegopat.current.threadCount; // Павлюков - сделал настройкой
+		this.countRowsInIdleSearch = this.settings.pflSnegopat.current.threadCount;
 		//debugger
 		this.re = new RegExp(/(([а-яa-z0-9]{1,})\s[а-яa-z0-9]{1,})(\.|\:)/i);
 
