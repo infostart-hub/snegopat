@@ -19,7 +19,7 @@
 
 function macrosОткрытьОкно()
 {
-    form = loadScriptForm(SelfScript.fullPath.replace(/js$/i, 'ssf'), SelfScript.self)
+    form = loadScriptFormEpf(SelfScript.fullPath.replace(/js$/i, 'epf'), "Форма", SelfScript.self)
     form.ОткрытьМодально()
     form = null
 }

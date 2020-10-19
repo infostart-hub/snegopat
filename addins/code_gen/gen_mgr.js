@@ -17,7 +17,7 @@ stdlib.require("SelectValueDialog.js", SelfScript);
 
 // Сразу загрузим форму, т.к. ее дерево будет использоваться для хранения функций-кодогенераторов
 var codeGens = [], form
-form = loadScriptForm(SelfScript.fullPath.replace(/js$/, 'ssf'), SelfScript.self)
+form = loadScriptFormEpf(SelfScript.fullPath.replace(/js$/, 'epf'), "Форма", SelfScript.self)
 form.ИспользоватьМетаданные = 1
 form.Дерево.Колонки.Добавить("caller")
 
@@ -52,7 +52,7 @@ function registerCodeGen(description, caller)
 // Собственно, выбор и запуск генерации
 SelfScript.Self["macrosХочу Кода!!!"] = function()
 {
-    var pathToForm = SelfScript.fullPath.replace(/js$/, 'ssf')
+    var pathToForm = SelfScript.fullPath.replace(/js$/, 'epf')
     // Обработку событий формы привяжем к самому скрипту
     if(form.ОткрытьМодально())
     {
@@ -230,7 +230,7 @@ AdditionalParams = stdlib.Class.extend({
     construct: function(){},
     getParams: function(data)
     {
-        this.form = loadScriptForm(SelfScript.fullPath.replace(/\\[^\\]*$/, '\\gen_param.ssf'), this);
+        this.form = loadScriptFormEpf(SelfScript.fullPath.replace(/js$/, 'epf'), "ФормаНастройки", this);
         this.form.comments = true
         this.form.VarName = data.VarName
         this.form.Attribs.Колонки.Добавить("Object")
