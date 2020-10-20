@@ -110,7 +110,7 @@ function _SpellChecker(settings) {
     var pathToFormSettings = SelfScript.fullPath.replace(/js$/, 'param.ssf');
     this.formParams = loadScriptForm(pathToFormSettings, this) // Обработку событий формы привяжем к самому скрипту
     
-    this.extSearch = stdlib.require(env.pathes.addins + 'extSearch.js').GetExtSearch();
+    this.extSearch = stdlib.require(env.pathes.addins + 'extSearchReplace.js').GetExtSearch();
     this.wnd = GetTextWindow();
     
     if (this.provider==null)
