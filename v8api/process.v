@@ -1,4 +1,4 @@
-﻿#if ver < 8.2.19 | (ver > 8.3.0 & ver < 8.3.4) | ver >= 8.3.18
+﻿#if ver < 8.2.19 | (ver > 8.3.0 & ver < 8.3.4) | ver >= 8.3.19
 #err Unsupported version of 1C - Эта версия 1С не поддерживается!
 #endif
 
