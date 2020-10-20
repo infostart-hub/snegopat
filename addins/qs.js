@@ -366,7 +366,7 @@ function CmdPanelrefreshModules() {
  */
 function macrosОткрыть() {
     if (!form) {
-        form = loadScriptForm(SelfScript.fullPath.replace(/js$/, "ssf"), SelfScript.self);
+        form = loadScriptFormEpf(SelfScript.fullPath.replace(/js$/, "epf"), "Форма", SelfScript.self);
         form.Controls.dbPath.Заголовок = dbPath;
         form.searchResult.Columns.Add("data");
     }

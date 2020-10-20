@@ -27,9 +27,9 @@ var мВерсияСкрипта = 1.40
 // Макрос для вызова окна
 function macrosОткрытьОкноВнешнихФайлов() {
 
-    var pathToForm = SelfScript.fullPath.replace(/js$/, 'ssf')
+    var pathToForm = SelfScript.fullPath.replace(/js$/, 'epf')
     if(!мФормаСкрипта){
-        мФормаСкрипта = loadScriptForm(pathToForm, SelfScript.self) // Обработку событий формы привяжем к самому скрипту
+        мФормаСкрипта = loadScriptFormEpf(pathToForm, "Форма", SelfScript.self) // Обработку событий формы привяжем к самому скрипту
         мФормаСкрипта.КлючСохраненияПоложенияОкна = SelfScript.uniqueName;
         мФормаСкрипта.Заголовок="Внешние файлы" //+мВерсияСкрипта        
         КэшКартинокТиповФайлов = ПолучитьКэшКартинокТиповФайлов(мФормаСкрипта);
@@ -880,8 +880,8 @@ function loadDvcsBackends() {
 ////
 
 function КпШапкаНастройки(Элемент) {
-    var pathToForm=SelfScript.fullPath.replace(/.js$/, 'param.ssf')
-    мФормаНастройки=loadScriptForm(pathToForm, SelfScript.self) // Обработку событий формы привяжем к самому скрипту
+    var pathToForm=SelfScript.fullPath.replace(/.js$/, '.epf')
+    мФормаНастройки=loadScriptFormEpf(pathToForm, "ФормаНастройки", SelfScript.self) // Обработку событий формы привяжем к самому скрипту
     мФормаНастройки.ЭлементыФормы.НадписьВерсия.Заголовок="Версия скрипта:"+мВерсияСкрипта
     мФормаНастройки.ОткрытьМодально()
 }

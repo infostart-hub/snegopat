@@ -98,7 +98,7 @@ SessionManager = ScriptForm.extend({
     construct : function (isExtend) {
 
         if (isExtend == undefined) isExtend = false;
-        this._super(env.pathes.addins + "SessionManager.ssf");
+        this._super(SelfScript.fullPath.replace(/.js$/, '.epf|Форма'));
 
         this.form.КлючСохраненияПоложенияОкна = "SessionManager.js"
         this.sessionsList = this.form.Controls.SessionsList.Value;
@@ -611,7 +611,7 @@ SessionManagerSettings = ScriptForm.extend({
 
     construct : function () {
 
-        this._super(env.pathes.addins + "SessionManager.settings.ssf");
+        this._super(SelfScript.fullPath.replace(/.js$/, '.epf|ФормаНастройки'));
 
         this.loadSettings();
 

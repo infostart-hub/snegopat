@@ -13,8 +13,8 @@ var pathTo1C = env.pathes.core + "starter.exe";
 var мФормаНастройки=null
 
 function macrosНастрокаv8Reader(){
-    var pathToForm=SelfScript.fullPath.replace(/js$/, 'ssf')
-    мФормаНастройки=loadScriptForm(pathToForm, SelfScript.self) // Обработку событий формы привяжем к самому скрипту
+    var pathToForm=SelfScript.fullPath.replace(/js$/, 'epf')
+    мФормаНастройки=loadScriptFormEpf(pathToForm, "Форма", SelfScript.self) // Обработку событий формы привяжем к самому скрипту
     мФормаНастройки.ОткрытьМодально()
 }
 

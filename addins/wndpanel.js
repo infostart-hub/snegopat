@@ -740,8 +740,8 @@ function НастройкиПриОткрытии() {
 }
 
 function CmdsConfig(Кнопка) {
-    var pathToForm = SelfScript.fullPath.replace(/.js$/, 'param.ssf')
-        мФормаНастройки = loadScriptForm(pathToForm, SelfScript.self) // Обработку событий формы привяжем к самому скрипту
+    var pathToForm = SelfScript.fullPath.replace(/.js$/, '.epf')
+        мФормаНастройки = loadScriptFormEpf(pathToForm, "ФормаНастройки", SelfScript.self) // Обработку событий формы привяжем к самому скрипту
         мФормаНастройки.ОткрытьМодально()
 }
 
@@ -838,7 +838,7 @@ function CmdshistorySort(Button){
 (function () {
     // Инициализация скрипта
     WndList.One = new WndList
-        form = loadScriptForm(SelfScript.fullPath.replace(/js$/, 'ssf'), SelfScript.self)
+        form = loadScriptFormEpf(SelfScript.fullPath.replace(/js$/, 'epf'), "Форма", SelfScript.self)
         form.КлючСохраненияПоложенияОкна = "wndpanel"
         form.WndList.Columns.Окно.ТипЗначения = v8New("ОписаниеТипов")
         var hk = [
@@ -864,9 +864,9 @@ function loadSessionManager() {
 function macrosОткрытьОкно() {
 
     мФормаСкрипта = null;
-    var pathToForm = SelfScript.fullPath.replace(/js$/, 'ssf')
+    var pathToForm = SelfScript.fullPath.replace(/js$/, 'epf')
         if (!мФормаСкрипта) {
-            мФормаСкрипта = loadScriptForm(pathToForm, SelfScript.self) // Обработку событий формы привяжем к самому скрипту
+            мФормаСкрипта = loadScriptFormEpf(pathToForm, "Форма", SelfScript.self) // Обработку событий формы привяжем к самому скрипту
                 мФормаСкрипта.КлючСохраненияПоложенияОкна = SelfScript.uniqueName;
             //мФормаСкрипта.Заголовок = "Список Процедур/Функций" //+мВерсияСкрипта
         }
