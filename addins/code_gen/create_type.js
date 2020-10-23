@@ -23,7 +23,7 @@ codegen_manager.registerCodeGen("Типизирующий коммент/Док�
 codegen_manager.registerCodeGen("Типизирующий коммент/ПроизвольныйТип", genarateNewType);
 
 function getWordUnderCursor(){
-    extSearch = stdlib.require(env.pathes.addins + 'extSearch.js').GetExtSearch();
+    extSearch = stdlib.require(env.pathes.addins + 'extSearchReplace.js').GetExtSearch();
     selText = ''
     w = extSearch.watcher.getActiveTextWindow();
     if (!w) return ''

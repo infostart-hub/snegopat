@@ -8,7 +8,8 @@ Packet ScriptInit("ScriptInit", initScripts, piOnMainWindow);
 bool initScripts() {
     string nameOfInstance = getDefaultInfoBase().connectString();
     // Получим хэндл основного окна
-    hRealMainWnd = FindWindow("V8TopLevelFrame".cstr, 0);
+    IWindow&& win = mainFrame.unk;
+    hRealMainWnd = win.hwnd();
     initActiveScriptSubsystem(hRealMainWnd, nameOfInstance);
     return true;
 }
