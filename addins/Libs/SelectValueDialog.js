@@ -37,7 +37,7 @@ SelectValueDialog = ScriptForm.extend({
     },
 
     construct : function (caption, values) {    
-        this._super(SelfScript.fullPath.replace(/js$/, 'epf|Форма'));
+        this._super(SelfScript);
         if (!values) {
         	values = [];
         }

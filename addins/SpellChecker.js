@@ -104,11 +104,9 @@ function _SpellChecker(settings) {
     }
     
     //this.provider = new _SpellWord();
-    var pathToForm = SelfScript.fullPath.replace(/js$/, 'epf')
-    this.form = loadScriptFormEpf(pathToForm, "Форма", this) // Обработку событий формы привяжем к самому скрипту
+    this.form = loadFormForScript(SelfScript, "", this) // Обработку событий формы привяжем к самому скрипту
     this.form.КлючСохраненияПоложенияОкна = SelfScript.uniqueName;
-    var pathToFormSettings = SelfScript.fullPath.replace(/js$/, 'epf');
-    this.formParams = loadScriptFormEpf(pathToFormSettings, "ФормаНастройки", this) // Обработку событий формы привяжем к самому скрипту
+    this.formParams = loadFormForScript(SelfScript, "ФормаНастроек", this) // Обработку событий формы привяжем к самому скрипту
     
     this.extSearch = stdlib.require(env.pathes.addins + 'extSearchReplace.js').GetExtSearch();
     this.wnd = GetTextWindow();

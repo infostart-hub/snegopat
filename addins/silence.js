@@ -170,7 +170,7 @@ ProcedurCreateHelper = ScriptForm.extend({
     },
 
     construct : function () {  
-        this._super(SelfScript.fullPath.replace(/.js$/, '.epf|Форма'));                
+        this._super(SelfScript);
         this.form.КлючСохраненияПоложенияОкна = "silence.dialog"
         this.loadSettings();
         this.timerId = null;

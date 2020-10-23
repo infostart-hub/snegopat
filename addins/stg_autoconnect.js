@@ -184,7 +184,7 @@ SelfScript.self["macrosНастроить автоматический реку�
 }
 
 function macrosНастройка() {
-    var form = loadScriptFormEpf(SelfScript.fullPath.replace(/js$/i, 'epf'), "Форма", {
+    var form = loadFormForScript(SelfScript, "", {
         ПриОткрытии: function() {
             form.showMessage = profileRoot.getValue(pflShowMessage);
             form.fRecursive = profileRoot.getValue(pflAutoRecursiveCheckOut);

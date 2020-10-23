@@ -411,8 +411,7 @@ ExtSearchDialog = ScriptForm.extend({
 	},
 
 	construct : function (query, initSearchArea) {
-		var pathToForm=SelfScript.fullPath.replace(/.js$/, '.epf|ФормаПоиска');
-		this._super(pathToForm);
+		this._super(SelfScript, 'ФормаПоиска');
 
 		this.form.КлючСохраненияПоложенияОкна = "extSearchReplace.dialog.js"
 		this.loadSettings();
@@ -523,8 +522,7 @@ ExtSearch = ScriptForm.extend({
 	construct : function (isExtend) {
 
 		if (isExtend == undefined) isExtend = false;
-		var pathToForm=SelfScript.fullPath.replace(/.js$/, '.epf|ФормаРезультатов')
-		this._super(pathToForm);
+		this._super(SelfScript, 'ФормаРезультатов');
 
 		this.form.КлючСохраненияПоложенияОкна = "extSearchReplace.js"
 		this.results = this.form.Controls.SearchResults.Value;

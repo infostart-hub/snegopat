@@ -155,7 +155,7 @@ function openQueryConsole(doModal) {
 
 function DebugHelperSettingsForm(settings) {
     this.settings = settings;
-    this.form = loadScriptFormEpf(SelfScript.fullPath.replace(/js$/, 'epf'), "Форма", this);
+    this.form = loadFormForScript(SelfScript, "", this);
 }
 
 DebugHelperSettingsForm.prototype.ShowDialog = function () {

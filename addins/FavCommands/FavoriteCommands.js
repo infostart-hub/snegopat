@@ -41,8 +41,7 @@ SelfScript.self['macrosОткрыть окно'] = function() {
 
 function FavoriteCommands(){
 	FavoriteCommands._instance = this;
-	var pathToForm = SelfScript.fullPath.replace(/js$/, 'epf');
-	this.form = loadScriptFormEpf(pathToForm, "Форма", this);
+	this.form = loadFormForScript(SelfScript, "", this);
 	this.OpenWindow = false;
 }
 
@@ -80,8 +79,7 @@ FavoriteCommands.prototype.ВызовКоманды = function (Кнопка) {
 }
 
 FavoriteCommands.prototype.КПОткрытьНастройки = function (Кнопка) {
-	var pathToForm=SelfScript.fullPath.replace(/.js$/, '.epf')
-    мФормаНастройки=loadScriptFormEpf(pathToForm, "ФормаНастройки", SelfScript.self) 
+	мФормаНастройки=loadFormForScript(SelfScript, "ФормаНастройки") 
 	мФормаНастройки.НаборКнопок = мНаборКнопок.Скопировать();
 	мФормаНастройки.Автозапуск = мАвтозапуск;
     мФормаНастройки.ОткрытьМодально()
@@ -276,8 +274,7 @@ profileRoot.createValue(pflFavoriteCommandsTab, СформироватьТзПо
 мФормаНастройки = null
 var мАвтозапуск = profileRoot.getValue(pflFavoriteCommandsOpenOnStart)
 var мНаборКнопок = profileRoot.getValue(pflFavoriteCommandsTab)
-var pathToForm=SelfScript.fullPath.replace(/.js$/, '.epf')
-    мФормаВыборкаКартинки=loadScriptFormEpf(pathToForm, "ФормаИконка", SelfScript.self) 
+    мФормаВыборкаКартинки=loadFormForScript(SelfScript, "ФормаИконка") 
 	мФормаВыборкаКартинки.НаборКартинокВыбор = СформироватьТзКартинок().Скопировать();
 //}
 

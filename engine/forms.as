@@ -282,6 +282,34 @@ bool loadScriptForm(IFile&& file, IDispatch&& eventHandler, const string& eventP
     return true;
 }
 
+//загрузка формы по скрипту и имени формы (если не стандартная)
+bool loadFormForScript(SelfScript&& selfScript, string formName, IDispatch&& eventHandler, const string& eventPrefix, Value& out result) {
+
+	string path = selfScript._fullPath;
+	doLog("path = " + path);
+	doLog("formName = " + formName);
+	string pathToForm = path;
+	pathToForm.replace(RegExp(".js$"), ".epf", 1);
+	
+	string fullPath = findFullPath(pathToForm);
+	
+	if (!fullPath.isEmpty())
+	{
+		doLog("Load EPF");
+		doLog("pathToForm = " + pathToForm);
+		return loadScriptForm(loadFormFile(pathToForm, formName.isEmpty()?"Форма":formName), (eventHandler is null)?selfScript.self:eventHandler, eventPrefix, result, true);
+	}
+	else//оставим поддержку SSF на всякий случай
+	{
+		doLog("Load SSF");
+		pathToForm = path;
+		pathToForm.replace(RegExp(".js$"), (formName.isEmpty()?"":("." + formName))+".ssf", 1);
+		doLog("pathToForm = " + pathToForm);
+		return loadScriptForm(loadFormFile(pathToForm, ""), (eventHandler is null)?selfScript.self:eventHandler, eventPrefix, result, false);
+	}
+	
+}
+
 bool loadScriptFormEpf(string path, string formName, IDispatch&& eventHandler, const string& eventPrefix, Value& out result) {
     return loadScriptForm(loadFormFile(path, formName), eventHandler, eventPrefix, result, true);
 }

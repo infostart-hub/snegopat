@@ -45,8 +45,7 @@ function _NotifySend(settings) {
                     // "MessagePovider":"TrayTip"
                     // }
     this.settings = settings;
-    var pathToForm = SelfScript.fullPath.replace(/js$/, 'epf')
-    this.form = loadScriptFormEpf(pathToForm, "Форма", this) // Обработку событий формы привяжем к самому скрипту
+    this.form = loadFormForScript(SelfScript, "", this) // Обработку событий формы привяжем к самому скрипту
     this.provider = this.initprovider();
     //Message("this.settings.MessagePovider" + this.settings.current.MessagePovider)
 

@@ -46,12 +46,20 @@ ScriptForm = stdlib.Class.extend({
 
     //} Свойства
 
-    construct: function (formPath) {
+	construct: function (SelfScript) {
 
-	    this.form = null;
-    	this.handlers = {};
+        this.form = null;
+        this.handlers = {};
         
-        this.loadForm(formPath);        
+        this.loadForm(SelfScript.fullPath, 'Форма');
+    },
+
+    construct: function (SelfScript, formName) {
+
+        this.form = null;
+        this.handlers = {};
+        
+        this.loadForm(SelfScript.fullPath, formName);
     },
     
     show: function (modal) {
@@ -204,12 +212,17 @@ ScriptForm = stdlib.Class.extend({
     //} Чтение/сохранение сохраняемых значений (реквизитов формы).
     
     //{ Приватные методы
-    loadForm: function (path) {
-		var m = path.match(/^(.+\.epf)\|(.+)$/i);
-		if (m)
-			this.form = loadScriptFormEpf(m[1], m[2], this);
+    loadForm: function (path, formName) {
+		
+		var pathToForm = path.replace(/js$/, 'epf');
+		if (stdlib.isFileExist(pathToForm)) 
+			this.form = loadScriptFormEpf(pathToForm, formName, this);
 		else
-			this.form = loadScriptForm(path, this);
+			if (formName)
+				this.form = loadScriptForm(path.replace(/js$/, formName+'.ssf'), this);
+			else
+				this.form = loadScriptForm(path.replace(/js$/, 'ssf'), this);
+		
         // Автоматически подключим обработчики событий.
         if (!this.disableAutoEvents) 
         {

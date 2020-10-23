@@ -16,7 +16,7 @@
 // Надо бы наверное сделать еще ввод индексов, может кто-то доделает?
 
 global.connectGlobals(SelfScript)
-form = loadScriptFormEpf(SelfScript.fullPath.replace(/js$/i, "epf"), "Форма", SelfScript.self)
+form = loadFormForScript(SelfScript)
 form.КлючСохраненияПоложенияОкна = "vtcreator"
 
 function macrosСоздатьТаблицуЗначений()

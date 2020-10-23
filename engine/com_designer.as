@@ -162,6 +162,13 @@ class Designer {
     void designScriptForm(const string& path = "") {
         ::designScriptForm(path);
     }
+    Variant loadFormForScript(SelfScript&& selfScript, string formName = "", IDispatch&& eventHandler = null, const string& eventPrefix="") {
+        Value form;
+        ::loadFormForScript(selfScript, formName, eventHandler, eventPrefix, form);
+		Variant res;
+        val2var(form, res);
+        return res;
+    }
     Variant loadScriptForm(string path, IDispatch&& eventHandler, const string& eventPrefix="") {
         Value form;
         ::loadScriptForm(path, eventHandler, eventPrefix, form);

@@ -71,7 +71,7 @@ function FuncProcPanel() {
     
     FuncProcPanel._instance = this;
     
-    this.form = loadScriptFormEpf(env.pathes.addins + "FuncProcPanel.epf", "Форма", this);
+    this.form = loadFormForScript(SelfScript, "", this);
     this.form.КлючСохраненияПоложенияОкна = "FuncProcPanel.js"
     this.results = this.form.FunctionList;
     this.results.Columns.Add('_method');

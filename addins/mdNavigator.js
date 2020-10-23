@@ -583,7 +583,7 @@ SelfScript.self['macrosОткрыть объект метаданных'] = func
     if(!form)
     {
 
-        form = loadScriptFormEpf(SelfScript.fullPath.replace(/js$/, 'epf'), "Форма", SelfScript.self)
+        form = loadFormForScript(SelfScript)
         form.КлючСохраненияПоложенияОкна = "mdNavigator"
         Icons = {
         'Func': form.Controls.PicFunc.Picture,
@@ -638,7 +638,7 @@ function SelectMdUUID(){
     if(!form)
     {
 
-        form = loadScriptFormEpf(SelfScript.fullPath.replace(/js$/, 'epf'), "Форма", SelfScript.self)
+        form = loadFormForScript(SelfScript)
         form.КлючСохраненияПоложенияОкна = "mdNavigator"
         Icons = {
         'Func': form.Controls.PicFunc.Picture,

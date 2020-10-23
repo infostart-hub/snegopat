@@ -169,7 +169,7 @@ function getDefaultMacros() {
 var ColorEditorForm = /** @class */ (function () {
     function ColorEditorForm(settings) {
         this.settings = settings;
-        this.form = loadScriptFormEpf(SelfScript.fullPath.replace(/js$/, 'epf'), "Форма", this);
+        this.form = loadFormForScript(SelfScript, "", this);
     }
     ColorEditorForm.prototype.ShowDialog = function () {
         return this.form.DoModal();
