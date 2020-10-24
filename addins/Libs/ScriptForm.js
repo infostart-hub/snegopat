@@ -51,7 +51,7 @@ ScriptForm = stdlib.Class.extend({
         this.form = null;
         this.handlers = {};
         
-        this.loadForm(SelfScript.fullPath, 'Форма');
+		this.loadForm(SelfScript.fullPath, 'Форма');
     },
 
     construct: function (SelfScript, formName) {
@@ -216,7 +216,10 @@ ScriptForm = stdlib.Class.extend({
 		
 		var pathToForm = path.replace(/js$/, 'epf');
 		if (stdlib.isFileExist(pathToForm)) 
-			this.form = loadScriptFormEpf(pathToForm, formName, this);
+			if (formName)
+				this.form = loadScriptFormEpf(pathToForm, formName, this);
+			else
+				this.form = loadScriptFormEpf(pathToForm, 'Форма', this);
 		else
 			if (formName)
 				this.form = loadScriptForm(path.replace(/js$/, formName+'.ssf'), this);
