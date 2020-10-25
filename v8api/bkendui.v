@@ -26,9 +26,7 @@
 #else
     17
 #endif
-  #if ver >= 8.3.18
-	save int doModal1(IFramedView& pView, int i1, int i2, int i3, int i4, int i5, int i6, int i7, int i8)
-  #elif ver < 8.3.4
+  #if ver < 8.3.4 | ver >= 8.3.18
 	save int doModal1(IFramedView& pView, int i1, int i2, int i3, int i4, int i5, int i6, int i7, int i8)
   #else
 	save int doModal1(IFramedView& pView, int i1, int i2, int i3, int i4, int i5, int i6, int i7, int i8, int i9)
@@ -44,9 +42,7 @@
 
 	+1
 
-  #if ver >= 8.3.18
-	save int doModal2(IFramedView& pView, int i1, int i2, int i3, int i4, int i5, int i6, int i7)
-  #elif ver < 8.3.4
+  #if ver < 8.3.4 | ver >= 8.3.18
 	save int doModal2(IFramedView& pView, int i1, int i2, int i3, int i4, int i5, int i6, int i7)
   #else
 	save int doModal2(IFramedView& pView, int i1, int i2, int i3, int i4, int i5, int i6, int i7, int i8)
