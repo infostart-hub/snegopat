@@ -46,7 +46,7 @@ PreCommitHookRedmine = ScriptForm.extend({
 
     construct : function () {
         
-        this._super(SelfScript.fullPath.replace(/.js$/, '.ssf')); //Загрузим форму с настройками, форма должна называться так же как и скрипт, только с расширением ssf
+        this._super(SelfScript); //Загрузим форму с настройками
         this.loadSettings(); //Загрузим сохраненные настройки. 
         
         PreCommitHookRedmine._instance = this;
