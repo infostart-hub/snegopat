@@ -31,14 +31,14 @@ for /f "usebackq delims=" %%p in (`%psCommand%`) do set proxyPass=%%p
 goto :setproxy
 :vispwd
 call:echocolor Red "Во время ввода пароль будет видимым!!!"
-set /p proxyPass=Введите пароль для прокси: 
+set /p proxyPass=Введите пароль для прокси:
 cls
 goto :setproxy
 :ntlm
 set CYGWIN=nodosfilewarning
 if "%notStorePass%"=="true" (
 	set proxyPass=-I
-	<nul set /p ksksk=Enter proxy 
+	<nul set /p ksksk=Enter proxy
 ) else (
 	if not "%proxyPass%"=="" set proxyPass=-p "%proxyPass%"
 )
@@ -120,7 +120,7 @@ if not "%pullErrors%"=="" (
 	goto :end
 )
 echo.
-tools\fossil update
+tools\fossil update trunk
 if errorlevel 1 (
 	echo.
 	call:echocolor Red "---------------------------------------------------"
