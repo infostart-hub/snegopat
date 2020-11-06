@@ -65,7 +65,8 @@
     function loadAddin(loaderStr, group) {
         //Message("Load " + loaderStr);
         if (!addins.loadAddin(loaderStr, group)) {
-            Message("Ошибка загрузки аддина '" + loaderStr + "': " + addins.lastAddinError);
+            if (!(addins.lastAddinError.substr(addins.lastAddinError.length-12) === "уже загружен"))
+                Message("Ошибка загрузки аддина '" + loaderStr + "': " + addins.lastAddinError);
             return false;
         }
         return true;
