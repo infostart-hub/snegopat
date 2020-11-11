@@ -59,7 +59,6 @@ function onDoModal(dlgInfo)
         repoType = (matches[2]=="конфигурации")?1:2;
         repoTitle = matches[2] + ((repoType==1)?"":matches[3]);
         repoParam = (repoType==1)?"Конфигурация":("Расширение:"+matches[3]);
-        Message("Try:"+count+". Stage:"+dlgInfo.stage+". Title:"+repoTitle);
     }
 
     if(repoType)
