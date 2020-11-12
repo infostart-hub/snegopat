@@ -390,9 +390,6 @@ function fillTable(newFilter)
                     maxIndex = percent
                 }
             }
-
-
-
             var row = form.ТаблицаМетаданных.Add()
             row.Name = vtMD[k].Name
             row.UUID = vtMD[k].UUID
@@ -405,17 +402,23 @@ function fillTable(newFilter)
             form.ЭлементыФормы.Подсистема.Заголовок  = "    "+currentSubSystemFilter+((recursiveSubsystems)?" (рекурсивно)":"");
             formTitle+=" подсистема "+currentSubSystemFilter+((recursiveSubsystems)?" (рекурсивно)":"");
         }
-        
-
     }
-    form.ЭлементыФормы.Режим.Заголовок = mode
+    form.ЭлементыФормы.Режим.Заголовок = mode;
     form.Заголовок = formTitle;
     if(form.ТаблицаМетаданных.Количество())
         form.ЭлементыФормы.ТаблицаМетаданных.ТекущаяСтрока = form.ТаблицаМетаданных.Получить(0)
 }
 
-function findMdObj(uuid)
-{
+function checkCurrentMetadata() {
+    try {
+        var t = curMD.rootObject.id;
+    } catch (e) {
+        curMD = metadata.current;
+    }
+}
+
+function findMdObj(uuid) {
+    checkCurrentMetadata();
     if(uuid == curMD.rootObject.id)
         return curMD.rootObject
     return curMD.findByUUID(uuid);
@@ -583,7 +586,7 @@ SelfScript.self['macrosОткрыть объект метаданных'] = func
     if(!form)
     {
 
-        form = loadScriptForm(SelfScript.fullPath.replace(/js$/, 'ssf'), SelfScript.self)
+        form = loadFormForScript(SelfScript)
         form.КлючСохраненияПоложенияОкна = "mdNavigator"
         Icons = {
         'Func': form.Controls.PicFunc.Picture,
@@ -638,7 +641,7 @@ function SelectMdUUID(){
     if(!form)
     {
 
-        form = loadScriptForm(SelfScript.fullPath.replace(/js$/, 'ssf'), SelfScript.self)
+        form = loadFormForScript(SelfScript)
         form.КлючСохраненияПоложенияОкна = "mdNavigator"
         Icons = {
         'Func': form.Controls.PicFunc.Picture,

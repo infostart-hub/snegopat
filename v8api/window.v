@@ -159,6 +159,9 @@
     +1
     +1
 	+1
+	#if ver >= 8.3.18
+		+1
+	#endif
     v8string getCaption()
 	v8string getTitle()
     save void setTitle(const v8string&in str)

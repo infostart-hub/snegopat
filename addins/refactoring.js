@@ -109,7 +109,7 @@ function MethodListForm(module) {
     this.module = module;
     this.originalMethodList = module.getMethodsTable();
 
-    this.form = loadScriptFormEpf(SelfScript.fullPath.replace(/\.js$/, '.epf'), 'MethodListForm',  this);
+    this.form = loadFormForScript(SelfScript, 'MethodListForm',  this);
     this.SelectedMethod = undefined;
 
     this.settings = SettingsManagement.CreateManager(SelfScript.uniqueName + "/MethodListForm", {
@@ -303,7 +303,7 @@ CreateMethodStubRefactoring.prototype.refactor = function (selectedText) {
 ////
 function RenameVariableRefactoring(module) {
     this.module = module;
-    this.form = loadScriptFormEpf(SelfScript.fullPath.replace(/\.js$/, '.epf'), 'ExtractVariableForm', this);
+    this.form = loadFormForScript(SelfScript, 'ExtractVariableForm', this);
     this.ReturnValue = this.form.Name;
 }
 
@@ -410,7 +410,7 @@ RenameVariableRefactoring.prototype.renameVariable = function(source) {
 ////
 function ExtractVariableRefactoring(module) {
     this.module = module;
-    this.form = loadScriptFormEpf(SelfScript.fullPath.replace(/\.js$/, '.epf'), 'ExtractVariableForm', this);
+    this.form = loadFormForScript(SelfScript, 'ExtractVariableForm', this);
     this.ReturnValue = this.form.Name;
 }
 
@@ -469,7 +469,7 @@ ExtractVariableRefactoring.prototype.extractVariable = function(source) {
 
 function ExtractMethodRefactoring(module) {
     this.module = module;
-    this.form = loadScriptFormEpf(SelfScript.fullPath.replace(/\.js$/, '.epf'), 'ExtractMethodForm', this);
+    this.form = loadFormForScript(SelfScript, 'ExtractMethodForm', this);
     this.Params = this.form.Params;
     this.ReturnValue = this.form.ReturnValue;
     this.SignaturePreview = this.form.SignaturePreview;

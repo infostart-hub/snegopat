@@ -157,7 +157,7 @@ function macrosПоказатьСтрокуСоединенияИБ()
 @*/
 function macrosНастройка()
 {
-    form = loadScriptForm(SelfScript.fullPath.replace(/js$/, 'ssf'), SelfScript.self)
+    form = loadFormForScript(SelfScript)
     form.Выражение = captionExpr
     form.ЭлементыФормы.Помощь.Заголовок = "Можно использовать:\n" + 
     "mainTitle - основной заголовок\n" +

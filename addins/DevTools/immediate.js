@@ -25,7 +25,7 @@ var TD = null; // Активный текстовый документ.
 addins.byUniqueName("global").object.connectGlobals(SelfScript)
 
 // Загрузка формы и подключение ее событий непосредственно к самому скрипту
-var form = loadScriptForm(SelfScript.fullPath.replace(/js$/i, "ssf"), SelfScript.self)
+var form = loadFormForScript(SelfScript)
 form.КлючСохраненияПоложенияОкна = "immediate.js"
 form.ЭлементыФормы.Код.ДобавитьСтроку(codeMarker + "\n")
 
