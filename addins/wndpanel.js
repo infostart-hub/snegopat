@@ -1,4 +1,4 @@
-﻿//engine: JScript
+//engine: JScript
 //uname: wndpanel
 //dname: Панель окон
 //author: Александр Орефков, Пушин Владимир <vladnet@gmail.com>
@@ -141,6 +141,8 @@ WndList = stdlib.Class.extend({
                             try { // попытаемся получить Родителя если не сможем значит строки уже нет
                                 var test = item.rowInVt.Родитель
                             } catch (e) {
+                                this.list.splice(i, 1)
+                                removed = true
                                 return true
                             }
                             if (item.rowInVt) {
@@ -172,14 +174,10 @@ WndList = stdlib.Class.extend({
                                                 item.rowInVt.Заголовок = tTtitle
                                         }
                                 }
-                            } catch(e)
-{
-//debugger
-}
-
-
+                            } catch(e) {
+                                //debugger
+                            }
                 }
-
                 return removed
         },
         // Функция для добавления новых окон в список.
@@ -363,11 +361,31 @@ WndList = stdlib.Class.extend({
 
 function macrosПоказать() {
     form.Filter = ""
-        form.Открыть()
-        form.CurrentControl = form.Controls.WndList
-        if (activateSearchElement) {
-            form.CurrentControl = form.Controls.Filter;
+
+    form.Открыть();
+    form.CurrentControl = form.Controls.WndList
+    if (activateSearchElement) {
+        form.CurrentControl = form.Controls.Filter;
+    }
+}
+
+function macrosПоказатьСкрыть() {
+    form.Filter = ""
+
+    if (form.Открыта())
+        if (form.ВводДоступен())
+        {
+            form.Закрыть();
+            return;
         }
+        else
+            form.Активизировать();
+    else
+        form.Открыть();
+    form.CurrentControl = form.Controls.WndList
+    if (activateSearchElement) {
+        form.CurrentControl = form.Controls.Filter;
+    }
 }
 
 function macrosПереключитьВидимостьОкнаСвойств() {
@@ -418,8 +436,10 @@ function WndListВыбор(Элемент, ВыбраннаяСтрока, Ко�
         if(Элемент.val.ТекущаяСтрока.Строки.Количество()>0){
             if(!Элемент.val.ТекущаяСтрока.Строки.Получить(0).Окно.view)
                 return
-        Элемент.val.ТекущаяСтрока.Строки.Получить(0).Окно.view.mdObj.parent.openEditor()
-        Элемент.val.ТекущаяСтрока.Строки.Получить(0).Окно.view.mdObj.openEditor()
+            лТекущаяВью=Элемент.val.ТекущаяСтрока.Строки.Получить(0).Окно.view
+            if(!лТекущаяВью.isAlive()) return
+            лТекущаяВью.mdObj.parent.openEditor()
+            лТекущаяВью.mdObj.openEditor()
         }
     }
 
@@ -477,7 +497,7 @@ function WndListПриВыводеСтроки(Элемент, Оформлен�
     }
     if (item.view.icon != undefined)
         cell.УстановитьКартинку(item.view.icon)
-    
+
     var cellinfo = ОформлениеСтроки.Ячейки.Инфо;
     var TypePicture = v8New("Картинка");
     var strwindow = item.view.title;
@@ -592,9 +612,9 @@ function closewindows() {
                 }
         } catch (e) {}
 
-		try{
-			withSelected(function(item){item.view.close()})
-		} catch (e){}
+        try{
+            withSelected(function(item){item.view.close()})
+        } catch (e){}
     }
 }
 
