@@ -250,8 +250,10 @@
 	    53
 	  #elif ver < 8.3.17
 	    55
-	  #elif ver < 8.3.18
+	  #elif ver < 8.3.17.1823
 		56
+	  #elif ver < 8.3.18
+	    64
 	  #else
 	    57
 	  #endif
