@@ -235,6 +235,16 @@ function macrosНастройка() {
 
 (function() {
 	if (stdlib.isConfigOpen()) {
+		var data = profileRoot.getValue(pflData);
+		if (data) {
+			if (toV8Value(data).typeName(1) == "Структура")
+			{
+				data0 = v8New("Соответствие");
+				data0.Вставить("Конфигурация", data);
+				profileRoot.setValue(pflData, data0);
+				Message("Сохранённые данные для входа в хранилище конвертированы в данные входа в хранилище Конфигурации");
+			}
+		}
 		var no = profileRoot.getValue(pflAutoOpenCfgStore);
 		if (profileRoot.getValue(pflAutoOpenCfgStore)) {
 			var s = stdcommands.CfgStore.OpenCfgStore.getState();
