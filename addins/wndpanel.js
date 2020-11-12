@@ -174,14 +174,10 @@ WndList = stdlib.Class.extend({
                                                 item.rowInVt.Заголовок = tTtitle
                                         }
                                 }
-                            } catch(e)
-{
-//debugger
-}
-
-
+                            } catch(e) {
+                                //debugger
+                            }
                 }
-
                 return removed
         },
         // Функция для добавления новых окон в список.
@@ -366,7 +362,7 @@ WndList = stdlib.Class.extend({
 function macrosПоказать() {
     form.Filter = ""
 
-	form.Открыть();
+    form.Открыть();
     form.CurrentControl = form.Controls.WndList
     if (activateSearchElement) {
         form.CurrentControl = form.Controls.Filter;
@@ -376,16 +372,16 @@ function macrosПоказать() {
 function macrosПоказатьСкрыть() {
     form.Filter = ""
 
-	if (form.Открыта())
-		if (form.ВводДоступен())
-		{
-			form.Закрыть();
-			return;
-		}
-		else
-			form.Активизировать();
-	else
-		form.Открыть();
+    if (form.Открыта())
+        if (form.ВводДоступен())
+        {
+            form.Закрыть();
+            return;
+        }
+        else
+            form.Активизировать();
+    else
+        form.Открыть();
     form.CurrentControl = form.Controls.WndList
     if (activateSearchElement) {
         form.CurrentControl = form.Controls.Filter;
@@ -501,7 +497,7 @@ function WndListПриВыводеСтроки(Элемент, Оформлен�
     }
     if (item.view.icon != undefined)
         cell.УстановитьКартинку(item.view.icon)
-    
+
     var cellinfo = ОформлениеСтроки.Ячейки.Инфо;
     var TypePicture = v8New("Картинка");
     var strwindow = item.view.title;
@@ -616,9 +612,9 @@ function closewindows() {
                 }
         } catch (e) {}
 
-		try{
-			withSelected(function(item){item.view.close()})
-		} catch (e){}
+        try{
+            withSelected(function(item){item.view.close()})
+        } catch (e){}
     }
 }
 
