@@ -327,7 +327,7 @@ class IDoModalHook {
         return _view is null ? "" : _view.title().str;
     }
     IV8Form&& get_form() {
-        if (_form is null) {
+        if (_form is null && !(_view is null)) {
             IForm&& f = _view.unk;
             if (f !is null)
                 &&_form = IV8Form(f);
