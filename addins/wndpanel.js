@@ -1,4 +1,4 @@
-//engine: JScript
+﻿//engine: JScript
 //uname: wndpanel
 //dname: Панель окон
 //author: Александр Орефков, Пушин Владимир <vladnet@gmail.com>
@@ -755,6 +755,7 @@ function CmdsRestoreSession(Кнопка) {
 function НастройкиПриОткрытии() {
     мФормаНастройки.ДляВнешнихФайловОтображатьТолькоИмяФайла = мДляВнешнихФайловОтображатьТолькоИмяФайла
     мФормаНастройки.ИспользоватьСессии = мИспользоватьСессии;
+    мФормаНастройки.ОткрыватьПриСтарте = мОткрыватьПриСтарте;
     мФормаНастройки.ПриОткрытииФормыАктивизироватьСтрокуПоиска = activateSearchElement;
     мФормаНастройки.АктивироватьОкноПриВыбореСтроки = мАктивироватьПриВыбореСтроки;
 }
@@ -766,12 +767,14 @@ function CmdsConfig(Кнопка) {
 
 function мЗаписатьНастройки() {
     мДляВнешнихФайловОтображатьТолькоИмяФайла = мФормаНастройки.ДляВнешнихФайловОтображатьТолькоИмяФайла
-        мИспользоватьСессии = мФормаНастройки.ИспользоватьСессии;
+    мИспользоватьСессии = мФормаНастройки.ИспользоватьСессии;
+    мОткрыватьПриСтарте = мФормаНастройки.ОткрыватьПриСтарте;
     activateSearchElement = мФормаНастройки.ПриОткрытииФормыАктивизироватьСтрокуПоиска;
     мАктивироватьПриВыбореСтроки = мФормаНастройки.АктивироватьОкноПриВыбореСтроки;
 
     profileRoot.setValue(pflOnlyNameForExtFiles, мДляВнешнихФайловОтображатьТолькоИмяФайла);
     profileRoot.setValue(pflUseSessions, мИспользоватьСессии);
+    profileRoot.setValue(pflOpenAtStart, мОткрыватьПриСтарте);
     profileRoot.setValue(pflActivateSearch, activateSearchElement);
     profileRoot.setValue(pflActivateOneClick, мАктивироватьПриВыбореСтроки);
 
@@ -941,16 +944,19 @@ function ПолучитьСписокМетаданных(){
 
 var pflOnlyNameForExtFiles = "WndPanel/OnlyNameForExtFiles"
 var pflUseSessions = "WndPanel/UseSessions";
+var pflOpenAtStart = "WndPanel/OpenAtStart";
 var pflActivateSearch = "WndPanel/ActivateSearch";
 var pflActivateOneClick = "WndPanel/ActivateOneClick";
 
 profileRoot.createValue(pflOnlyNameForExtFiles, false, pflSnegopat)
 profileRoot.createValue(pflUseSessions, false, pflSnegopat)
+profileRoot.createValue(pflOpenAtStart, false, pflSnegopat)
 profileRoot.createValue(pflActivateSearch, false, pflSnegopat)
 profileRoot.createValue(pflActivateOneClick, false, pflSnegopat)
 
 var мДляВнешнихФайловОтображатьТолькоИмяФайла = profileRoot.getValue(pflOnlyNameForExtFiles);
 var мИспользоватьСессии = profileRoot.getValue(pflUseSessions);
+var мОткрыватьПриСтарте= profileRoot.getValue(pflOpenAtStart);
 var activateSearchElement = profileRoot.getValue(pflActivateSearch);
 var мАктивироватьПриВыбореСтроки = profileRoot.getValue(pflActivateOneClick);
 
@@ -964,5 +970,6 @@ if (мИспользоватьСессии) {
     loadSessionManager();
 }
 
-//macrosОткрытьОкно()
-macrosПоказать()
+if (мОткрыватьПриСтарте) {
+    macrosПоказать();
+}
