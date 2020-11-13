@@ -47,110 +47,115 @@ function cnnString()
 
 var count = 0;
 
-function doAutoConnect(dlgInfo, matches)
+function doAutoConnectToStorage(dlgInfo)
 {
-	repoTitle = matches[2];
-	repoParam = "Конфигурация";
+	var matches = dlgInfo.caption.match(/^(Соединение с хранилищем )(конфигурации|расширения )(.*)/i);
 	
-	if (!(matches[2]=="конфигурации"))
+	if (matches && matches.length && matches[2])
 	{
-		repoTitle = repoTitle + matches[3];
-		repoParam = "Расширение:"+matches[3];
-	}
-
-	if (count > 16) {
-			prevConnectSuccessed = true;
-			count = 0;
-	}
-
-	if (dlgInfo.stage == afterInitial)
-	{
-
-		count++;
-
-		if (prevCaption == repoTitle)//не удалось авторизоваться
+		repoTitle = matches[2];
+		repoParam = "Конфигурация";
+		
+		if (!(matches[2]=="конфигурации"))
 		{
-			prevConnectSuccessed = false
-		}
-		else
-		{
-			prevCaption = repoTitle;
-			prevConnectSuccessed = true;
+			repoTitle = repoTitle + matches[3];
+			repoParam = "Расширение:"+matches[3];
 		}
 
-		var data0 = profileRoot.getValue(pflData);
-		if (!(data0))
-			data0 = v8New("Соответствие");
-		var data = data0.Получить(repoParam);
-		if(data)
-		{
-			if (!prevConnectSuccessed)
-			{
-				if(MessageBox("Авто-соединение с хранилищем "+repoTitle+" было неудачным. Сбросить сохраненные данные?", mbYesNo | mbDefButton1 | mbIconQuestion, "Снегопат") == mbaYes)
-				{
-					var data0 = profileRoot.getValue(pflData);
-					if (data0)
-						data0.Удалить(repoParam);
-				}
+		if (count > 16) {
 				prevConnectSuccessed = true;
+				count = 0;
+		}
+
+		if (dlgInfo.stage == afterInitial)
+		{
+
+			count++;
+
+			if (prevCaption == repoTitle)//не удалось авторизоваться
+			{
+				prevConnectSuccessed = false
 			}
 			else
 			{
-				var currentBasePath = profileRoot.getValue(pflCurrentBasePath);
-				if (!currentBasePath)
-					currentBasePath = cnnString();
-
-				if (currentBasePath.toLowerCase() != cnnString().toLowerCase()){
-					var questionStirng = " Для базы сохранена другая строка подключения. \n";
-					questionStirng += "Текущий путь:"+cnnString()+"\n";
-					questionStirng += "Сохраненный путь:"+currentBasePath+" \n";
-					questionStirng += "\t ВНИМАНИЕ ВОПРОС \n"+"Продолжить автоподключение?";
-					if(MessageBox( questionStirng, mbYesNo | mbDefButton1 | mbIconQuestion, "Авто-соединение к хранилищу "+repoTitle+" !") == mbaNo)
-						return;
-				}
-				// Если есть сохраненные данные, то вводим их
-				dlgInfo.form.getControl("UserName").value = data.login
-				dlgInfo.form.getControl("UserPassword").value = data.password
-				dlgInfo.form.getControl("DepotPath").value = data.path
-				dlgInfo.cancel = true   // Отменяем показ диалога
-				dlgInfo.result = 1      // Как будто в нем нажали Ок
-				if(profileRoot.getValue(pflShowMessage))    // Информируем пользователя, если он хочет
-					Message("Авто-подключение к хранилищу "+repoTitle+" '" + data.path + "' пользователем '" + data.login + "'")
+				prevCaption = repoTitle;
+				prevConnectSuccessed = true;
 			}
-		}
-	}
-	else if(dlgInfo.stage == afterDoModal && dlgInfo.result == 1 && dlgInfo.cancel == false)
-	{
-		// Предложим сохранить введенные данные
-		if(MessageBox("Подставлять введенные значения автоматически при последующих подключениях?",
-			mbYesNo | mbDefButton1 | mbIconQuestion) == mbaYes)
-		{
-			// Сохраним их
+
 			var data0 = profileRoot.getValue(pflData);
 			if (!(data0))
 				data0 = v8New("Соответствие");
-			var data = v8New("Структура", "login,password,path",
-				dlgInfo.form.getControl("UserName").value,
-				dlgInfo.form.getControl("UserPassword").value,
-				dlgInfo.form.getControl("DepotPath").value);
-			data0.Вставить(repoParam, data);
-			var currentBasePath = cnnString();
-			profileRoot.createValue(pflData, false, pflBaseUser)    // Храним отдельно для базы/пользователя
-			profileRoot.createValue(pflCurrentBasePath, false, pflBaseUser);
-			profileRoot.setValue(pflData, data0)
-			profileRoot.setValue(pflCurrentBasePath, currentBasePath)
+			var data = data0.Получить(repoParam);
+			if(data)
+			{
+				if (!prevConnectSuccessed)
+				{
+					if(MessageBox("Авто-соединение с хранилищем "+repoTitle+" было неудачным. Сбросить сохраненные данные?", mbYesNo | mbDefButton1 | mbIconQuestion, "Снегопат") == mbaYes)
+					{
+						var data0 = profileRoot.getValue(pflData);
+						if (data0)
+							data0.Удалить(repoParam);
+					}
+					prevConnectSuccessed = true;
+				}
+				else
+				{
+					var currentBasePath = profileRoot.getValue(pflCurrentBasePath);
+					if (!currentBasePath)
+						currentBasePath = cnnString();
+
+					if (currentBasePath.toLowerCase() != cnnString().toLowerCase()){
+						var questionStirng = " Для базы сохранена другая строка подключения. \n";
+						questionStirng += "Текущий путь:"+cnnString()+"\n";
+						questionStirng += "Сохраненный путь:"+currentBasePath+" \n";
+						questionStirng += "\t ВНИМАНИЕ ВОПРОС \n"+"Продолжить автоподключение?";
+						if(MessageBox( questionStirng, mbYesNo | mbDefButton1 | mbIconQuestion, "Авто-соединение к хранилищу "+repoTitle+" !") == mbaNo)
+							return;
+					}
+					// Если есть сохраненные данные, то вводим их
+					dlgInfo.form.getControl("UserName").value = data.login
+					dlgInfo.form.getControl("UserPassword").value = data.password
+					dlgInfo.form.getControl("DepotPath").value = data.path
+					dlgInfo.cancel = true   // Отменяем показ диалога
+					dlgInfo.result = 1      // Как будто в нем нажали Ок
+					if(profileRoot.getValue(pflShowMessage))    // Информируем пользователя, если он хочет
+						Message("Авто-подключение к хранилищу "+repoTitle+" '" + data.path + "' пользователем '" + data.login + "'")
+				}
+			}
 		}
+		else if(dlgInfo.stage == afterDoModal && dlgInfo.result == 1 && dlgInfo.cancel == false)
+		{
+			// Предложим сохранить введенные данные
+			if(MessageBox("Подставлять введенные значения автоматически при последующих подключениях?",
+				mbYesNo | mbDefButton1 | mbIconQuestion) == mbaYes)
+			{
+				// Сохраним их
+				var data0 = profileRoot.getValue(pflData);
+				if (!(data0))
+					data0 = v8New("Соответствие");
+				var data = v8New("Структура", "login,password,path",
+					dlgInfo.form.getControl("UserName").value,
+					dlgInfo.form.getControl("UserPassword").value,
+					dlgInfo.form.getControl("DepotPath").value);
+				data0.Вставить(repoParam, data);
+				var currentBasePath = cnnString();
+				profileRoot.createValue(pflData, false, pflBaseUser)    // Храним отдельно для базы/пользователя
+				profileRoot.createValue(pflCurrentBasePath, false, pflBaseUser);
+				profileRoot.setValue(pflData, data0)
+				profileRoot.setValue(pflCurrentBasePath, currentBasePath)
+			}
+		}
+		return true;
 	}
+	return false;
 }
 
 // Обработчик показа модальных окон.
 function onDoModal(dlgInfo)
 {
-    var matches = dlgInfo.caption.match(/^(Соединение с хранилищем )(конфигурации|расширения )(.*)/i);
-
-    if(matches && matches.length && matches[2])
+    if(doAutoConnectToStorage(dlgInfo))
     {
-		doAutoConnect(dlgInfo, matches);
+        return;
     }
     else if(dlgInfo.stage == openModalWnd && (dlgInfo.caption == "Захват объектов в хранилище конфигурации" ||
         dlgInfo.caption == "Помещение объектов в хранилище конфигурации"))
