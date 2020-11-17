@@ -230,6 +230,7 @@ class IntelliSite : SmartBoxSite {
         } else {
             StringComparator cmp;
             string pattern = buffer.substr(0, posInBuffer);
+            pattern.ltrim("&\"'");
             if (pattern.find(spaceSymbol) >= 0)
                 cmp.setPattern(pattern.replace(spaceSymbol, ' '), cmContain);
             else

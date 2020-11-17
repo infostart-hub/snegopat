@@ -99,12 +99,16 @@ class ModuleTextProcessor : TextProcessor, ModuleTextSource {
     uint lastMethodBeginLine = 0;
     ModuleElements&& moduleElements;
     TextDoc&& td;
+    DirectivesSet dirSet = dirSetNone;
+    bool bOnlyMeths = false;
 
     void getModuleSourceText(v8string& text) {
         td.tm.save(text);
     }
     // Подключение к и отключение от текстового документа
     void setTextDoc(TextDoc&& textDoc) {
+        bOnlyMeths = false;
+        dirSet = dirSetNone;
         //Print("ModuleTextProcessor connect to doc");
         if (textDoc !is null) { // Подключение к текстовому документу
             // Проверим, не является ли он каким-либо модулем объекта метаданных
@@ -113,14 +117,33 @@ class ModuleTextProcessor : TextProcessor, ModuleTextSource {
             if (textDoc.mdInfo is null) {    // Просто текст, для которого выбрали расширение "Встроенный язык"
                 &&moduleElements = ModuleElements();    // Просто создадим новый парсер структуры модуля
                 &&moduleElements.source = this;
-            } else // Получим возможно уже существующий парсер модуля с установкой ему себя как источник текста модуля
+            } else {
+                // Получим возможно уже существующий парсер модуля с установкой ему себя как источник текста модуля
                 &&moduleElements = getModuleElementsParser(textDoc.mdInfo.object, textDoc.mdInfo.mdPropUuid, this);
+                checkIsOnlyMeths(textDoc.mdInfo);
+            }
         } else {    // Нас отключают от документа перед его закрытием
             if (td !is null && td.mdInfo !is null) // Если мы подключались к парсеру модуля, удалим его
                 removeModuleElementsParser(moduleElements, td.mdInfo.object, td.mdInfo.mdPropUuid);
             &&moduleElements = null;
         }
         &&td = textDoc;
+    }
+    // Метод проверяет, допустимы ли в модуле только методы (без переменых и операторов тела модуля),
+    // а также допустимый набор директив методов
+    void checkIsOnlyMeths(TextDocMdInfo&& mdInfo) {
+        string name = stringFromAddress(mdInfo.object.mdClass.getName(1));
+        if (name == "ОбщийМодуль") {
+            bOnlyMeths = true;
+            dirSet = dirSetCommonModule;
+        } else if (name == "Команда" || name == "ОбщаяКоманда") {
+            bOnlyMeths = true;
+            dirSet = dirSetCommand;
+        } else if (name == "Форма") {
+            dirSet = dirSetForm;
+        } else if (mdInfo.mdPropUuid == gModSeance || mdInfo.mdPropUuid == gModOfMgr) {
+            bOnlyMeths = true;
+        }
     }
 
     void connectEditor(TextWnd&& editor) { &&editor.editorData = ModuleEditorData(); }
@@ -326,12 +349,13 @@ class ModuleTextProcessor : TextProcessor, ModuleTextSource {
         insertInSelection(pTxtWnd.ted, pTxtWnd.textDoc.tm, pTxtWnd.textDoc.itm, replace, true, false);
         return true;
     }
+
     void activateInModule(TextWnd&& editor, const string&in lastLexem, TextPosition& caretPos, ActivateModes mode, wchar_t symbol) {
         // Для начала получим текст текущего метода
         uint line = caretPos.line, col = caretPos.col;
         string methodText;
         execContextTypes directive;
-        LexemTypes firstLexem = getMethodText(editor.textDoc.tm, line, col, false, methodText, directive);
+        LexemTypes firstLexem = getMethodText(editor.textDoc.tm, line, col, bOnlyMeths, methodText, directive);
 
         // Теперь проверим, не нужно ли перепарсить структуру модуля
         if (lastMethodBeginLine != line) {
@@ -385,6 +409,8 @@ class ModuleTextProcessor : TextProcessor, ModuleTextSource {
         }
         // Добавим типы
         addTypes(parseResult, isite);
+        // Добавим директивы
+        direcivesSet.processResult(parseResult, dirSet, isite);
         // Для вставки некоторых элементов нужна информация о результатах парсинга
         &&lastParseMethodResult = parseResult;
         // покажем список
