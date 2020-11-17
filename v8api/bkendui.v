@@ -5,8 +5,10 @@
 // Открытие окна
 #if ver < 8.3.6
 	9
-#else
+#elif ver < 8.3.18.1201
 	10
+#else
+    11
 #endif
   #if ver >= 8.3.18
 	save void openView(IFramedView& view, const ViewPosition& pos=ViewPosition(), int openIn=0, bool activate=true, const Guid& g=IID_NULL)

@@ -254,8 +254,10 @@
 		56
 	  #elif ver < 8.3.18
 	    64
-	  #else
+	  #elif ver < 8.3.18.1201
 	    57
+	  #else
+	    65
 	  #endif
 		IConfigMngr@+ getConfigMgr()
 
