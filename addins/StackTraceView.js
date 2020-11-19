@@ -82,7 +82,7 @@ function findMdObjByFullName(RelativeName, parentObj) {
 var StackTrace = /** @class */ (function () {
     function StackTrace() {
         this.timerId = 0;
-        this.form = loadScriptFormEpf(env.pathes.custom + "\\StackTraceView.epf", "Форма", this);
+        this.form = loadFormForScript(SelfScript, "", this);
     }
     StackTrace.prototype.CheckText = function (text) {
         var regExp = this.RegExp();
