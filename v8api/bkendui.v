@@ -5,6 +5,8 @@
 // Открытие окна
 #if ver < 8.3.6
 	9
+#elif ver = 8.3.17.1851
+	11
 #elif ver < 8.3.18.1201
 	10
 #else
@@ -28,6 +30,9 @@
 #else
     17
 #endif
+	#if ver = 8.3.17.1851
+     +1
+    #endif
   #if ver < 8.3.4 | ver >= 8.3.18
 	save int doModal1(IFramedView& pView, int i1, int i2, int i3, int i4, int i5, int i6, int i7, int i8)
   #else
