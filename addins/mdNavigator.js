@@ -784,6 +784,7 @@ function ТаблицаМетаданныхПриАктивизацииСтро�
 // Команда "Обновить МД"
 function КомандыОбновитьМД(Кнопка)
 {
+    checkCurrentMetadata();
     readMDtoVT()
     if(currentFilter.length)
         fillTable(currentFilter)
