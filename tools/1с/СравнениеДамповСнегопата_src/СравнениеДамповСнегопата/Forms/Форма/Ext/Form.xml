@@ -1,0 +1,624 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Form xmlns="http://v8.1c.ru/8.3/xcf/logform" xmlns:app="http://v8.1c.ru/8.2/managed-application/core" xmlns:cfg="http://v8.1c.ru/8.1/data/enterprise/current-config" xmlns:dcscor="http://v8.1c.ru/8.1/data-composition-system/core" xmlns:dcsset="http://v8.1c.ru/8.1/data-composition-system/settings" xmlns:ent="http://v8.1c.ru/8.1/data/enterprise" xmlns:lf="http://v8.1c.ru/8.2/managed-application/logform" xmlns:style="http://v8.1c.ru/8.1/data/ui/style" xmlns:sys="http://v8.1c.ru/8.1/data/ui/fonts/system" xmlns:v8="http://v8.1c.ru/8.1/data/core" xmlns:v8ui="http://v8.1c.ru/8.1/data/ui" xmlns:web="http://v8.1c.ru/8.1/data/ui/colors/web" xmlns:win="http://v8.1c.ru/8.1/data/ui/colors/windows" xmlns:xr="http://v8.1c.ru/8.3/xcf/readable" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.10">
+	<AutoSaveDataInSettings>Use</AutoSaveDataInSettings>
+	<SaveDataInSettings>UseList</SaveDataInSettings>
+	<AutoCommandBar name="ФормаКоманднаяПанель" id="-1">
+		<Autofill>false</Autofill>
+	</AutoCommandBar>
+	<Events>
+		<Event name="OnCreateAtServer">ПриСозданииНаСервере</Event>
+	</Events>
+	<ChildItems>
+		<UsualGroup name="ГруппаНастройки" id="93">
+			<Title>
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Настройки</v8:content>
+				</v8:item>
+			</Title>
+			<ToolTip>
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Группа настройки</v8:content>
+				</v8:item>
+			</ToolTip>
+			<Group>AlwaysHorizontal</Group>
+			<Behavior>Collapsible</Behavior>
+			<CollapsedRepresentationTitle>
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Настройки</v8:content>
+				</v8:item>
+			</CollapsedRepresentationTitle>
+			<Representation>None</Representation>
+			<ExtendedTooltip name="ГруппаНастройкиРасширеннаяПодсказка" id="94"/>
+			<ChildItems>
+				<UsualGroup name="ГруппаНастройкиПрав" id="97">
+					<Title>
+						<v8:item>
+							<v8:lang>ru</v8:lang>
+							<v8:content>Группа настройки прав</v8:content>
+						</v8:item>
+					</Title>
+					<ToolTip>
+						<v8:item>
+							<v8:lang>ru</v8:lang>
+							<v8:content>Группа настройки прав</v8:content>
+						</v8:item>
+					</ToolTip>
+					<Group>Vertical</Group>
+					<Representation>StrongSeparation</Representation>
+					<ShowTitle>false</ShowTitle>
+					<ExtendedTooltip name="ГруппаНастройкиПравРасширеннаяПодсказка" id="98"/>
+					<ChildItems>
+						<InputField name="ПапкаДампов1" id="4">
+							<DataPath>Объект.ПапкаДампов1</DataPath>
+							<Title>
+								<v8:item>
+									<v8:lang>ru</v8:lang>
+									<v8:content>Дампы 1</v8:content>
+								</v8:item>
+							</Title>
+							<EditMode>EnterOnInput</EditMode>
+							<HorizontalStretch>true</HorizontalStretch>
+							<ChoiceButton>true</ChoiceButton>
+							<ContextMenu name="ПапкаДампов1КонтекстноеМеню" id="5"/>
+							<ExtendedTooltip name="ПапкаДампов1РасширеннаяПодсказка" id="6"/>
+							<Events>
+								<Event name="StartChoice">ПапкаДампов1НачалоВыбора</Event>
+							</Events>
+						</InputField>
+						<InputField name="ПапкаДампов2" id="7">
+							<DataPath>Объект.ПапкаДампов2</DataPath>
+							<Title>
+								<v8:item>
+									<v8:lang>ru</v8:lang>
+									<v8:content>Дампы 2</v8:content>
+								</v8:item>
+							</Title>
+							<EditMode>EnterOnInput</EditMode>
+							<HorizontalStretch>true</HorizontalStretch>
+							<ChoiceButton>true</ChoiceButton>
+							<ContextMenu name="ПапкаДампов2КонтекстноеМеню" id="8"/>
+							<ExtendedTooltip name="ПапкаДампов2РасширеннаяПодсказка" id="9"/>
+							<Events>
+								<Event name="StartChoice">ПапкаДампов2НачалоВыбора</Event>
+							</Events>
+						</InputField>
+					</ChildItems>
+				</UsualGroup>
+				<UsualGroup name="ГруппаНастройкиЛев" id="95">
+					<Title>
+						<v8:item>
+							<v8:lang>ru</v8:lang>
+							<v8:content>Группа настройки лев</v8:content>
+						</v8:item>
+					</Title>
+					<ToolTip>
+						<v8:item>
+							<v8:lang>ru</v8:lang>
+							<v8:content>Группа настройки лев</v8:content>
+						</v8:item>
+					</ToolTip>
+					<Group>Vertical</Group>
+					<Representation>StrongSeparation</Representation>
+					<ShowTitle>false</ShowTitle>
+					<ExtendedTooltip name="ГруппаНастройкиЛевРасширеннаяПодсказка" id="96"/>
+					<ChildItems>
+						<InputField name="ПутьКСтартеру" id="1">
+							<DataPath>Объект.ПутьКСтартеру</DataPath>
+							<EditMode>EnterOnInput</EditMode>
+							<ChoiceButton>true</ChoiceButton>
+							<OpenButton>true</OpenButton>
+							<ContextMenu name="ПутьКСтартеруКонтекстноеМеню" id="2"/>
+							<ExtendedTooltip name="ПутьКСтартеруРасширеннаяПодсказка" id="3"/>
+							<Events>
+								<Event name="StartChoice">ПутьКСтартеруНачалоВыбора</Event>
+								<Event name="Opening">ПутьКСтартеруОткрытие</Event>
+							</Events>
+						</InputField>
+						<UsualGroup name="Группа5" id="121">
+							<Group>AlwaysHorizontal</Group>
+							<Representation>None</Representation>
+							<ShowTitle>false</ShowTitle>
+							<ExtendedTooltip name="Группа5РасширеннаяПодсказка" id="122"/>
+							<ChildItems>
+								<CheckBoxField name="ПоказыватьБезОписания" id="10">
+									<DataPath>Объект.ПоказыватьБезОписания</DataPath>
+									<TitleLocation>Right</TitleLocation>
+									<EditMode>EnterOnInput</EditMode>
+									<CheckBoxType>Auto</CheckBoxType>
+									<ContextMenu name="ПоказыватьБезОписанияКонтекстноеМеню" id="11"/>
+									<ExtendedTooltip name="ПоказыватьБезОписанияРасширеннаяПодсказка" id="12"/>
+									<Events>
+										<Event name="OnChange">ПоказыватьБезОписанияПриИзменении</Event>
+									</Events>
+								</CheckBoxField>
+								<CommandBar name="Группа6" id="123">
+									<EnableContentChange>true</EnableContentChange>
+									<HorizontalLocation>Right</HorizontalLocation>
+									<CommandSource>Form</CommandSource>
+									<ExtendedTooltip name="Группа6РасширеннаяПодсказка" id="124"/>
+									<ChildItems>
+										<Button name="ФормаКнопка1" id="125">
+											<Type>CommandBarButton</Type>
+											<Representation>Picture</Representation>
+											<CommandName>Form.StandardCommand.SaveValues</CommandName>
+											<LocationInCommandBar>InCommandBar</LocationInCommandBar>
+											<ExtendedTooltip name="ФормаКнопка1РасширеннаяПодсказка" id="126"/>
+										</Button>
+										<Button name="ФормаКнопка2" id="127">
+											<Type>CommandBarButton</Type>
+											<Representation>Picture</Representation>
+											<CommandName>Form.StandardCommand.RestoreValues</CommandName>
+											<LocationInCommandBar>InCommandBar</LocationInCommandBar>
+											<ExtendedTooltip name="ФормаКнопка2РасширеннаяПодсказка" id="128"/>
+										</Button>
+									</ChildItems>
+								</CommandBar>
+							</ChildItems>
+						</UsualGroup>
+					</ChildItems>
+				</UsualGroup>
+			</ChildItems>
+		</UsualGroup>
+		<UsualGroup name="Группа1" id="99">
+			<Group>AlwaysHorizontal</Group>
+			<Representation>None</Representation>
+			<ShowTitle>false</ShowTitle>
+			<ExtendedTooltip name="Группа1РасширеннаяПодсказка" id="100"/>
+			<ChildItems>
+				<UsualGroup name="ГруппаФайлы" id="15">
+					<Title>
+						<v8:item>
+							<v8:lang>ru</v8:lang>
+							<v8:content>Файлы</v8:content>
+						</v8:item>
+					</Title>
+					<Group>Vertical</Group>
+					<ExtendedTooltip name="ГруппаФайлыРасширеннаяПодсказка" id="16"/>
+					<ChildItems>
+						<Table name="Файлы" id="17">
+							<Representation>List</Representation>
+							<ChangeRowSet>false</ChangeRowSet>
+							<ChangeRowOrder>false</ChangeRowOrder>
+							<SelectionMode>SingleRow</SelectionMode>
+							<DataPath>Объект.Файлы</DataPath>
+							<SearchStringLocation>None</SearchStringLocation>
+							<ViewStatusLocation>None</ViewStatusLocation>
+							<SearchControlLocation>None</SearchControlLocation>
+							<RowFilter xsi:nil="true"/>
+							<ContextMenu name="ФайлыКонтекстноеМеню" id="18"/>
+							<AutoCommandBar name="ФайлыКоманднаяПанель" id="19">
+								<Autofill>false</Autofill>
+								<ChildItems>
+									<Button name="ФайлыПрочитать" id="101">
+										<Type>CommandBarButton</Type>
+										<CommandName>Form.Command.Прочитать</CommandName>
+										<ExtendedTooltip name="ФайлыПрочитатьРасширеннаяПодсказка" id="102"/>
+									</Button>
+									<Button name="ФайлыТолькоСИзменениями" id="139">
+										<Type>CommandBarButton</Type>
+										<Check>true</Check>
+										<CommandName>Form.Command.ФайлыТолькоСИзменениями</CommandName>
+										<ExtendedTooltip name="ФайлыТолькоСИзменениямиРасширеннаяПодсказка" id="140"/>
+									</Button>
+								</ChildItems>
+							</AutoCommandBar>
+							<ExtendedTooltip name="ФайлыРасширеннаяПодсказка" id="20"/>
+							<SearchStringAddition name="ФайлыСтрокаПоиска" id="21">
+								<AdditionSource>
+									<Item>Файлы</Item>
+									<Type>SearchStringRepresentation</Type>
+								</AdditionSource>
+								<ContextMenu name="ФайлыСтрокаПоискаКонтекстноеМеню" id="22"/>
+								<ExtendedTooltip name="ФайлыСтрокаПоискаРасширеннаяПодсказка" id="23"/>
+							</SearchStringAddition>
+							<ViewStatusAddition name="ФайлыСостояниеПросмотра" id="24">
+								<AdditionSource>
+									<Item>Файлы</Item>
+									<Type>ViewStatusRepresentation</Type>
+								</AdditionSource>
+								<ContextMenu name="ФайлыСостояниеПросмотраКонтекстноеМеню" id="25"/>
+								<ExtendedTooltip name="ФайлыСостояниеПросмотраРасширеннаяПодсказка" id="26"/>
+							</ViewStatusAddition>
+							<SearchControlAddition name="ФайлыУправлениеПоиском" id="27">
+								<AdditionSource>
+									<Item>Файлы</Item>
+									<Type>SearchControl</Type>
+								</AdditionSource>
+								<ContextMenu name="ФайлыУправлениеПоискомКонтекстноеМеню" id="28"/>
+								<ExtendedTooltip name="ФайлыУправлениеПоискомРасширеннаяПодсказка" id="29"/>
+							</SearchControlAddition>
+							<Events>
+								<Event name="60edb81d-887b-478e-94ee-7fef2b13393d">ФайлыПриАктивизацииСтроки</Event>
+							</Events>
+							<ChildItems>
+								<LabelField name="ФайлыНомерСтроки" id="30">
+									<DataPath>Объект.Файлы.LineNumber</DataPath>
+									<EditMode>EnterOnInput</EditMode>
+									<Width>2</Width>
+									<ContextMenu name="ФайлыНомерСтрокиКонтекстноеМеню" id="31"/>
+									<ExtendedTooltip name="ФайлыНомерСтрокиРасширеннаяПодсказка" id="32"/>
+								</LabelField>
+								<InputField name="ФайлыДельта" id="33">
+									<DataPath>Объект.Файлы.Дельта</DataPath>
+									<ReadOnly>true</ReadOnly>
+									<EditMode>EnterOnInput</EditMode>
+									<Width>3</Width>
+									<ContextMenu name="ФайлыДельтаКонтекстноеМеню" id="34"/>
+									<ExtendedTooltip name="ФайлыДельтаРасширеннаяПодсказка" id="35"/>
+								</InputField>
+								<InputField name="ФайлыФайл" id="36">
+									<DataPath>Объект.Файлы.Файл</DataPath>
+									<ReadOnly>true</ReadOnly>
+									<EditMode>EnterOnInput</EditMode>
+									<ContextMenu name="ФайлыФайлКонтекстноеМеню" id="37"/>
+									<ExtendedTooltip name="ФайлыФайлРасширеннаяПодсказка" id="38"/>
+								</InputField>
+							</ChildItems>
+						</Table>
+					</ChildItems>
+				</UsualGroup>
+				<UsualGroup name="Группа2" id="103">
+					<Group>Vertical</Group>
+					<Representation>None</Representation>
+					<ShowTitle>false</ShowTitle>
+					<ExtendedTooltip name="Группа2РасширеннаяПодсказка" id="104"/>
+					<ChildItems>
+						<UsualGroup name="Группа3" id="105">
+							<Group>AlwaysHorizontal</Group>
+							<Representation>None</Representation>
+							<ShowTitle>false</ShowTitle>
+							<ExtendedTooltip name="Группа3РасширеннаяПодсказка" id="106"/>
+							<ChildItems>
+								<InputField name="ФайлыЗаголовок1" id="107">
+									<DataPath>Items.Файлы.CurrentData.Заголовок1</DataPath>
+									<ReadOnly>true</ReadOnly>
+									<AutoMaxWidth>false</AutoMaxWidth>
+									<ContextMenu name="ФайлыЗаголовок1КонтекстноеМеню" id="108"/>
+									<ExtendedTooltip name="ФайлыЗаголовок1РасширеннаяПодсказка" id="109"/>
+								</InputField>
+								<InputField name="ФайлыЗаголовок2" id="110">
+									<DataPath>Items.Файлы.CurrentData.Заголовок2</DataPath>
+									<ReadOnly>true</ReadOnly>
+									<AutoMaxWidth>false</AutoMaxWidth>
+									<ContextMenu name="ФайлыЗаголовок2КонтекстноеМеню" id="111"/>
+									<ExtendedTooltip name="ФайлыЗаголовок2РасширеннаяПодсказка" id="112"/>
+								</InputField>
+							</ChildItems>
+						</UsualGroup>
+						<UsualGroup name="ГруппаФункции" id="39">
+							<Title>
+								<v8:item>
+									<v8:lang>ru</v8:lang>
+									<v8:content>Функции</v8:content>
+								</v8:item>
+							</Title>
+							<Group>Vertical</Group>
+							<Representation>None</Representation>
+							<ShowTitle>false</ShowTitle>
+							<ExtendedTooltip name="ГруппаФункцииРасширеннаяПодсказка" id="40"/>
+							<ChildItems>
+								<Table name="Функции" id="41">
+									<Representation>List</Representation>
+									<ChangeRowSet>false</ChangeRowSet>
+									<ChangeRowOrder>false</ChangeRowOrder>
+									<SelectionMode>SingleRow</SelectionMode>
+									<EnableStartDrag>true</EnableStartDrag>
+									<EnableDrag>true</EnableDrag>
+									<DataPath>Объект.Функции</DataPath>
+									<SearchStringLocation>None</SearchStringLocation>
+									<ViewStatusLocation>None</ViewStatusLocation>
+									<SearchControlLocation>None</SearchControlLocation>
+									<RowFilter xsi:nil="true"/>
+									<ContextMenu name="ФункцииКонтекстноеМеню" id="42"/>
+									<AutoCommandBar name="ФункцииКоманднаяПанель" id="43">
+										<Autofill>false</Autofill>
+									</AutoCommandBar>
+									<ExtendedTooltip name="ФункцииРасширеннаяПодсказка" id="44"/>
+									<SearchStringAddition name="ФункцииСтрокаПоиска" id="45">
+										<AdditionSource>
+											<Item>Функции</Item>
+											<Type>SearchStringRepresentation</Type>
+										</AdditionSource>
+										<ContextMenu name="ФункцииСтрокаПоискаКонтекстноеМеню" id="46"/>
+										<ExtendedTooltip name="ФункцииСтрокаПоискаРасширеннаяПодсказка" id="47"/>
+									</SearchStringAddition>
+									<ViewStatusAddition name="ФункцииСостояниеПросмотра" id="48">
+										<AdditionSource>
+											<Item>Функции</Item>
+											<Type>ViewStatusRepresentation</Type>
+										</AdditionSource>
+										<ContextMenu name="ФункцииСостояниеПросмотраКонтекстноеМеню" id="49"/>
+										<ExtendedTooltip name="ФункцииСостояниеПросмотраРасширеннаяПодсказка" id="50"/>
+									</ViewStatusAddition>
+									<SearchControlAddition name="ФункцииУправлениеПоиском" id="51">
+										<AdditionSource>
+											<Item>Функции</Item>
+											<Type>SearchControl</Type>
+										</AdditionSource>
+										<ContextMenu name="ФункцииУправлениеПоискомКонтекстноеМеню" id="52"/>
+										<ExtendedTooltip name="ФункцииУправлениеПоискомРасширеннаяПодсказка" id="53"/>
+									</SearchControlAddition>
+									<ChildItems>
+										<LabelField name="ФункцииНомерСтроки" id="54">
+											<DataPath>Объект.Функции.LineNumber</DataPath>
+											<Visible>false</Visible>
+											<EditMode>EnterOnInput</EditMode>
+											<ContextMenu name="ФункцииНомерСтрокиКонтекстноеМеню" id="55"/>
+											<ExtendedTooltip name="ФункцииНомерСтрокиРасширеннаяПодсказка" id="56"/>
+										</LabelField>
+										<InputField name="ФункцииФайл" id="57">
+											<DataPath>Объект.Функции.Файл</DataPath>
+											<Visible>false</Visible>
+											<EditMode>EnterOnInput</EditMode>
+											<ContextMenu name="ФункцииФайлКонтекстноеМеню" id="58"/>
+											<ExtendedTooltip name="ФункцииФайлРасширеннаяПодсказка" id="59"/>
+										</InputField>
+										<InputField name="ФункцииКвоСтрок1" id="75">
+											<DataPath>Объект.Функции.КвоСтрок1</DataPath>
+											<ReadOnly>true</ReadOnly>
+											<Title>
+												<v8:item>
+													<v8:lang>ru</v8:lang>
+													<v8:content>К1</v8:content>
+												</v8:item>
+											</Title>
+											<EditMode>EnterOnInput</EditMode>
+											<ContextMenu name="ФункцииКвоСтрок1КонтекстноеМеню" id="76"/>
+											<ExtendedTooltip name="ФункцииКвоСтрок1РасширеннаяПодсказка" id="77"/>
+										</InputField>
+										<InputField name="ФункцииКвоСтрок2" id="78">
+											<DataPath>Объект.Функции.КвоСтрок2</DataPath>
+											<ReadOnly>true</ReadOnly>
+											<Title>
+												<v8:item>
+													<v8:lang>ru</v8:lang>
+													<v8:content>К2</v8:content>
+												</v8:item>
+											</Title>
+											<EditMode>EnterOnInput</EditMode>
+											<ContextMenu name="ФункцииКвоСтрок2КонтекстноеМеню" id="79"/>
+											<ExtendedTooltip name="ФункцииКвоСтрок2РасширеннаяПодсказка" id="80"/>
+										</InputField>
+										<InputField name="ФункцииПроцент" id="84">
+											<DataPath>Объект.Функции.Процент</DataPath>
+											<ReadOnly>true</ReadOnly>
+											<Title>
+												<v8:item>
+													<v8:lang>ru</v8:lang>
+													<v8:content>%</v8:content>
+												</v8:item>
+											</Title>
+											<EditMode>EnterOnInput</EditMode>
+											<ContextMenu name="ФункцииПроцентКонтекстноеМеню" id="85"/>
+											<ExtendedTooltip name="ФункцииПроцентРасширеннаяПодсказка" id="86"/>
+										</InputField>
+										<InputField name="ФункцииНомер1" id="60">
+											<DataPath>Объект.Функции.Номер1</DataPath>
+											<ReadOnly>true</ReadOnly>
+											<Title>
+												<v8:item>
+													<v8:lang>ru</v8:lang>
+													<v8:content>№Ф</v8:content>
+												</v8:item>
+											</Title>
+											<EditMode>EnterOnInput</EditMode>
+											<ContextMenu name="ФункцииНомер1КонтекстноеМеню" id="61"/>
+											<ExtendedTooltip name="ФункцииНомер1РасширеннаяПодсказка" id="62"/>
+										</InputField>
+										<InputField name="ФункцииОписание1" id="66">
+											<DataPath>Объект.Функции.Описание1</DataPath>
+											<ReadOnly>true</ReadOnly>
+											<EditMode>EnterOnInput</EditMode>
+											<ContextMenu name="ФункцииОписание1КонтекстноеМеню" id="67"/>
+											<ExtendedTooltip name="ФункцииОписание1РасширеннаяПодсказка" id="68"/>
+										</InputField>
+										<InputField name="ФункцииНомер2" id="63">
+											<DataPath>Объект.Функции.Номер2</DataPath>
+											<Visible>false</Visible>
+											<ReadOnly>true</ReadOnly>
+											<EditMode>EnterOnInput</EditMode>
+											<ContextMenu name="ФункцииНомер2КонтекстноеМеню" id="64"/>
+											<ExtendedTooltip name="ФункцииНомер2РасширеннаяПодсказка" id="65"/>
+										</InputField>
+										<InputField name="ФункцииОписание2" id="69">
+											<DataPath>Объект.Функции.Описание2</DataPath>
+											<ReadOnly>true</ReadOnly>
+											<EditMode>EnterOnInput</EditMode>
+											<ContextMenu name="ФункцииОписание2КонтекстноеМеню" id="70"/>
+											<ExtendedTooltip name="ФункцииОписание2РасширеннаяПодсказка" id="71"/>
+										</InputField>
+										<CheckBoxField name="ФункцииЕстьОписание" id="72">
+											<DataPath>Объект.Функции.ЕстьОписание</DataPath>
+											<Visible>false</Visible>
+											<EditMode>EnterOnInput</EditMode>
+											<CheckBoxType>Auto</CheckBoxType>
+											<ContextMenu name="ФункцииЕстьОписаниеКонтекстноеМеню" id="73"/>
+											<ExtendedTooltip name="ФункцииЕстьОписаниеРасширеннаяПодсказка" id="74"/>
+										</CheckBoxField>
+										<CheckBoxField name="ФункцииРазные" id="81">
+											<DataPath>Объект.Функции.Разные</DataPath>
+											<Visible>false</Visible>
+											<EditMode>EnterOnInput</EditMode>
+											<CheckBoxType>Auto</CheckBoxType>
+											<ContextMenu name="ФункцииРазныеКонтекстноеМеню" id="82"/>
+											<ExtendedTooltip name="ФункцииРазныеРасширеннаяПодсказка" id="83"/>
+										</CheckBoxField>
+										<InputField name="ФункцииТекст1" id="87">
+											<DataPath>Объект.Функции.Текст1</DataPath>
+											<Visible>false</Visible>
+											<EditMode>EnterOnInput</EditMode>
+											<ContextMenu name="ФункцииТекст1КонтекстноеМеню" id="88"/>
+											<ExtendedTooltip name="ФункцииТекст1РасширеннаяПодсказка" id="89"/>
+										</InputField>
+										<InputField name="ФункцииТекст2" id="90">
+											<DataPath>Объект.Функции.Текст2</DataPath>
+											<Visible>false</Visible>
+											<EditMode>EnterOnInput</EditMode>
+											<ContextMenu name="ФункцииТекст2КонтекстноеМеню" id="91"/>
+											<ExtendedTooltip name="ФункцииТекст2РасширеннаяПодсказка" id="92"/>
+										</InputField>
+									</ChildItems>
+								</Table>
+							</ChildItems>
+						</UsualGroup>
+						<UsualGroup name="Группа4" id="113">
+							<Group>AlwaysHorizontal</Group>
+							<Representation>None</Representation>
+							<ShowTitle>false</ShowTitle>
+							<ExtendedTooltip name="Группа4РасширеннаяПодсказка" id="114"/>
+							<ChildItems>
+								<UsualGroup name="Группа7" id="129">
+									<Group>Vertical</Group>
+									<Representation>None</Representation>
+									<ShowTitle>false</ShowTitle>
+									<ExtendedTooltip name="Группа7РасширеннаяПодсказка" id="130"/>
+									<ChildItems>
+										<InputField name="ФункцииОписание3" id="133">
+											<DataPath>Items.Функции.CurrentData.Описание1</DataPath>
+											<ReadOnly>true</ReadOnly>
+											<TitleLocation>None</TitleLocation>
+											<ContextMenu name="ФункцииОписание3КонтекстноеМеню" id="134"/>
+											<ExtendedTooltip name="ФункцииОписание3РасширеннаяПодсказка" id="135"/>
+										</InputField>
+										<InputField name="ФункцииТекст3" id="115">
+											<DataPath>Items.Функции.CurrentData.Текст1</DataPath>
+											<ReadOnly>true</ReadOnly>
+											<TitleLocation>None</TitleLocation>
+											<AutoMaxWidth>false</AutoMaxWidth>
+											<ContextMenu name="ФункцииТекст3КонтекстноеМеню" id="116"/>
+											<ExtendedTooltip name="ФункцииТекст3РасширеннаяПодсказка" id="117"/>
+										</InputField>
+									</ChildItems>
+								</UsualGroup>
+								<UsualGroup name="Группа8" id="131">
+									<Group>Vertical</Group>
+									<Representation>None</Representation>
+									<ShowTitle>false</ShowTitle>
+									<ExtendedTooltip name="Группа8РасширеннаяПодсказка" id="132"/>
+									<ChildItems>
+										<InputField name="ФункцииОписание4" id="136">
+											<DataPath>Items.Функции.CurrentData.Описание2</DataPath>
+											<ReadOnly>true</ReadOnly>
+											<TitleLocation>None</TitleLocation>
+											<ContextMenu name="ФункцииОписание4КонтекстноеМеню" id="137"/>
+											<ExtendedTooltip name="ФункцииОписание4РасширеннаяПодсказка" id="138"/>
+										</InputField>
+										<InputField name="ФункцииТекст4" id="118">
+											<DataPath>Items.Функции.CurrentData.Текст2</DataPath>
+											<ReadOnly>true</ReadOnly>
+											<TitleLocation>None</TitleLocation>
+											<AutoMaxWidth>false</AutoMaxWidth>
+											<ContextMenu name="ФункцииТекст4КонтекстноеМеню" id="119"/>
+											<ExtendedTooltip name="ФункцииТекст4РасширеннаяПодсказка" id="120"/>
+										</InputField>
+									</ChildItems>
+								</UsualGroup>
+							</ChildItems>
+						</UsualGroup>
+					</ChildItems>
+				</UsualGroup>
+			</ChildItems>
+		</UsualGroup>
+	</ChildItems>
+	<Attributes>
+		<Attribute name="Объект" id="1">
+			<Type>
+				<v8:Type>cfg:ExternalDataProcessorObject.СравнениеДамповСнегопата</v8:Type>
+			</Type>
+			<MainAttribute>true</MainAttribute>
+			<Save>
+				<Field>Объект.ПапкаДампов1</Field>
+				<Field>Объект.ПапкаДампов2</Field>
+				<Field>Объект.ПоказыватьБезОписания</Field>
+				<Field>Объект.ПутьКСтартеру</Field>
+			</Save>
+		</Attribute>
+		<ConditionalAppearance>
+			<dcsset:item>
+				<dcsset:selection>
+					<dcsset:item>
+						<dcsset:field>Файлы</dcsset:field>
+					</dcsset:item>
+				</dcsset:selection>
+				<dcsset:filter>
+					<dcsset:item xsi:type="dcsset:FilterItemComparison">
+						<dcsset:left xsi:type="dcscor:Field">Объект.Файлы.Дельта</dcsset:left>
+						<dcsset:comparisonType>NotEqual</dcsset:comparisonType>
+						<dcsset:right xsi:type="xs:decimal">0</dcsset:right>
+					</dcsset:item>
+				</dcsset:filter>
+				<dcsset:appearance>
+					<dcscor:item xsi:type="dcsset:SettingsParameterValue">
+						<dcscor:parameter>ЦветФона</dcscor:parameter>
+						<dcscor:value xsi:type="v8ui:Color">#CCFFFF</dcscor:value>
+					</dcscor:item>
+				</dcsset:appearance>
+			</dcsset:item>
+			<dcsset:item>
+				<dcsset:selection>
+					<dcsset:item>
+						<dcsset:field>Функции</dcsset:field>
+					</dcsset:item>
+				</dcsset:selection>
+				<dcsset:filter>
+					<dcsset:item xsi:type="dcsset:FilterItemComparison">
+						<dcsset:left xsi:type="dcscor:Field">Объект.Функции.Разные</dcsset:left>
+						<dcsset:comparisonType>Equal</dcsset:comparisonType>
+						<dcsset:right xsi:type="xs:boolean">true</dcsset:right>
+					</dcsset:item>
+				</dcsset:filter>
+				<dcsset:appearance>
+					<dcscor:item xsi:type="dcsset:SettingsParameterValue">
+						<dcscor:parameter>ЦветФона</dcscor:parameter>
+						<dcscor:value xsi:type="v8ui:Color">#CCFFCC</dcscor:value>
+					</dcscor:item>
+				</dcsset:appearance>
+			</dcsset:item>
+		</ConditionalAppearance>
+	</Attributes>
+	<Commands>
+		<Command name="Прочитать" id="1">
+			<Title>
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Прочитать</v8:content>
+				</v8:item>
+			</Title>
+			<ToolTip>
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Прочитать</v8:content>
+				</v8:item>
+			</ToolTip>
+			<Picture>
+				<xr:Ref>StdPicture.DocumentJournal</xr:Ref>
+				<xr:LoadTransparent>true</xr:LoadTransparent>
+			</Picture>
+			<Action>Прочитать</Action>
+			<Representation>TextPicture</Representation>
+		</Command>
+		<Command name="ФайлыТолькоСИзменениями" id="2">
+			<Title>
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Дельты</v8:content>
+				</v8:item>
+			</Title>
+			<ToolTip>
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Файлы только с изменениями</v8:content>
+				</v8:item>
+			</ToolTip>
+			<Picture>
+				<xr:Ref>StdPicture.ExternalDataSourceCubeDimensionTable</xr:Ref>
+				<xr:LoadTransparent>true</xr:LoadTransparent>
+			</Picture>
+			<Action>ФайлыТолькоСИзменениями</Action>
+			<Representation>TextPicture</Representation>
+		</Command>
+	</Commands>
+</Form>
