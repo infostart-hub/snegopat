@@ -51,38 +51,26 @@
 					<ShowTitle>false</ShowTitle>
 					<ExtendedTooltip name="ГруппаНастройкиПравРасширеннаяПодсказка" id="98"/>
 					<ChildItems>
-						<InputField name="ПапкаДампов1" id="4">
-							<DataPath>Объект.ПапкаДампов1</DataPath>
-							<Title>
-								<v8:item>
-									<v8:lang>ru</v8:lang>
-									<v8:content>Дампы 1</v8:content>
-								</v8:item>
-							</Title>
+						<InputField name="ДампыРабочие" id="4">
+							<DataPath>Объект.ДампыРабочие</DataPath>
 							<EditMode>EnterOnInput</EditMode>
 							<HorizontalStretch>true</HorizontalStretch>
 							<ChoiceButton>true</ChoiceButton>
-							<ContextMenu name="ПапкаДампов1КонтекстноеМеню" id="5"/>
-							<ExtendedTooltip name="ПапкаДампов1РасширеннаяПодсказка" id="6"/>
+							<ContextMenu name="ДампыРабочиеКонтекстноеМеню" id="5"/>
+							<ExtendedTooltip name="ДампыРабочиеРасширеннаяПодсказка" id="6"/>
 							<Events>
-								<Event name="StartChoice">ПапкаДампов1НачалоВыбора</Event>
+								<Event name="StartChoice">ДампыРабочиеНачалоВыбора</Event>
 							</Events>
 						</InputField>
-						<InputField name="ПапкаДампов2" id="7">
-							<DataPath>Объект.ПапкаДампов2</DataPath>
-							<Title>
-								<v8:item>
-									<v8:lang>ru</v8:lang>
-									<v8:content>Дампы 2</v8:content>
-								</v8:item>
-							</Title>
+						<InputField name="ДампыКАнализу" id="7">
+							<DataPath>Объект.ДампыКАнализу</DataPath>
 							<EditMode>EnterOnInput</EditMode>
 							<HorizontalStretch>true</HorizontalStretch>
 							<ChoiceButton>true</ChoiceButton>
-							<ContextMenu name="ПапкаДампов2КонтекстноеМеню" id="8"/>
-							<ExtendedTooltip name="ПапкаДампов2РасширеннаяПодсказка" id="9"/>
+							<ContextMenu name="ДампыКАнализуКонтекстноеМеню" id="8"/>
+							<ExtendedTooltip name="ДампыКАнализуРасширеннаяПодсказка" id="9"/>
 							<Events>
-								<Event name="StartChoice">ПапкаДампов2НачалоВыбора</Event>
+								<Event name="StartChoice">ДампыКАнализуНачалоВыбора</Event>
 							</Events>
 						</InputField>
 					</ChildItems>
@@ -273,14 +261,14 @@
 							<ExtendedTooltip name="Группа3РасширеннаяПодсказка" id="106"/>
 							<ChildItems>
 								<InputField name="ФайлыЗаголовок1" id="107">
-									<DataPath>Items.Файлы.CurrentData.Заголовок1</DataPath>
+									<DataPath>Items.Файлы.CurrentData.ЗаголовокРабочегоДампа</DataPath>
 									<ReadOnly>true</ReadOnly>
 									<AutoMaxWidth>false</AutoMaxWidth>
 									<ContextMenu name="ФайлыЗаголовок1КонтекстноеМеню" id="108"/>
 									<ExtendedTooltip name="ФайлыЗаголовок1РасширеннаяПодсказка" id="109"/>
 								</InputField>
 								<InputField name="ФайлыЗаголовок2" id="110">
-									<DataPath>Items.Файлы.CurrentData.Заголовок2</DataPath>
+									<DataPath>Items.Файлы.CurrentData.ЗаголовокАнализируемогоДампа</DataPath>
 									<ReadOnly>true</ReadOnly>
 									<AutoMaxWidth>false</AutoMaxWidth>
 									<ContextMenu name="ФайлыЗаголовок2КонтекстноеМеню" id="111"/>
@@ -356,67 +344,87 @@
 											<ContextMenu name="ФункцииФайлКонтекстноеМеню" id="58"/>
 											<ExtendedTooltip name="ФункцииФайлРасширеннаяПодсказка" id="59"/>
 										</InputField>
-										<InputField name="ФункцииКвоСтрок1" id="75">
-											<DataPath>Объект.Функции.КвоСтрок1</DataPath>
-											<ReadOnly>true</ReadOnly>
+										<ColumnGroup name="ФункцииГруппаКоличество" id="141">
+											<EnableContentChange>true</EnableContentChange>
 											<Title>
 												<v8:item>
 													<v8:lang>ru</v8:lang>
-													<v8:content>К1</v8:content>
+													<v8:content>Кол-во строк</v8:content>
 												</v8:item>
 											</Title>
-											<EditMode>EnterOnInput</EditMode>
-											<ContextMenu name="ФункцииКвоСтрок1КонтекстноеМеню" id="76"/>
-											<ExtendedTooltip name="ФункцииКвоСтрок1РасширеннаяПодсказка" id="77"/>
-										</InputField>
-										<InputField name="ФункцииКвоСтрок2" id="78">
-											<DataPath>Объект.Функции.КвоСтрок2</DataPath>
-											<ReadOnly>true</ReadOnly>
-											<Title>
+											<ToolTip>
 												<v8:item>
 													<v8:lang>ru</v8:lang>
-													<v8:content>К2</v8:content>
+													<v8:content>Функции группа количество</v8:content>
 												</v8:item>
-											</Title>
-											<EditMode>EnterOnInput</EditMode>
-											<ContextMenu name="ФункцииКвоСтрок2КонтекстноеМеню" id="79"/>
-											<ExtendedTooltip name="ФункцииКвоСтрок2РасширеннаяПодсказка" id="80"/>
-										</InputField>
+											</ToolTip>
+											<Group>Horizontal</Group>
+											<ShowInHeader>true</ShowInHeader>
+											<ExtendedTooltip name="ФункцииГруппаКоличествоРасширеннаяПодсказка" id="142"/>
+											<ChildItems>
+												<InputField name="ФункцииКвоСтрокРаб" id="75">
+													<DataPath>Объект.Функции.КоличествоСтрокРаб</DataPath>
+													<ReadOnly>true</ReadOnly>
+													<Title>
+														<v8:item>
+															<v8:lang>ru</v8:lang>
+															<v8:content>Раб</v8:content>
+														</v8:item>
+													</Title>
+													<EditMode>EnterOnInput</EditMode>
+													<ContextMenu name="ФункцииКвоСтрокРабКонтекстноеМеню" id="76"/>
+													<ExtendedTooltip name="ФункцииКвоСтрокРабРасширеннаяПодсказка" id="77"/>
+												</InputField>
+												<InputField name="ФункцииКвоСтрокАнализ" id="78">
+													<DataPath>Объект.Функции.КоличествоСтрокАнализ</DataPath>
+													<ReadOnly>true</ReadOnly>
+													<Title>
+														<v8:item>
+															<v8:lang>ru</v8:lang>
+															<v8:content>Анализ</v8:content>
+														</v8:item>
+													</Title>
+													<EditMode>EnterOnInput</EditMode>
+													<ContextMenu name="ФункцииКвоСтрокАнализКонтекстноеМеню" id="79"/>
+													<ExtendedTooltip name="ФункцииКвоСтрокАнализРасширеннаяПодсказка" id="80"/>
+												</InputField>
+											</ChildItems>
+										</ColumnGroup>
 										<InputField name="ФункцииПроцент" id="84">
 											<DataPath>Объект.Функции.Процент</DataPath>
 											<ReadOnly>true</ReadOnly>
 											<Title>
 												<v8:item>
 													<v8:lang>ru</v8:lang>
-													<v8:content>%</v8:content>
+													<v8:content>% расхождения</v8:content>
 												</v8:item>
 											</Title>
 											<EditMode>EnterOnInput</EditMode>
 											<ContextMenu name="ФункцииПроцентКонтекстноеМеню" id="85"/>
 											<ExtendedTooltip name="ФункцииПроцентРасширеннаяПодсказка" id="86"/>
 										</InputField>
-										<InputField name="ФункцииНомер1" id="60">
-											<DataPath>Объект.Функции.Номер1</DataPath>
+										<InputField name="НомерФункцииРаб" id="60">
+											<DataPath>Объект.Функции.НомерФункцииРаб</DataPath>
 											<ReadOnly>true</ReadOnly>
 											<Title>
 												<v8:item>
 													<v8:lang>ru</v8:lang>
-													<v8:content>№Ф</v8:content>
+													<v8:content>№ Ф-ии</v8:content>
 												</v8:item>
 											</Title>
 											<EditMode>EnterOnInput</EditMode>
-											<ContextMenu name="ФункцииНомер1КонтекстноеМеню" id="61"/>
-											<ExtendedTooltip name="ФункцииНомер1РасширеннаяПодсказка" id="62"/>
+											<ContextMenu name="НомерФункцииРабКонтекстноеМеню" id="61"/>
+											<ExtendedTooltip name="НомерФункцииРабРасширеннаяПодсказка" id="62"/>
 										</InputField>
 										<InputField name="ФункцииОписание1" id="66">
-											<DataPath>Объект.Функции.Описание1</DataPath>
+											<DataPath>Объект.Функции.ОписаниеФункцииРаб</DataPath>
 											<ReadOnly>true</ReadOnly>
 											<EditMode>EnterOnInput</EditMode>
 											<ContextMenu name="ФункцииОписание1КонтекстноеМеню" id="67"/>
 											<ExtendedTooltip name="ФункцииОписание1РасширеннаяПодсказка" id="68"/>
 										</InputField>
 										<InputField name="ФункцииНомер2" id="63">
-											<DataPath>Объект.Функции.Номер2</DataPath>
+											<DataPath>Объект.Функции.НомерФункцииАнализ</DataPath>
 											<Visible>false</Visible>
 											<ReadOnly>true</ReadOnly>
 											<EditMode>EnterOnInput</EditMode>
@@ -424,7 +432,7 @@
 											<ExtendedTooltip name="ФункцииНомер2РасширеннаяПодсказка" id="65"/>
 										</InputField>
 										<InputField name="ФункцииОписание2" id="69">
-											<DataPath>Объект.Функции.Описание2</DataPath>
+											<DataPath>Объект.Функции.ОписаниеФункцииАнализ</DataPath>
 											<ReadOnly>true</ReadOnly>
 											<EditMode>EnterOnInput</EditMode>
 											<ContextMenu name="ФункцииОписание2КонтекстноеМеню" id="70"/>
@@ -447,14 +455,14 @@
 											<ExtendedTooltip name="ФункцииРазныеРасширеннаяПодсказка" id="83"/>
 										</CheckBoxField>
 										<InputField name="ФункцииТекст1" id="87">
-											<DataPath>Объект.Функции.Текст1</DataPath>
+											<DataPath>Объект.Функции.ТекстФункцииРаб</DataPath>
 											<Visible>false</Visible>
 											<EditMode>EnterOnInput</EditMode>
 											<ContextMenu name="ФункцииТекст1КонтекстноеМеню" id="88"/>
 											<ExtendedTooltip name="ФункцииТекст1РасширеннаяПодсказка" id="89"/>
 										</InputField>
 										<InputField name="ФункцииТекст2" id="90">
-											<DataPath>Объект.Функции.Текст2</DataPath>
+											<DataPath>Объект.Функции.ТекстФункцииАнализ</DataPath>
 											<Visible>false</Visible>
 											<EditMode>EnterOnInput</EditMode>
 											<ContextMenu name="ФункцииТекст2КонтекстноеМеню" id="91"/>
@@ -477,14 +485,14 @@
 									<ExtendedTooltip name="Группа7РасширеннаяПодсказка" id="130"/>
 									<ChildItems>
 										<InputField name="ФункцииОписание3" id="133">
-											<DataPath>Items.Функции.CurrentData.Описание1</DataPath>
+											<DataPath>Items.Функции.CurrentData.ОписаниеФункцииРаб</DataPath>
 											<ReadOnly>true</ReadOnly>
 											<TitleLocation>None</TitleLocation>
 											<ContextMenu name="ФункцииОписание3КонтекстноеМеню" id="134"/>
 											<ExtendedTooltip name="ФункцииОписание3РасширеннаяПодсказка" id="135"/>
 										</InputField>
 										<InputField name="ФункцииТекст3" id="115">
-											<DataPath>Items.Функции.CurrentData.Текст1</DataPath>
+											<DataPath>Items.Функции.CurrentData.ТекстФункцииРаб</DataPath>
 											<ReadOnly>true</ReadOnly>
 											<TitleLocation>None</TitleLocation>
 											<AutoMaxWidth>false</AutoMaxWidth>
@@ -500,14 +508,14 @@
 									<ExtendedTooltip name="Группа8РасширеннаяПодсказка" id="132"/>
 									<ChildItems>
 										<InputField name="ФункцииОписание4" id="136">
-											<DataPath>Items.Функции.CurrentData.Описание2</DataPath>
+											<DataPath>Items.Функции.CurrentData.ОписаниеФункцииАнализ</DataPath>
 											<ReadOnly>true</ReadOnly>
 											<TitleLocation>None</TitleLocation>
 											<ContextMenu name="ФункцииОписание4КонтекстноеМеню" id="137"/>
 											<ExtendedTooltip name="ФункцииОписание4РасширеннаяПодсказка" id="138"/>
 										</InputField>
 										<InputField name="ФункцииТекст4" id="118">
-											<DataPath>Items.Функции.CurrentData.Текст2</DataPath>
+											<DataPath>Items.Функции.CurrentData.ТекстФункцииАнализ</DataPath>
 											<ReadOnly>true</ReadOnly>
 											<TitleLocation>None</TitleLocation>
 											<AutoMaxWidth>false</AutoMaxWidth>
@@ -530,8 +538,8 @@
 			</Type>
 			<MainAttribute>true</MainAttribute>
 			<Save>
-				<Field>Объект.ПапкаДампов1</Field>
-				<Field>Объект.ПапкаДампов2</Field>
+				<Field>Объект.ДампыКАнализу</Field>
+				<Field>Объект.ДампыРабочие</Field>
 				<Field>Объект.ПоказыватьБезОписания</Field>
 				<Field>Объект.ПутьКСтартеру</Field>
 			</Save>

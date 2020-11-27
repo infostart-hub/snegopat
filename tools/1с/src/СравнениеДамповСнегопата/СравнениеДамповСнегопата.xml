@@ -64,11 +64,11 @@
 			</Attribute>
 			<Attribute uuid="83da5e26-bda1-4a63-9da8-ebf9420fedf8">
 				<Properties>
-					<Name>ПапкаДампов1</Name>
+					<Name>ДампыРабочие</Name>
 					<Synonym>
 						<v8:item>
 							<v8:lang>ru</v8:lang>
-							<v8:content>Папка дампов 1</v8:content>
+							<v8:content>Рабочие дампы</v8:content>
 						</v8:item>
 					</Synonym>
 					<Comment/>
@@ -102,11 +102,11 @@
 			</Attribute>
 			<Attribute uuid="557bdacb-b34e-45df-842b-b34fc1741bd8">
 				<Properties>
-					<Name>ПапкаДампов2</Name>
+					<Name>ДампыКАнализу</Name>
 					<Synonym>
 						<v8:item>
 							<v8:lang>ru</v8:lang>
-							<v8:content>Папка дампов 2</v8:content>
+							<v8:content>Дампы к анализу</v8:content>
 						</v8:item>
 					</Synonym>
 					<Comment/>
@@ -307,11 +307,11 @@
 					</Attribute>
 					<Attribute uuid="3b6df209-45dd-4052-bed9-41fb469953c0">
 						<Properties>
-							<Name>Заголовок1</Name>
+							<Name>ЗаголовокРабочегоДампа</Name>
 							<Synonym>
 								<v8:item>
 									<v8:lang>ru</v8:lang>
-									<v8:content>Заголовок1</v8:content>
+									<v8:content>Заголовок рабочего дампа</v8:content>
 								</v8:item>
 							</Synonym>
 							<Comment/>
@@ -347,11 +347,11 @@
 					</Attribute>
 					<Attribute uuid="8299e00d-a9fe-4285-8fd8-32b54d7e5524">
 						<Properties>
-							<Name>Заголовок2</Name>
+							<Name>ЗаголовокАнализируемогоДампа</Name>
 							<Synonym>
 								<v8:item>
 									<v8:lang>ru</v8:lang>
-									<v8:content>Заголовок2</v8:content>
+									<v8:content>Заголовок анализируемого дампа</v8:content>
 								</v8:item>
 							</Synonym>
 							<Comment/>
@@ -484,7 +484,7 @@
 									<v8:content>Файл</v8:content>
 								</v8:item>
 							</Synonym>
-							<Comment/>
+							<Comment>Для связи с таблицей файлов</Comment>
 							<Type>
 								<v8:Type>xs:string</v8:Type>
 								<v8:StringQualifiers>
@@ -517,7 +517,7 @@
 					</Attribute>
 					<Attribute uuid="f9aa9097-bb61-4bc4-bd96-b6095a52c196">
 						<Properties>
-							<Name>Номер1</Name>
+							<Name>НомерФункцииРаб</Name>
 							<Synonym>
 								<v8:item>
 									<v8:lang>ru</v8:lang>
@@ -558,7 +558,7 @@
 					</Attribute>
 					<Attribute uuid="653746f4-f3f7-4534-9d11-7d212cafceff">
 						<Properties>
-							<Name>Номер2</Name>
+							<Name>НомерФункцииАнализ</Name>
 							<Synonym>
 								<v8:item>
 									<v8:lang>ru</v8:lang>
@@ -599,11 +599,11 @@
 					</Attribute>
 					<Attribute uuid="039b1015-4cb7-4d1b-b05b-e811d32aa81a">
 						<Properties>
-							<Name>Описание1</Name>
+							<Name>ОписаниеФункцииРаб</Name>
 							<Synonym>
 								<v8:item>
 									<v8:lang>ru</v8:lang>
-									<v8:content>Описание1</v8:content>
+									<v8:content>Описание функции рабочего дампа</v8:content>
 								</v8:item>
 							</Synonym>
 							<Comment/>
@@ -639,11 +639,11 @@
 					</Attribute>
 					<Attribute uuid="410d0f00-0657-4a7c-9a2d-c2bb7c7e6b98">
 						<Properties>
-							<Name>Описание2</Name>
+							<Name>ОписаниеФункцииАнализ</Name>
 							<Synonym>
 								<v8:item>
 									<v8:lang>ru</v8:lang>
-									<v8:content>Описание2</v8:content>
+									<v8:content>Описание функции дампа анализа</v8:content>
 								</v8:item>
 							</Synonym>
 							<Comment/>
@@ -715,11 +715,11 @@
 					</Attribute>
 					<Attribute uuid="64c93b2a-a1c7-4cc0-b1c1-954364e80cc7">
 						<Properties>
-							<Name>КвоСтрок1</Name>
+							<Name>КоличествоСтрокРаб</Name>
 							<Synonym>
 								<v8:item>
 									<v8:lang>ru</v8:lang>
-									<v8:content>Кво строк1</v8:content>
+									<v8:content>Количество строк раб</v8:content>
 								</v8:item>
 							</Synonym>
 							<Comment/>
@@ -756,11 +756,11 @@
 					</Attribute>
 					<Attribute uuid="ee3bd44e-16b2-4307-ac17-33ec227d6825">
 						<Properties>
-							<Name>КвоСтрок2</Name>
+							<Name>КоличествоСтрокАнализ</Name>
 							<Synonym>
 								<v8:item>
 									<v8:lang>ru</v8:lang>
-									<v8:content>Кво строк2</v8:content>
+									<v8:content>Количество строк анализ</v8:content>
 								</v8:item>
 							</Synonym>
 							<Comment/>
@@ -874,11 +874,11 @@
 					</Attribute>
 					<Attribute uuid="41575e07-5d4c-49e8-a7b5-38a02c810dd7">
 						<Properties>
-							<Name>Текст1</Name>
+							<Name>ТекстФункцииРаб</Name>
 							<Synonym>
 								<v8:item>
 									<v8:lang>ru</v8:lang>
-									<v8:content>Текст1</v8:content>
+									<v8:content>Текст функции раб</v8:content>
 								</v8:item>
 							</Synonym>
 							<Comment/>
@@ -914,11 +914,11 @@
 					</Attribute>
 					<Attribute uuid="77cc5165-8a36-4025-8458-7693684f1202">
 						<Properties>
-							<Name>Текст2</Name>
+							<Name>ТекстФункцииАнализ</Name>
 							<Synonym>
 								<v8:item>
 									<v8:lang>ru</v8:lang>
-									<v8:content>Текст2</v8:content>
+									<v8:content>Текст функции анализ</v8:content>
 								</v8:item>
 							</Synonym>
 							<Comment/>
