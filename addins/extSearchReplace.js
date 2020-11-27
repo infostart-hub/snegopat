@@ -1434,12 +1434,6 @@ ExtSearch = ScriptForm.extend({
 			return;
 		}
 
-		if (this.form.ReplaceStr == '')
-		{
-			DoMessageBox('Не задана строка замены');
-			return;
-		}
-
 		var newStr = this.form.ReplaceStr;
 
 		var spChoice = v8New("СписокЗначений");
