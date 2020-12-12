@@ -1091,7 +1091,7 @@ ExtSearch = ScriptForm.extend({
 		}
 		else
 		{
-			var searchPattern = this.form.WholeWords ? "(?:[^\\w\\dА-я]|^)" + row.ExactMatch + "([^\\w\\dА-я]|$)" : StringUtils.addSlashes(row.ExactMatch);
+			var searchPattern = this.form.WholeWords ? "(?:[^\\w\\dА-я]|^)" + StringUtils.addSlashes(row.ExactMatch) + "([^\\w\\dА-я]|$)" : StringUtils.addSlashes(row.ExactMatch);
 			var re = new RegExp(searchPattern, 'g');
 			var matches = re.exec(row.FoundLine);
 
@@ -1431,12 +1431,6 @@ ExtSearch = ScriptForm.extend({
 		if (this.form.Query == '')
 		{
 			DoMessageBox('Не задана строка поиска');
-			return;
-		}
-
-		if (this.form.ReplaceStr == '')
-		{
-			DoMessageBox('Не задана строка замены');
 			return;
 		}
 
