@@ -124,11 +124,11 @@ function storeCurrentWindow(tw) {
 }
 function loadForm() {
     if (!form)
-    form = loadFormForScript(SelfScript);
+        form = loadFormForScript(SelfScript);
 }
 function loadFormSettings() {
     if (!formSettings)
-    formSettings = loadFormForScript(SelfScript, "Настройка");
+        formSettings = loadFormForScript(SelfScript, "Настройка");
 }
 function fillForm() {
     loadForm();
