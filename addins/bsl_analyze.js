@@ -43,9 +43,9 @@ var pflFolder = "Snegopat/bsl_analize/";
 var pflPathToBslServer = pflFolder + "pathToBslServer";
 var pflPathToBslCfg    = pflFolder + "pathToBslCfg";
 var pflPathToBslTemp   = pflFolder + "pathToTemp";
-function tryFindPathToBsl(path) {
-    if (v8New("File", path).Exist()) {
-        pathToBslServer = path;
+function tryFindPathToBsl(p) {
+    if (v8New("File", p).Exist()) {
+        pathToServer = p;
         return true;
     }
     return false;
@@ -124,11 +124,11 @@ function storeCurrentWindow(tw) {
 }
 function loadForm() {
     if (!form)
-        form = loadScriptFormEpf(SelfScript.fullPath.replace(/js$/i, "epf"), "Форма", SelfScript.self);
+    form = loadFormForScript(SelfScript);
 }
 function loadFormSettings() {
     if (!formSettings)
-        formSettings = loadScriptFormEpf(SelfScript.fullPath.replace(/js$/i, "epf"), "Настройка", SelfScript.self);
+    formSettings = loadFormForScript(SelfScript, "Настройка");
 }
 function fillForm() {
     loadForm();
