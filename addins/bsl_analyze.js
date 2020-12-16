@@ -201,12 +201,11 @@ function pathToBslCfgНачалоВыбора(Элемент, Стандартн
         formSettings.pathToBslCfg = sel.FullFileName;
 }
 function pathToTempНачалоВыбора(Элемент, СтандартнаяОбработка) {
-    debugger;
     var Mode = FileDialogMode.ChooseDirectory;
-    var sel = v8New("FileDialog"); //TODO: Как передать "Mode" в конструктор "FileDialog"?
+    var sel = v8New("FileDialog", Mode);
     sel.Title = "Укажите расположение папки для временных файлов";
     if (sel.Choose())
-        formSettings.PathToTemp = sel.Directory;
+        formSettings.PathToTemp = sel.Directory + "\\";
 }
 function CmdBarOpenSettings(Кнопка) {
     openFormSettings();
