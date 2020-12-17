@@ -327,7 +327,7 @@ class IDoModalHook {
         return _view is null ? "" : _view.title().str;
     }
     IV8Form&& get_form() {
-        if (_form is null) {
+        if (_form is null && !(_view is null)) {
             IForm&& f = _view.unk;
             if (f !is null)
                 &&_form = IV8Form(f);
@@ -462,7 +462,7 @@ void afterModal(IFramedView& pView, int result) {
     mem::int_ptr[pView.self] = info.originals.realVtable;
 }
 
-#if ver < 8.3.4
+#if ver < 8.3.4 | ver >= 8.3.18
 funcdef int DoModal1Func(IBkEndUI&, IFramedView&, int, int, int, int, int, int, int, int);
 int doModal1_trap(IBkEndUI& pThis, IFramedView& pView, int i1, int i2, int i3, int i4, int i5, int i6, int i7, int i8) {
 #else
@@ -476,7 +476,7 @@ int doModal1_trap(IBkEndUI& pThis, IFramedView& pView, int i1, int i2, int i3, i
     // вызываем оригинал
     DoModal1Func&& orig;
     trDoModal1.getOriginal(&&orig);
-#if ver < 8.3.4
+#if ver < 8.3.4 | ver >= 8.3.18
     result = orig(pThis, pView, i1, i2, i3, i4, i5, i6, i7, i8);
 #else
     result = orig(pThis, pView, i1, i2, i3, i4, i5, i6, i7, i8, i9);
@@ -487,7 +487,7 @@ int doModal1_trap(IBkEndUI& pThis, IFramedView& pView, int i1, int i2, int i3, i
     return result;
 }
 
-#if ver < 8.3.4
+#if ver < 8.3.4 | ver >= 8.3.18
 funcdef int DoModal2Func(IBkEndUI&, IFramedView&, int, int, int, int, int, int, int);
 int doModal2_trap(IBkEndUI& pThis, IFramedView& pView, int i1, int i2, int i3, int i4, int i5, int i6, int i7) {
 #else
@@ -501,7 +501,7 @@ int doModal2_trap(IBkEndUI& pThis, IFramedView& pView, int i1, int i2, int i3, i
     // вызываем оригинал
     DoModal2Func&& orig;
     trDoModal2.getOriginal(&&orig);
-#if ver < 8.3.4
+#if ver < 8.3.4 | ver >= 8.3.18
     result = orig(pThis, pView, i1, i2, i3, i4, i5, i6, i7);
 #else
     result = orig(pThis, pView, i1, i2, i3, i4, i5, i6, i7, i8);

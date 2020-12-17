@@ -179,3 +179,71 @@ void selectTypeAfterInsert(KeywordItem& item, TextWnd&& editor) {
     addTypeStores(ist, lastParseMethodResult.allowedAccesses);
     ist.show(editor, "");
 }
+
+class DirectiveItem : SmartBoxInsertableItem {
+    DirectiveItem(const string& name) {
+        super(name, imgKeyword);
+        d.key = d.key.substr(1);
+    }
+    void textForTooltip(string& text) {
+        text = "Вставка директивы §" + d.descr;
+    }
+    void textForInsert(string&out text) {
+        text = d.descr + "\n";
+    }
+};
+
+enum DirectivesSet {
+    dirSetNone,
+    dirSetForm,
+    dirSetCommand,
+    dirSetCommonModule
+};
+
+class DirecivesSet {
+    DirectiveItem atServerE("&AtServer"),
+        atClientE("&AtClient"),
+        atClientAtServerE("&AtClientAtServer"),
+        atServerNoContextE("&AtServerNoContext"),
+        atClientAtServerNoContextE("&AtClientAtServerNoContext"),
+        atServerR("&НаСервере"),
+        atClientR("&НаКлиенте"),
+        atClientAtServerR("&НаКлиентеНаСервере"),
+        atServerNoContextR("&НаСервереБезКонтекста"),
+        atClientAtServerNoContextR("&НаКлиентеНаСервереБезКонтекста");
+    array<SmartBoxItem&&> formsEng = { &&atClientE, &&atServerE, &&atServerNoContextE, &&atClientAtServerNoContextE };
+    array<SmartBoxItem&&> formsRus = { &&atClientR, &&atServerR, &&atServerNoContextR, &&atClientAtServerNoContextR };
+    array<SmartBoxItem&&> cmdsEng = { &&atClientE, &&atServerE, &&atClientAtServerE };
+    array<SmartBoxItem&&> cmdsRus = { &&atClientR, &&atServerR, &&atClientAtServerR };
+    array<SmartBoxItem&&> cmnmEng = { &&atClientE, &&atServerE };
+    array<SmartBoxItem&&> cmnmRus = { &&atClientR, &&atServerR };
+
+    void processResult(ParseMethodResult&& parseResult, DirectivesSet ds, IntelliSite&& isite) {
+        if (parseResult.isFlagSet(allowDirective)) {
+            switch (ds) {
+            case dirSetNone:
+                break;
+            case dirSetForm:
+                if (0 != (useLangs & useLangEng))
+                    isite.addItemGroup(formsEng);
+                if (0 != (useLangs & useLangRus))
+                    isite.addItemGroup(formsRus);
+                break;
+            case dirSetCommand:
+                if (0 != (useLangs & useLangEng))
+                    isite.addItemGroup(cmdsEng);
+                if (0 != (useLangs & useLangRus))
+                    isite.addItemGroup(cmdsRus);
+                break;
+            case dirSetCommonModule:
+                if (0 != (useLangs & useLangEng))
+                    isite.addItemGroup(cmnmEng);
+                if (0 != (useLangs & useLangRus))
+                    isite.addItemGroup(cmnmRus);
+                break;
+            }
+        }
+    }
+};
+
+DirecivesSet direcivesSet;

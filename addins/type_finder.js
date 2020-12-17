@@ -40,7 +40,7 @@ function calcInitName()
 function initForm()
 {
     // Загрузим и настроим форму
-    form = loadScriptFormEpf(SelfScript.fullPath.replace(/js$/, 'epf'), "Форма", SelfScript.self)
+    form = loadFormForScript(SelfScript)
     form.КлючСохраненияПоложенияОкна = SelfScript.uniqueName
     form.Types.Columns.Add("data")
     form.Types.Columns.Add("picture")

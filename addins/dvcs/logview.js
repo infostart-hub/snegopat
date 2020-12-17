@@ -22,8 +22,8 @@ var RootFile = null
 function macrosЖурнал(){
     var Form = CreateLogViewForm();
     Form.open();
-    /* var pathToForm=SelfScript.fullPath.replace(/js$/, 'ssf')
-    мФормаЖурнала=loadScriptForm(pathToForm, SelfScript.self) // Обработку событий формы привяжем к самому скрипту
+    /* 
+    мФормаЖурнала=loadFormForScript(SelfScript) // Обработку событий формы привяжем к самому скрипту
     мФормаЖурнала.Открыть(); */
 }
 
@@ -33,7 +33,7 @@ function CreateLogViewForm() {
 
 function _LogView() {
 
-    this.form = loadScriptForm(SelfScript.fullPath.replace(/js$/, 'ssf'), this);
+    this.form = loadFormForScript(SelfScript, '', this);
     this.backend = null;
     this.rootpath = null;
 

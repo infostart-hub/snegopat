@@ -67,7 +67,7 @@ function macrosПоказатьПрофайл()
     refreshAll()
         // if(!form)
         // {
-            // form = loadScriptForm(SelfScript.fullPath.replace(/js$/i, 'ssf'), SelfScript.self)
+            // form = loadFormForScript(SelfScript)
             // walkProfile(profileRoot, form.ProfileTree)
         // }
     form.Открыть()
@@ -77,7 +77,7 @@ function refreshAll()
 {
     if(!form)
     {
-        form = loadScriptForm(SelfScript.fullPath.replace(/js$/i, 'ssf'), SelfScript.self)
+        form = loadFormForScript(SelfScript)
             //walkProfile(profileRoot, form.ProfileTree)
     }
     walkProfile(profileRoot, form.ProfileTree)

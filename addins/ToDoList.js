@@ -60,7 +60,7 @@ ToDoListForm = ScriptForm.extend({
 
     construct: function() {
 		this._instance = null;
-        this._super(SelfScript.fullPath.replace(/js$/, 'epf|Форма'));
+        this._super(SelfScript);
 		
 		ToDoListForm._instance = this;
 		

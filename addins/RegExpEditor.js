@@ -47,7 +47,7 @@ function CreateRegExpEditor() {
 }
 
 function _RegExpEditor() {
-    this.form = loadScriptForm(SelfScript.fullPath.replace(/js$/, 'ssf'), this);
+    this.form = loadFormForScript(SelfScript, "", this);
 
     this.owner = null; // Элемент управления, из которого открыт редактор.    
     this.textWindow = null; // Текстовый документ, из которого открыт редактор.

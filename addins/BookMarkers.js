@@ -54,9 +54,8 @@ SelfScript.self['macrosОткрыть окно'] = function() {
 function BookMarkers(){
 
 	BookMarkers._instance = this;
-	var pathToForm = SelfScript.fullPath.replace(/js$/, 'epf');
 	this.targetWindow = GetTextWindow();
-	this.form = loadScriptFormEpf(pathToForm, "Форма", this)
+	this.form = loadFormForScript(SelfScript, '', this)
 	this.form.КлючСохраненияПоложенияОкна = SelfScript.uniqueName;
 	this.watcher = new TextWindowsWatcher();
 	this.OpenWindow = false;
@@ -800,8 +799,7 @@ TextWindowsWatcherGoToLine = stdlib.Class.extend({
 //} end of TextWindowsWatcherGoToLine class
 
 BookMarkers.prototype.КоманднаяПанель1Настройки = function(Элемент) {
-    var pathToForm=SelfScript.fullPath.replace(/.js$/, '.epf')
-    мФормаНастройки=loadScriptFormEpf(pathToForm, "Настройка", SelfScript.self) // Обработку событий формы привяжем к самому скрипту
+    мФормаНастройки=loadFormForScript(SelfScript, "Настройка") // Обработку событий формы привяжем к самому скрипту
     мФормаНастройки.ОткрытьМодально()
 }
 

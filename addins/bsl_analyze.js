@@ -98,11 +98,11 @@ function storeCurrentWindow(tw) {
 }
 function loadForm() {
     if (!form)
-        form = loadScriptFormEpf(SelfScript.fullPath.replace(/js$/i, "epf"), "Форма", SelfScript.self);
+        form = loadFormForScript(SelfScript);
 }
 function loadFormSettings() {
     if (!formSettings)
-        formSettings = loadScriptFormEpf(SelfScript.fullPath.replace(/js$/i, "epf"), "Настройка", SelfScript.self);
+        formSettings = loadFormForScript(SelfScript, "Настройка");
 }
 function fillForm() {
     loadForm();

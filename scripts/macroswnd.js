@@ -177,8 +177,8 @@ exports.MacrosWnd = (function () {
                 this.MacrosTreeCtrl.ТекущаяСтрока = this.lastMacrosRow;
             else if (this.form.MacrosTree.Строки.Количество() > 0)
                 this.MacrosTreeCtrl.ТекущаяСтрока = this.form.MacrosTree.Строки.Get(0);
-            if (!pattern.length)
-                this.form.ТекущийЭлемент = this.MacrosTreeCtrl;
+            //if (!pattern.length)
+            //    this.form.ТекущийЭлемент = this.MacrosTreeCtrl;
         };
         MacrosWnd.prototype.PatternРегулирование = function (Элемент, Направление, СтандартнаяОбработка) {
             var tp = this.MacrosTreeCtrl, cr = tp.ТекущаяСтрока;

@@ -61,8 +61,7 @@ var СоответствиеФайловИСтатусов = [];
 var мФормаНастройки=null
 
 function macrosНастрокаFossil(){
-    var pathToForm=SelfScript.fullPath.replace(/js$/, 'ssf')
-    мФормаНастройки=loadScriptForm(pathToForm, SelfScript.self) // Обработку событий формы привяжем к самому скрипту
+    мФормаНастройки=loadFormForScript(SelfScript) // Обработку событий формы привяжем к самому скрипту
     мФормаНастройки.ОткрытьМодально()
 }
 

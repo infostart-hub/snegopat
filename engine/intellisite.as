@@ -100,6 +100,9 @@ class IntelliSite : SmartBoxSite {
     bool bAllowMultyFilter;
     array<string>&& hotItems;
     ToolTipWindow templateToolTip;
+#if ver >= 8.3.12
+    bool updownPressed = false;
+#endif
 
     IntelliSite() {
         clearAllItems();
@@ -230,6 +233,7 @@ class IntelliSite : SmartBoxSite {
         } else {
             StringComparator cmp;
             string pattern = buffer.substr(0, posInBuffer);
+            pattern.ltrim("&\"'");
             if (pattern.find(spaceSymbol) >= 0)
                 cmp.setPattern(pattern.replace(spaceSymbol, ' '), cmContain);
             else
@@ -338,6 +342,12 @@ class IntelliSite : SmartBoxSite {
         case VK_TAB:
             SendMessage(smartBox.hwnd, WM_KEYDOWN, VK_RETURN, 0);
             return true;
+        #if ver >= 8.3.12
+        case VK_DOWN:
+        case VK_UP:
+            updownPressed = true;
+            break;
+        #endif
         }
         return false;
     }
@@ -376,12 +386,21 @@ class IntelliSite : SmartBoxSite {
     }
     bool onKillFocus(HWND hNewWnd) {
         if (!bInHide) {
+            if (hNewWnd == smartBox.hwnd) {
+                return false;
+            }
         #if ver < 8.3.12
-            if (hNewWnd == getHwnd(textWnd)) {
+            // Этот кусок срабатывает когда нажимают вверх/вниз при открытой подсказке о параметрах метода
+            // Не даем фокусу уйти из списка. 
+            else if (hNewWnd == getHwnd(textWnd)) {
                 SetFocus(smartBox.hwnd);
                 return true;
-            } else if (hNewWnd == smartBox.hwnd) {
-                return false;
+            }
+        #else
+            else if (updownPressed) {
+                updownPressed = false;
+                SetFocus(smartBox.hwnd);
+                return true;
             }
         #endif
         }

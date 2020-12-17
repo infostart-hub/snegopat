@@ -233,7 +233,7 @@ DebugInstruments = ScriptForm.extend({
 
     construct : function () {
         
-        this._super(env.pathes.addins + "DebugInstruments.ssf");
+        this._super(SelfScript);
 
 
         this.loadSettings();
