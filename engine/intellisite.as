@@ -576,6 +576,10 @@ mixin class MethodInsertable {
         else {
             string lastExpr = getTextLine(wnd.textDoc.tm, caretPos.line).substr(caretPos.col - 1)
                 .replace(endLineRex, "");
+            array<string>&& tail = lastExpr.split(whiteSpaceRex);
+            if (tail.length > 0) {
+                lastExpr = tail[0];
+            }
             insert += lastExpr + ")";
             end.col += lastExpr.length;
             

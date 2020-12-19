@@ -160,6 +160,9 @@ RegExp whiteSpaceRex("\\s+");
 RegExp ucaseLetterRex("\\p{Upper}");
 RegExp scriptTagsRex("""^(?://(\w+)\:|\$(\w+))[ \t]*(.*?)\s*?\n""");
 RegExp newlines("\\n");
+RegExp typeMethodOnLeft("Тип\\s*\\(\\s*\"$|Тype\\s*\\(\\s*\"$");
+RegExp closedBracketOnRight("^\\s*\\)");
+RegExp quoteOnRight("^\\s*\"");
 
 // Проверка, завершается ли строка текста открытым литералом
 bool isLineEndWithOpenQuote(const string& line) {
