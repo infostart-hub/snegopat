@@ -31,7 +31,7 @@ class V8Dumper {
 
     void dump() {
         // Откроем файл для дампа
-        URL url("file://" + myFolder + "v8.d.ts");
+        URL url("file://" + myFolder + "v8_1c.d.ts");
         IFileSystem&& fs = getFSService();
         {
             ExceptionCatcher catcher;

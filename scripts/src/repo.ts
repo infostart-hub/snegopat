@@ -53,7 +53,8 @@
 @*/
 
 /// <reference path="../snegopat.d.ts"/>
-/// <reference path="../v8.d.ts"/>
+//1/// <reference path="../v8_1c.d.ts"/>
+import { global, File, FormItems, Map, TextBox, ValueTable, ValueTableRow, Form, ЗначениеИзСтрокиВнутр, FindFiles } from "v8_1c";
 
 global.connectGlobals(SelfScript);
 import * as stdlib from "./std";
