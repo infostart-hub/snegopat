@@ -19,6 +19,7 @@ class BuiltinFuncItem : SmartBoxInsertableItem, MethodInsertable {
         super(name, imgPublicMethod);
         paramsCount = pc;
         isFunction = true;
+        insertingString = name;
     }
     void textForTooltip(string& text) {
         text = "Встроенная функция §" + d.descr;
@@ -152,6 +153,7 @@ class GlobalContextMethod : SmartBoxInsertableItem, MethodInsertable {
         super(name, imgMethodWithKey);
         paramsCount = pc;
         isFunction = isf;
+        insertingString = name;
     }
     void textForTooltip(string& text) {
         text = "Метод глобального контекста §" + d.descr;
@@ -189,6 +191,7 @@ class ExtContextMethod : SmartBoxInsertableItem, MethodInsertable {
         paramsCount = pc;
         isFunction = isf;
         context = ctx;
+        insertingString = name;
     }
     void textForTooltip(string& text) {
         text = "Метод " + context + "::" + d.descr + "()";

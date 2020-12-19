@@ -19,6 +19,7 @@ const uint16 spaceSymbol = '∙';
 class SmartBoxInsertableItem : SmartBoxItem {
     SmartBoxInsertableItem(const string& descr, imagesIdx img) {
         super(descr, img);
+        // Message("SmartBoxInsertableItem descr " + descr);
     }
     void textForInsert(string&out text) {
         text = d.descr;
@@ -559,14 +560,40 @@ class IntelliSite : SmartBoxSite {
 mixin class MethodInsertable {
     bool isFunction;
     uint paramsCount;
+    string insertingString;
+    string addingString;
+
+    void updateInsertPosition(TextWnd& wnd, TextPosition& start, TextPosition& end, bool& notIndent) override {
+
+        string insert = insertingString;
+        // Message("before MethodInsertable::updateInsertPosition insert " + insert);
+
+        TextPosition caretPos;
+        wnd.ted.getCaretPosition(caretPos, false);
+
+        if (getTextLine(wnd.textDoc.tm, end.line).substr(end.col - 1).replace(indentRex, "").isEmpty())   // Если остаток строки пустой,
+            insert += ";";
+        else {
+            string lastExpr = getTextLine(wnd.textDoc.tm, caretPos.line).substr(caretPos.col - 1)
+                .replace(endLineRex, "");
+            insert += lastExpr + ")";
+            end.col += lastExpr.length;
+            
+            addingString = lastExpr;
+
+            // Message("in MethodInsertable::updateInsertPosition lastExpr " + lastExpr);
+        }
+    }
+
     void textForInsert(string&out text) {
         text = d.descr + "(";
         if (paramsCount > 0)
             text += "¦";
-        text += ")";
+        text += addingString + ")";
         if (!isFunction)
             text += ";";
     }
+
 #if ver >= 8.3.4
     void afterInsert(TextWnd&& editor) {
         showV8MethodsParams();

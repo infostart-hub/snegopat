@@ -282,6 +282,8 @@ class V8StockMethod : V8StockItemBase {
         else
             idx = imgMethodWithKey;
         super(d, idx, b, l, vd);
+
+        // Message("V8StockMethod " + getCategory() + ", " + d); 
     }
     string getCategory() {
         switch (d.image) {
@@ -295,17 +297,36 @@ class V8StockMethod : V8StockItemBase {
         return builtinFuncs.contains(d.descr) ? "Встроенная функция" : "Глобальный метод";
     }
     void updateInsertPosition(TextWnd& wnd, TextPosition& start, TextPosition& end, bool& notIndent) override {
+
+        // Message("before V8StockItemBase::updateInsertPosition insert " + insert);
         V8StockItemBase::updateInsertPosition(wnd, start, end, notIndent);
+
+        TextPosition caretPos;
+        wnd.ted.getCaretPosition(caretPos, false);
+
         wchar_t lastSymbol = insert[insert.length - 1];
         if (lastSymbol == '(')
-            insert += "¦)";
+            insert += "¦";
         if (lastSymbol == '(' || lastSymbol == ')') {
             if (getTextLine(wnd.textDoc.tm, end.line).substr(end.col - 1).replace(indentRex, "").isEmpty())   // Если остаток строки пустой,
-                insert += ";";         // добавим запяточку
+                if (lastSymbol == '(')
+                    insert += ");";
+                else
+                    insert += ";";
+            else {
+                string lastExpr = getTextLine(wnd.textDoc.tm, caretPos.line).substr(caretPos.col - 1)
+                    .replace(endLineRex, "");
+                insert += lastExpr + ")";
+                end.col += lastExpr.length;
+    
+                // Message("in V8StockMethod::updateInsertPosition lastExpr " + lastExpr);
+            }
         }
+
     }
+
 #if ver >= 8.3.4
-    void afterInsert(TextWnd&& editor) {
+    void afterInsert(TextWnd&& wnd) {
         showV8MethodsParams();
     }
 #endif

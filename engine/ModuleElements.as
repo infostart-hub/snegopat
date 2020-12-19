@@ -183,6 +183,7 @@ class ModuleMethodItem : SmartBoxInsertableItem, MethodInsertable {
         &&info = i;
         paramsCount = i.paramsCount();
         isFunction = i.isFunction;
+        insertingString = i.name;
     }
     void textForTooltip(string& text) {
         text = (isFunction ? "Функция " : "Процедура ") + info.name + "(";
