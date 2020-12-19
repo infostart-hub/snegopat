@@ -272,6 +272,7 @@ class V8StockKeyword : V8StockItemBase {
 
 class V8StockMethod : V8StockItemBase {
     bool isFunction;
+    
     V8StockMethod(int from, const string& d, bool isFunc, IV8Bookmark&& b, IAssistList&& l, IV8DataSource&& vd) {
         imagesIdx idx;
         if (from == tcfModuleSelf)
@@ -286,19 +287,19 @@ class V8StockMethod : V8StockItemBase {
 
         isFunction = isFunc;
 
-        Message("V8StockMethod " + getCategory() + ", " + d + ", isFunction " + isFunction); 
+        // Message("V8StockMethod " + getCategory() + ", " + d + ", isFunction " + isFunction); 
     }
     string getCategory() {
         string type = "Процедура";
         if (isFunction)
             type = "Функция";
         switch (d.image) {
-        case imgPublicMethod:
-            return type + " модуля";
-        case imgCtxMethod:
-            return type + " контекста";
-        case imgCmnModule:
-            return type + " общего модуля";
+            case imgPublicMethod:
+                return type + " модуля";
+            case imgCtxMethod:
+                return type + " контекста";
+            case imgCmnModule:
+                return type + " общего модуля";
         }
         if (builtinFuncs.contains(d.descr))
             return "Встроенная функция";
