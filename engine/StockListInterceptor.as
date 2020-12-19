@@ -144,7 +144,7 @@ bool showAssistList(IAssistList& lst, TextWnd&& wnd, IV8DataSource&& ds, IV8Book
             if (typeContextInfoItem.isMethod) {
                 if (!methods.insert(name))  // ключ уже был в наборе
                     continue;
-                &&newItem = V8StockMethod(typeContextInfoItem.from, name, item, lst, ds);
+                &&newItem = V8StockMethod(typeContextInfoItem.from, name, typeContextInfoItem.haveRetVal, item, lst, ds);
             } else if (typeContextInfoItem.from == tcfKeyword) {
                 &&newItem = V8StockKeyword(name, item, lst, ds);
             } else if (typeContextInfoItem.from == tcfTemplate) {
@@ -271,7 +271,8 @@ class V8StockKeyword : V8StockItemBase {
 };
 
 class V8StockMethod : V8StockItemBase {
-    V8StockMethod(int from, const string& d, IV8Bookmark&& b, IAssistList&& l, IV8DataSource&& vd) {
+    bool isFunction;
+    V8StockMethod(int from, const string& d, bool isFunc, IV8Bookmark&& b, IAssistList&& l, IV8DataSource&& vd) {
         imagesIdx idx;
         if (from == tcfModuleSelf)
             idx = imgPublicMethod;
@@ -283,18 +284,28 @@ class V8StockMethod : V8StockItemBase {
             idx = imgMethodWithKey;
         super(d, idx, b, l, vd);
 
-        // Message("V8StockMethod " + getCategory() + ", " + d); 
+        isFunction = isFunc;
+
+        Message("V8StockMethod " + getCategory() + ", " + d + ", isFunction " + isFunction); 
     }
     string getCategory() {
+        string type = "Процедура";
+        if (isFunction)
+            type = "Функция";
         switch (d.image) {
         case imgPublicMethod:
-            return "Метод модуля";
+            return type + " модуля";
         case imgCtxMethod:
-            return "Метод контекста";
+            return type + " контекста";
         case imgCmnModule:
-            return "Метод общего модуля";
+            return type + " общего модуля";
         }
-        return builtinFuncs.contains(d.descr) ? "Встроенная функция" : "Глобальный метод";
+        if (builtinFuncs.contains(d.descr))
+            return "Встроенная функция";
+        if (isFunction)
+            return "Глобальная функция";
+        else
+            return "Глобальный метод";
     }
     void updateInsertPosition(TextWnd& wnd, TextPosition& start, TextPosition& end, bool& notIndent) override {
 
