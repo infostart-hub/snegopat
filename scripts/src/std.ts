@@ -15,7 +15,6 @@
 @*/
 
 /// <reference path="../snegopat.d.ts"/>
-//1/// <reference path="../v8_1c.d.ts"/>
 import { global, File, FormItems, Map, TextBox, ValueTable, ValueTableRow, Form, ЗначениеИзСтрокиВнутр } from "v8_1c";
 import * as stdcommands from "./commands";
 

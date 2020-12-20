@@ -8,7 +8,6 @@
 //help: inplace
 
 /// <reference path="../snegopat.d.ts"/>
-//1/// <reference path="../v8_1c.d.ts"/>
 import { global } from "v8_1c";
 
 /*@

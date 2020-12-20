@@ -9,7 +9,6 @@
 //addin: scintilla_int
 
 /// <reference path="../snegopat.d.ts"/>
-//1/// <reference path="../v8_1c.d.ts"/>
 import { global, File, FormItems, Map, TextBox, ValueTable, ValueTableRow, Form, ЗначениеИзСтрокиВнутр, Controls, TableBox, Вопрос, КодВозвратаДиалога, Предупреждение, РежимДиалогаВопрос } from "v8_1c";
 
 import * as stdlib from "./std";
