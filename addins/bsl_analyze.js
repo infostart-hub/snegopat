@@ -37,11 +37,11 @@ var filePath;
 var lastView;
 var lastSelection;
 var pathToBslServer;
-var pathToBslCfg;
+var pathToBslJson;
 var pathToTemp;
 var pflFolder = "Snegopat/bsl_analize/";
-var pflPathToBslServer = pflFolder + "pathToBslServer";
-var pflPathToBslCfg    = pflFolder + "pathToBslCfg";
+var pflPathToBslServer = pflFolder + "pathToBsl";
+var pflPathToBslJson    = pflFolder + "pathToBslJson";
 var pflPathToBslTemp   = pflFolder + "pathToTemp";
 function tryFindPathToBsl(p) {
     if (v8New("File", p).Exist()) {
@@ -52,7 +52,7 @@ function tryFindPathToBsl(p) {
 }
 function storeSettings() {
     profileRoot.setValue(pflPathToBslServer, pathToBslServer);
-    profileRoot.setValue(pflPathToBslCfg,    pathToBslCfg);
+    profileRoot.setValue(pflPathToBslJson,    pathToBslJson);
     profileRoot.setValue(pflPathToBslTemp,   pathToTemp);
 }
 (function () {
@@ -65,8 +65,8 @@ function storeSettings() {
         if (!!pathToBslServer)
             storeSettings();
     }
-    profileRoot.createValue(pflPathToBslCfg, "", pflSnegopat);
-    pathToBslCfg = profileRoot.getValue(pflPathToBslCfg);
+    profileRoot.createValue(pflPathToBslJson, "", pflSnegopat);
+    pathToBslJson = profileRoot.getValue(pflPathToBslJson);
     profileRoot.createValue(pflPathToBslTemp, "", pflSnegopat);
     pathToTemp = profileRoot.getValue(pflPathToBslTemp);
     if (!pathToTemp) {
@@ -83,8 +83,8 @@ function runAnalyses(td) {
             MessageBox("Не удалось записать текст модуля во временный файл");
             return undefined;
         }
-        if (pathToBslCfg)
-            var key_c = ' -c "' + pathToBslCfg + '"'
+        if (pathToBslJson)
+            var key_c = ' -c "' + pathToBslJson + '"'
         else
             var key_c = '';    
         var wsh = new ActiveXObject("Wscript.Shell");
@@ -175,12 +175,12 @@ function openFormSettings() {
 }
 function formSettingsПриОткрытии() {
     formSettings.pathToBslServer = pathToBslServer;
-    formSettings.pathToBslCfg    = pathToBslCfg;
+    formSettings.pathToBslJson    = pathToBslJson;
     formSettings.pathToTemp      = pathToTemp;
 }
 function formSettingsЗаписатьИЗакрыть(Кнопка) {
     pathToBslServer = formSettings.pathToBslServer;
-    pathToBslCfg    = formSettings.pathToBslCfg;
+    pathToBslJson    = formSettings.pathToBslJson;
     pathToTemp      = formSettings.pathToTemp;
     storeSettings();
     formSettings.Close();
@@ -189,23 +189,34 @@ function formSettingsСкачатьbsl(Кнопка) {
     RunApp("https://github.com/1c-syntax/bsl-language-server/releases");
 }
 function pathToBslServerНачалоВыбора(Элемент, СтандартнаяОбработка) {
-    var sel = v8New("FileDialog");
-    sel.Title = "Укажите расположение выполняемого файла bsl-language-server";
-    if (sel.Choose())
-        formSettings.pathToBslServer = sel.FullFileName;
+    var Dialog = FileDialog("Укажите расположение выполняемого файла bsl-language-server.exe", "exe", formSettings.pathToBslServer);
+    if (Dialog.Choose())
+        formSettings.pathToBslServer = Dialog.FullFileName;
 }
-function pathToBslCfgНачалоВыбора(Элемент, СтандартнаяОбработка) {
-    var sel = v8New("FileDialog");
-    sel.Title = "Укажите расположение файла Bsl_ls_cfg.json";
-    if (sel.Choose())
-        formSettings.pathToBslCfg = sel.FullFileName;
+function pathToBslJsonНачалоВыбора(Элемент, СтандартнаяОбработка) {
+    var Dialog = FileDialog("Укажите расположение файла bsl-language-server.json", "json", formSettings.pathToBslJson);
+    if (Dialog.Choose())
+        formSettings.pathToBslJson = Dialog.FullFileName;
 }
 function pathToTempНачалоВыбора(Элемент, СтандартнаяОбработка) {
+    var Dialog = DirectoryDialog("Укажите расположение папки для временных файлов", formSettings.PathToTemp);
+    if (Dialog.Choose())
+        formSettings.PathToTemp = Dialog.Directory + "\\";
+}
+function FileDialog(title, extension, path) {
+    var fileDialog = v8New("FileDialog");
+    fileDialog.Title = title;
+    fileDialog.Filter = "(*." + extension + ")|*." + extension;
+    fileDialog.Directory = v8New("File", path).Path;
+    fileDialog.FullFileName = path;
+    return fileDialog;
+}
+function DirectoryDialog(Title, path) {
     var Mode = FileDialogMode.ChooseDirectory;
-    var sel = v8New("FileDialog", Mode);
-    sel.Title = "Укажите расположение папки для временных файлов";
-    if (sel.Choose())
-        formSettings.PathToTemp = sel.Directory + "\\";
+    var fileDialog = v8New("FileDialog", Mode);
+    fileDialog.Title = Title;
+    fileDialog.Directory = path;
+    return fileDialog;
 }
 function CmdBarOpenSettings(Кнопка) {
     openFormSettings();
