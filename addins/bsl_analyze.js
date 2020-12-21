@@ -45,7 +45,7 @@ var pflPathToBslJson    = pflFolder + "pathToBslJson";
 var pflPathToBslTemp   = pflFolder + "pathToTemp";
 function tryFindPathToBsl(p) {
     if (v8New("File", p).Exist()) {
-        pathToServer = p;
+        pathToBslServer = p;
         return true;
     }
     return false;
