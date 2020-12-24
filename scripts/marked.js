@@ -1,9 +1,9 @@
-//engine: JScript
+п»ї//engine: JScript
 //uname: marked
-//dname: Markdown парсер
+//dname: Markdown РїР°СЂСЃРµСЂ
 //author: Copyright (c) 2011-2014, Christopher Jeffrey. (MIT Licensed)
 //www: https://github.com/chjj/marked
-//descr: этот скрипт используется для преобразования файлов с markdown-разметкой в html файлы.
+//descr: СЌС‚РѕС‚ СЃРєСЂРёРїС‚ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґР»СЏ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ С„Р°Р№Р»РѕРІ СЃ markdown-СЂР°Р·РјРµС‚РєРѕР№ РІ html С„Р°Р№Р»С‹.
 //help: inplace
 
 /**

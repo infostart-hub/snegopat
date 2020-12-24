@@ -1,6 +1,6 @@
 ﻿//engine: JScript
 //uname: queryParamsExtractor
-//dname: Query Parameters Extractor
+//dname: Извлечение параметров запроса
 //descr: Выделяет параметры из текста запроса
 //author: Василий Фролов aka Палыч, palytsh@mail.ru
 //help: inplace
