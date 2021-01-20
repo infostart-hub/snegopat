@@ -194,7 +194,7 @@ function pathToBslServerНачалоВыбора(Элемент, Стандар�
         formSettings.pathToBslServer = Dialog.FullFileName;
 }
 function pathToBslJsonНачалоВыбора(Элемент, СтандартнаяОбработка) {
-    var Dialog = FileDialog("Укажите расположение файла bsl-language-server.json", "json", formSettings.pathToBslJson);
+    var Dialog = FileDialog("Укажите расположение файла .bsl-language-server.json", "json", formSettings.pathToBslJson);
     if (Dialog.Choose())
         formSettings.pathToBslJson = Dialog.FullFileName;
 }
