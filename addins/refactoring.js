@@ -109,7 +109,7 @@ function MethodListForm(module) {
     this.module = module;
     this.originalMethodList = module.getMethodsTable();
 
-    this.form = loadFormForScript(SelfScript, 'MethodListForm',  this);
+    this.form = loadFormForScript(SelfScript, 'MethodListForm', this);
     this.SelectedMethod = undefined;
 
     this.settings = SettingsManagement.CreateManager(SelfScript.uniqueName + "/MethodListForm", {
@@ -254,28 +254,45 @@ function CreateMethodStubRefactoring(module) {
 
 CreateMethodStubRefactoring.prototype.refactor = function (selectedText) {
 
-    var methodName, methodSignature, matches;
+    var fullMethodCall, parts, methodName, moduleName, methodSignature, matches;
 
-    methodName = this.textWindow.GetWordUnderCursor();
-    if (!methodName)
+    fullMethodCall = this.textWindow.GetWordUnderCursor(/[\.\w\dА-я]/);
+    if (!fullMethodCall)
         return;
 
-    var method_call_proc = new RegExp("(?:;\\s*|^\\s*)" + methodName + '(\\(.*?\\))');
-    var method_call_func = new RegExp(methodName + "(\\(.*?\\))");
+    parts = fullMethodCall.split('.');
+
+    var isCallFromModule = parts.length > 1;
+
+    if (isCallFromModule) {
+        // TODO: Поддержку модулей менеджеров и (?) модулей менеджерв
+        // (если получиться определять тип)
+        moduleName = parts[0];
+        methodName = parts[1];
+    }
+    else {
+        moduleName = '';
+        methodName = parts[0];
+    }
+
+    // Экранируем точку (хотя не обязательно, она матчит любой символ, в том числе и саму себя).
+    var escDot = function(s) { return s.replace('.', '\\.'); }
+
+    var method_call_proc = new RegExp("(?:;\\s*|^\\s*)" + escDot(fullMethodCall) + '(\\(.*?\\))');
+    var method_call_func = new RegExp(escDot(fullMethodCall) + "(\\(.*?\\))");
 
     var line = this.textWindow.GetLine(this.textWindow.GetCaretPos().beginRow);
 
     var matches = line.match(method_call_proc);
     var isProc = (matches != null);
 
-    if (!isProc)
-    {
+    if (!isProc) {
         matches = line.match(method_call_func);
         if (!matches)
             return;
     }
 
-    methodSignature = methodName + matches[1];
+    methodSignature = methodName + matches[1] + (isCallFromModule ? ' Экспорт' : '');
 
     var procTemplate = "\n"
     + "Процедура ИмяМетода()\n"
@@ -290,10 +307,38 @@ CreateMethodStubRefactoring.prototype.refactor = function (selectedText) {
 
     var stubCode = isProc ? procTemplate : funcTemplate;
     stubCode = stubCode.replace('ИмяМетода()', methodSignature);
-    var curMethod = this.module.getActiveLineMethod();
-    var insertLineIndex = curMethod.EndLine + 1;
-    this.textWindow.InsertLine(insertLineIndex + 1, stubCode);
-    this.textWindow.SetCaretPos(insertLineIndex + 3, 1);
+
+    var insertLineIndex = 0, textWindow = null;
+
+    if (isCallFromModule) {
+        var mdModule = metadata.current.rootObject.childObject("ОбщиеМодули", moduleName);
+        if (!mdModule) {
+            Message("Общий модуль " + moduleName + " не найден!");
+            return;
+        }
+        mdModule.openModule("Модуль");
+
+        textWindow = GetTextWindow();
+        if (!textWindow) {
+            Message("Не найдет активный текстовый документ общего модуля " + moduleName);
+            return;
+        }
+
+        insertLineIndex = textWindow.LinesCount();
+        module = SyntaxAnalysis.AnalyseTextDocument(textWindow);
+        if (module.context.Methods.length) {
+            var lastMethod = module.context.Methods[ module.context.Methods.length - 1 ];
+            insertLineIndex = lastMethod.EndLine + 1;
+        }
+    }
+    else {
+        textWindow = this.textWindow;
+        var curMethod = this.module.getActiveLineMethod();
+        insertLineIndex = curMethod.EndLine + 1;
+    }
+
+    textWindow.InsertLine(insertLineIndex + 1, stubCode);
+    textWindow.SetCaretPos(insertLineIndex + 3, 1);
 }
 
 ////} CreateMethodRefactoring
