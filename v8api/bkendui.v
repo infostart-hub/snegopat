@@ -17,9 +17,12 @@
   #else
 	save void openView(IFramedView& view, const ViewPosition& pos=ViewPosition(), int openIn=0, bool activate=true, const Guid& g=IID_NULL, const Rect& r=kEmptyRect)
   #endif
+
 ////////////////////////////////////////////////////////
 // Открыть диалог и Предупреждение
-#if ver >= 8.3.9
+#if ver >= 8.3.17.1549
+    21
+#elif ver >= 8.3.9
     21
 #elif ver >= 8.3.7
 	20
@@ -51,6 +54,10 @@
 #endif
 
 	+1
+
+#if ver >= 8.3.17.1549
+    24
+#endif
 
   #if ver < 8.3.4 | ver >= 8.3.18 | ver = 8.3.16.1814
 	save int doModal2(IFramedView& pView, int i1, int i2, int i3, int i4, int i5, int i6, int i7)
@@ -94,6 +101,11 @@
   #else
         +22
   #endif
+#if ver >= 8.3.17.1549
+    75
+#elif ver >= 8.3.18
+    74
+#endif
 	save bool GetFileName(SelectFileName& data, int timeout, HWND parent)
 
 
