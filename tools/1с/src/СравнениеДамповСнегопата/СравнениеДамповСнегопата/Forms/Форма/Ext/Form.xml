@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<Form xmlns="http://v8.1c.ru/8.3/xcf/logform" xmlns:app="http://v8.1c.ru/8.2/managed-application/core" xmlns:cfg="http://v8.1c.ru/8.1/data/enterprise/current-config" xmlns:dcscor="http://v8.1c.ru/8.1/data-composition-system/core" xmlns:dcsset="http://v8.1c.ru/8.1/data-composition-system/settings" xmlns:ent="http://v8.1c.ru/8.1/data/enterprise" xmlns:lf="http://v8.1c.ru/8.2/managed-application/logform" xmlns:style="http://v8.1c.ru/8.1/data/ui/style" xmlns:sys="http://v8.1c.ru/8.1/data/ui/fonts/system" xmlns:v8="http://v8.1c.ru/8.1/data/core" xmlns:v8ui="http://v8.1c.ru/8.1/data/ui" xmlns:web="http://v8.1c.ru/8.1/data/ui/colors/web" xmlns:win="http://v8.1c.ru/8.1/data/ui/colors/windows" xmlns:xr="http://v8.1c.ru/8.3/xcf/readable" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.10">
+<Form xmlns="http://v8.1c.ru/8.3/xcf/logform" xmlns:app="http://v8.1c.ru/8.2/managed-application/core" xmlns:cfg="http://v8.1c.ru/8.1/data/enterprise/current-config" xmlns:dcscor="http://v8.1c.ru/8.1/data-composition-system/core" xmlns:dcsset="http://v8.1c.ru/8.1/data-composition-system/settings" xmlns:ent="http://v8.1c.ru/8.1/data/enterprise" xmlns:lf="http://v8.1c.ru/8.2/managed-application/logform" xmlns:style="http://v8.1c.ru/8.1/data/ui/style" xmlns:sys="http://v8.1c.ru/8.1/data/ui/fonts/system" xmlns:v8="http://v8.1c.ru/8.1/data/core" xmlns:v8ui="http://v8.1c.ru/8.1/data/ui" xmlns:web="http://v8.1c.ru/8.1/data/ui/colors/web" xmlns:win="http://v8.1c.ru/8.1/data/ui/colors/windows" xmlns:xr="http://v8.1c.ru/8.3/xcf/readable" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.4">
 	<AutoSaveDataInSettings>Use</AutoSaveDataInSettings>
 	<SaveDataInSettings>UseList</SaveDataInSettings>
 	<AutoCommandBar name="ФормаКоманднаяПанель" id="-1">
@@ -22,7 +22,7 @@
 					<v8:content>Группа настройки</v8:content>
 				</v8:item>
 			</ToolTip>
-			<Group>AlwaysHorizontal</Group>
+			<Group>Horizontal</Group>
 			<Behavior>Collapsible</Behavior>
 			<CollapsedRepresentationTitle>
 				<v8:item>
@@ -106,7 +106,7 @@
 							</Events>
 						</InputField>
 						<UsualGroup name="Группа5" id="121">
-							<Group>AlwaysHorizontal</Group>
+							<Group>Horizontal</Group>
 							<Representation>None</Representation>
 							<ShowTitle>false</ShowTitle>
 							<ExtendedTooltip name="Группа5РасширеннаяПодсказка" id="122"/>
@@ -131,15 +131,15 @@
 										<Button name="ФормаКнопка1" id="125">
 											<Type>CommandBarButton</Type>
 											<Representation>Picture</Representation>
+											<OnlyInAllActions>true</OnlyInAllActions>
 											<CommandName>Form.StandardCommand.SaveValues</CommandName>
-											<LocationInCommandBar>InCommandBar</LocationInCommandBar>
 											<ExtendedTooltip name="ФормаКнопка1РасширеннаяПодсказка" id="126"/>
 										</Button>
 										<Button name="ФормаКнопка2" id="127">
 											<Type>CommandBarButton</Type>
 											<Representation>Picture</Representation>
+											<OnlyInAllActions>true</OnlyInAllActions>
 											<CommandName>Form.StandardCommand.RestoreValues</CommandName>
-											<LocationInCommandBar>InCommandBar</LocationInCommandBar>
 											<ExtendedTooltip name="ФормаКнопка2РасширеннаяПодсказка" id="128"/>
 										</Button>
 									</ChildItems>
@@ -151,7 +151,7 @@
 			</ChildItems>
 		</UsualGroup>
 		<UsualGroup name="Группа1" id="99">
-			<Group>AlwaysHorizontal</Group>
+			<Group>Horizontal</Group>
 			<Representation>None</Representation>
 			<ShowTitle>false</ShowTitle>
 			<ExtendedTooltip name="Группа1РасширеннаяПодсказка" id="100"/>
@@ -255,7 +255,7 @@
 					<ExtendedTooltip name="Группа2РасширеннаяПодсказка" id="104"/>
 					<ChildItems>
 						<UsualGroup name="Группа3" id="105">
-							<Group>AlwaysHorizontal</Group>
+							<Group>Horizontal</Group>
 							<Representation>None</Representation>
 							<ShowTitle>false</ShowTitle>
 							<ExtendedTooltip name="Группа3РасширеннаяПодсказка" id="106"/>
@@ -473,7 +473,7 @@
 							</ChildItems>
 						</UsualGroup>
 						<UsualGroup name="Группа4" id="113">
-							<Group>AlwaysHorizontal</Group>
+							<Group>Horizontal</Group>
 							<Representation>None</Representation>
 							<ShowTitle>false</ShowTitle>
 							<ExtendedTooltip name="Группа4РасширеннаяПодсказка" id="114"/>
@@ -538,10 +538,10 @@
 			</Type>
 			<MainAttribute>true</MainAttribute>
 			<Save>
-				<Field>Объект.ДампыКАнализу</Field>
-				<Field>Объект.ДампыРабочие</Field>
-				<Field>Объект.ПоказыватьБезОписания</Field>
 				<Field>Объект.ПутьКСтартеру</Field>
+				<Field>Объект.ПоказыватьБезОписания</Field>
+				<Field>Объект.ДампыРабочие</Field>
+				<Field>Объект.ДампыКАнализу</Field>
 			</Save>
 		</Attribute>
 		<ConditionalAppearance>
