@@ -44,7 +44,12 @@
 					<PasswordMode>false</PasswordMode>
 					<Format/>
 					<EditFormat/>
-					<ToolTip/>
+					<ToolTip>
+						<v8:item>
+							<v8:lang>ru</v8:lang>
+							<v8:content>Каталог core, в котором находится файл starter.exe от Снегопата</v8:content>
+						</v8:item>
+					</ToolTip>
 					<MarkNegatives>false</MarkNegatives>
 					<Mask/>
 					<MultiLine>false</MultiLine>
@@ -68,7 +73,7 @@
 					<Synonym>
 						<v8:item>
 							<v8:lang>ru</v8:lang>
-							<v8:content>Рабочие дампы</v8:content>
+							<v8:content>Дампы платформы, где Снегопат работает</v8:content>
 						</v8:item>
 					</Synonym>
 					<Comment/>
@@ -82,7 +87,14 @@
 					<PasswordMode>false</PasswordMode>
 					<Format/>
 					<EditFormat/>
-					<ToolTip/>
+					<ToolTip>
+						<v8:item>
+							<v8:lang>ru</v8:lang>
+							<v8:content>Дампы платформы, с которой Снегопат работает.
+Обычно в каталоге dumps Снегопата. 
+Например, snegopat\dump\8.03.0017.1549</v8:content>
+						</v8:item>
+					</ToolTip>
 					<MarkNegatives>false</MarkNegatives>
 					<Mask/>
 					<MultiLine>false</MultiLine>
@@ -106,7 +118,7 @@
 					<Synonym>
 						<v8:item>
 							<v8:lang>ru</v8:lang>
-							<v8:content>Дампы к анализу</v8:content>
+							<v8:content>Дампы платформы, с которой Снегопат еще не работает.</v8:content>
 						</v8:item>
 					</Synonym>
 					<Comment/>
@@ -120,7 +132,14 @@
 					<PasswordMode>false</PasswordMode>
 					<Format/>
 					<EditFormat/>
-					<ToolTip/>
+					<ToolTip>
+						<v8:item>
+							<v8:lang>ru</v8:lang>
+							<v8:content>Дампы платформы, с которой Снегопат еще не работает.
+Обычно в каталоге dumps Снегопата. 
+Например, snegopat\dump\8.03.0017.1549</v8:content>
+						</v8:item>
+					</ToolTip>
 					<MarkNegatives>false</MarkNegatives>
 					<Mask/>
 					<MultiLine>false</MultiLine>

@@ -9,11 +9,93 @@
 		<Event name="OnCreateAtServer">ПриСозданииНаСервере</Event>
 	</Events>
 	<ChildItems>
+		<UsualGroup name="ГруппаПодготовкаДампов" id="148">
+			<Title>
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>1 Подготовка дампов Снегопата</v8:content>
+				</v8:item>
+			</Title>
+			<ToolTip>
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Группа подготовка дампов</v8:content>
+				</v8:item>
+			</ToolTip>
+			<Group>Horizontal</Group>
+			<Behavior>Collapsible</Behavior>
+			<ExtendedTooltip name="ГруппаПодготовкаДамповРасширеннаяПодсказка" id="149"/>
+			<ChildItems>
+				<LabelDecoration name="ДекорацияПодсказкаПолученияДампов" id="145">
+					<TextColor>#339966</TextColor>
+					<Title formatted="false">
+						<v8:item>
+							<v8:lang>ru</v8:lang>
+							<v8:content>1 Нужно запустить стартер 1С со Снегопатом. 
+2 Далее выбрать ИБ с требуемоей версии платформы (работоспособной или новой), 
+3 дождаться запуска Конфигуратора .
+4 Далее нужно выбрать подходящую папку внутри dumps каталога Снегопата</v8:content>
+						</v8:item>
+					</Title>
+					<ContextMenu name="ДекорацияПодсказкаПолученияДамповКонтекстноеМеню" id="146"/>
+					<ExtendedTooltip name="ДекорацияПодсказкаПолученияДамповРасширеннаяПодсказка" id="147"/>
+				</LabelDecoration>
+				<UsualGroup name="Группа9" id="150">
+					<Group>Vertical</Group>
+					<Representation>None</Representation>
+					<ShowTitle>false</ShowTitle>
+					<ExtendedTooltip name="Группа9РасширеннаяПодсказка" id="151"/>
+					<ChildItems>
+						<InputField name="ПутьКСтартеру" id="1">
+							<DataPath>Объект.ПутьКСтартеру</DataPath>
+							<EditMode>EnterOnInput</EditMode>
+							<ChoiceButton>true</ChoiceButton>
+							<AutoMarkIncomplete>true</AutoMarkIncomplete>
+							<ContextMenu name="ПутьКСтартеруКонтекстноеМеню" id="2"/>
+							<ExtendedTooltip name="ПутьКСтартеруРасширеннаяПодсказка" id="3"/>
+							<Events>
+								<Event name="StartChoice">ПутьКСтартеруНачалоВыбора</Event>
+							</Events>
+						</InputField>
+						<UsualGroup name="Группа10" id="154">
+							<Group>Horizontal</Group>
+							<Representation>None</Representation>
+							<ShowTitle>false</ShowTitle>
+							<ExtendedTooltip name="Группа10РасширеннаяПодсказка" id="155"/>
+							<ChildItems>
+								<Button name="ПолучитьДампыОтСнегопата1" id="152">
+									<Type>UsualButton</Type>
+									<CommandName>Form.Command.ПолучитьДампыОтСнегопата</CommandName>
+									<Title>
+										<v8:item>
+											<v8:lang>ru</v8:lang>
+											<v8:content>Получить дампы от снегопата 1</v8:content>
+										</v8:item>
+									</Title>
+									<ExtendedTooltip name="ПолучитьДампыОтСнегопата1РасширеннаяПодсказка" id="153"/>
+								</Button>
+								<Button name="ПолучитьДампыОтСнегопата" id="143">
+									<Type>UsualButton</Type>
+									<CommandName>Form.Command.ПолучитьДампыОтСнегопата</CommandName>
+									<Title>
+										<v8:item>
+											<v8:lang>ru</v8:lang>
+											<v8:content>Получить дампы от снегопата 2</v8:content>
+										</v8:item>
+									</Title>
+									<ExtendedTooltip name="ПолучитьДампыОтСнегопатаРасширеннаяПодсказка" id="144"/>
+								</Button>
+							</ChildItems>
+						</UsualGroup>
+					</ChildItems>
+				</UsualGroup>
+			</ChildItems>
+		</UsualGroup>
 		<UsualGroup name="ГруппаНастройки" id="93">
 			<Title>
 				<v8:item>
 					<v8:lang>ru</v8:lang>
-					<v8:content>Настройки</v8:content>
+					<v8:content>2 Настройки</v8:content>
 				</v8:item>
 			</Title>
 			<ToolTip>
@@ -51,23 +133,12 @@
 					<ShowTitle>false</ShowTitle>
 					<ExtendedTooltip name="ГруппаНастройкиПравРасширеннаяПодсказка" id="98"/>
 					<ChildItems>
-						<InputField name="ПутьКСтартеру" id="1">
-							<DataPath>Объект.ПутьКСтартеру</DataPath>
-							<EditMode>EnterOnInput</EditMode>
-							<ChoiceButton>true</ChoiceButton>
-							<OpenButton>true</OpenButton>
-							<ContextMenu name="ПутьКСтартеруКонтекстноеМеню" id="2"/>
-							<ExtendedTooltip name="ПутьКСтартеруРасширеннаяПодсказка" id="3"/>
-							<Events>
-								<Event name="StartChoice">ПутьКСтартеруНачалоВыбора</Event>
-								<Event name="Opening">ПутьКСтартеруОткрытие</Event>
-							</Events>
-						</InputField>
 						<InputField name="ДампыРабочие" id="4">
 							<DataPath>Объект.ДампыРабочие</DataPath>
 							<EditMode>EnterOnInput</EditMode>
 							<HorizontalStretch>true</HorizontalStretch>
 							<ChoiceButton>true</ChoiceButton>
+							<AutoMarkIncomplete>true</AutoMarkIncomplete>
 							<ContextMenu name="ДампыРабочиеКонтекстноеМеню" id="5"/>
 							<ExtendedTooltip name="ДампыРабочиеРасширеннаяПодсказка" id="6"/>
 							<Events>
@@ -79,6 +150,7 @@
 							<EditMode>EnterOnInput</EditMode>
 							<HorizontalStretch>true</HorizontalStretch>
 							<ChoiceButton>true</ChoiceButton>
+							<AutoMarkIncomplete>true</AutoMarkIncomplete>
 							<ContextMenu name="ДампыКАнализуКонтекстноеМеню" id="8"/>
 							<ExtendedTooltip name="ДампыКАнализуРасширеннаяПодсказка" id="9"/>
 							<Events>
@@ -160,7 +232,7 @@
 					<Title>
 						<v8:item>
 							<v8:lang>ru</v8:lang>
-							<v8:content>Файлы</v8:content>
+							<v8:content>3 Файлы</v8:content>
 						</v8:item>
 					</Title>
 					<Group>Vertical</Group>
@@ -182,7 +254,7 @@
 								<ChildItems>
 									<Button name="ФайлыПрочитать" id="101">
 										<Type>CommandBarButton</Type>
-										<CommandName>Form.Command.Прочитать</CommandName>
+										<CommandName>Form.Command.СравнитьДампы</CommandName>
 										<ExtendedTooltip name="ФайлыПрочитатьРасширеннаяПодсказка" id="102"/>
 									</Button>
 									<Button name="ФайлыТолькоСИзменениями" id="139">
@@ -588,24 +660,24 @@
 		</ConditionalAppearance>
 	</Attributes>
 	<Commands>
-		<Command name="Прочитать" id="1">
+		<Command name="СравнитьДампы" id="1">
 			<Title>
 				<v8:item>
 					<v8:lang>ru</v8:lang>
-					<v8:content>Прочитать</v8:content>
+					<v8:content>Сравнить дампы</v8:content>
 				</v8:item>
 			</Title>
 			<ToolTip>
 				<v8:item>
 					<v8:lang>ru</v8:lang>
-					<v8:content>Прочитать</v8:content>
+					<v8:content>Сравнить дампы</v8:content>
 				</v8:item>
 			</ToolTip>
 			<Picture>
 				<xr:Ref>StdPicture.DocumentJournal</xr:Ref>
 				<xr:LoadTransparent>true</xr:LoadTransparent>
 			</Picture>
-			<Action>Прочитать</Action>
+			<Action>СравнитьДампы</Action>
 			<Representation>TextPicture</Representation>
 		</Command>
 		<Command name="ФайлыТолькоСИзменениями" id="2">
@@ -638,7 +710,8 @@
 			<ToolTip>
 				<v8:item>
 					<v8:lang>ru</v8:lang>
-					<v8:content>Получить дампы от снегопата</v8:content>
+					<v8:content>Запустится стартер 1С со Снегопатом. Нужно выбрать ИБ с требуемоей версии платформы (работоспособной или новой), дождаться запуска Конфигуратора .
+Далее нужно выбрать подходящую папку внутри dumps каталога Снегопата</v8:content>
 				</v8:item>
 			</ToolTip>
 			<Action>ПолучитьДампыОтСнегопата</Action>
