@@ -8,4 +8,4 @@ out
 .scannerwork
 
 !.gitignore
-tools/1с/СравнениеДамповСнегопата.epf
+tools/1с/*.epf
