@@ -17,9 +17,12 @@
   #else
 	save void openView(IFramedView& view, const ViewPosition& pos=ViewPosition(), int openIn=0, bool activate=true, const Guid& g=IID_NULL, const Rect& r=kEmptyRect)
   #endif
+
 ////////////////////////////////////////////////////////
 // Открыть диалог и Предупреждение
-#if ver >= 8.3.9
+#if ver >= 8.3.17.1549
+    21
+#elif ver >= 8.3.9
     21
 #elif ver >= 8.3.7
 	20
@@ -33,7 +36,7 @@
 	#if ver = 8.3.17.1851
      +1
     #endif
-  #if ver < 8.3.4 | ver >= 8.3.18
+  #if ver < 8.3.4 | ver >= 8.3.18 | ver = 8.3.16.1814
 	save int doModal1(IFramedView& pView, int i1, int i2, int i3, int i4, int i5, int i6, int i7, int i8)
   #else
 	save int doModal1(IFramedView& pView, int i1, int i2, int i3, int i4, int i5, int i6, int i7, int i8, int i9)
@@ -41,10 +44,10 @@
 
 #if ver < 8.3
     save int messageBox(const v8string&in text, uint type=0, uint timeout=0, uint caption=0, HWND parent=uint(-1), mbp& param=mbp(), int i1=0, int i2=0, int i3=0)
-#elif ver < 8.3.12
+#elif ver < 8.3.12 
     save int messageBox(const v8string&in text, uint type=0, uint timeout=0, uint caption=0, HWND parent=uint(-1), mbp& param=mbp(), int i1=0, int i2=0, int i3=0, int i4=0, int i5=0)
 #else
-    #if ver = 8.3.17.1823
+    #if ver = 8.3.17.1823 | ver = 8.3.16.1814
      +1
     #endif
     save int messageBox(const v8string&in text, uint type=0, uint timeout=0, uint caption=0, HWND parent=0, mbp& param=mbp(), int i1=0, int i2=0, int i3=0, int i4=0, int i5=0)
@@ -52,7 +55,11 @@
 
 	+1
 
-  #if ver < 8.3.4 | ver >= 8.3.18
+#if ver >= 8.3.17.1549
+    24
+#endif
+
+  #if ver < 8.3.4 | ver >= 8.3.18 | ver = 8.3.16.1814
 	save int doModal2(IFramedView& pView, int i1, int i2, int i3, int i4, int i5, int i6, int i7)
   #else
 	save int doModal2(IFramedView& pView, int i1, int i2, int i3, int i4, int i5, int i6, int i7, int i8)
@@ -65,7 +72,7 @@
 // Сообщить
     #if ver >= 8.3.18
       51
-    #elif ver >= 8.3.17.1823
+    #elif ver >= 8.3.17.1823 | ver = 8.3.16.1814
         53
 	#elif ver >= 8.3.10.1877
 		52
@@ -94,6 +101,11 @@
   #else
         +22
   #endif
+#if ver >= 8.3.17.1549
+    75
+#elif ver >= 8.3.18
+    74
+#endif
 	save bool GetFileName(SelectFileName& data, int timeout, HWND parent)
 
 

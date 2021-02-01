@@ -19,6 +19,7 @@ class BuiltinFuncItem : SmartBoxInsertableItem, MethodInsertable {
         super(name, imgPublicMethod);
         paramsCount = pc;
         isFunction = true;
+        insertingString = name;
     }
     void textForTooltip(string& text) {
         text = "Встроенная функция §" + d.descr;
@@ -29,8 +30,10 @@ class TypeNameItem : SmartBoxInsertableItem {
     int hasCtorParams = -1;
     TypeNameItem(const string& name) {
         super(name, imgType);
+        // Message("TypeNameItem " + name);
     }
     void textForInsert(string&out text) {
+        // Message("TypeNameItem d.descr " + d.descr);
         if (hasCtorParams < 0) {
             hasCtorParams = 0;
             auto fnd = oneDesigner.__mapTypeNames.find(d.descr);
@@ -152,6 +155,7 @@ class GlobalContextMethod : SmartBoxInsertableItem, MethodInsertable {
         super(name, imgMethodWithKey);
         paramsCount = pc;
         isFunction = isf;
+        insertingString = name;
     }
     void textForTooltip(string& text) {
         text = "Метод глобального контекста §" + d.descr;
@@ -189,6 +193,7 @@ class ExtContextMethod : SmartBoxInsertableItem, MethodInsertable {
         paramsCount = pc;
         isFunction = isf;
         context = ctx;
+        insertingString = name;
     }
     void textForTooltip(string& text) {
         text = "Метод " + context + "::" + d.descr + "()";
@@ -311,6 +316,8 @@ void readTypeNames() {
     for (uint i = 0, mi = tInfo.count(); i < mi; i++) {
         string nameEng = tInfo.name(i, 0);
         string nameRus = tInfo.name(i, 1);
+        // Message("readTypeNames nameRus" + nameRus);
+        // Message("readTypeNames nameEng" + nameEng);
         if (nameEng == nameRus) {
             v8stock[stockTypeNames, langCmn].insertLast(TypeNameItem(nameEng));
         } else {

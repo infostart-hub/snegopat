@@ -38,7 +38,7 @@ class EmptyTextProcessor : TextProcessor {
     void setTextDoc(TextDoc&& textDoc) {}
     void connectEditor(TextWnd&& editor) { &&editor.editorData = null; }
     void afterChar(TextWnd&& editor, uint16 symbol) {}
-    bool onKeyDown(TextWnd&& editor, uint wParam, uint lParam) { return false; }
+    bool onKeyDown(TextWnd&& editor, WPARAM wParam, LPARAM lParam) { return false; }
     bool onChar(TextWnd&& editor, uint16 symbol) { return false; }
     void itemInserted(TextWnd&& editor, SmartBoxInsertableItem&& item) {}
 };
@@ -394,13 +394,15 @@ void DispatchMessagesTrap(MSG& msg, int_ptr p1) {
             if (activeTextWnd.onKeyDown(msg.wParam, msg.lParam))
                 return;
         } else if (msg.message == WM_CHAR) {
-            if (activeTextWnd.beforeChar(msg.wParam))
+            if (!getIntelliSite().isActive()) {
+                if (activeTextWnd.beforeChar(msg.wParam))
+                    return;
+                trDispatchMsg.swap();
+                orig(msg, p1);
+                trDispatchMsg.swap();
+                activeTextWnd.afterChar(msg.wParam);
                 return;
-            trDispatchMsg.swap();
-            orig(msg, p1);
-            trDispatchMsg.swap();
-            activeTextWnd.afterChar(msg.wParam);
-            return;
+            }
         } else if (msg.message == WM_LBUTTONDOWN) {
             trDispatchMsg.swap();
             orig(msg, p1);

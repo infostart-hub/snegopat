@@ -153,12 +153,16 @@ enum execContextTypes {
 // Кое-какие регэкспы. Пока нормальный парсер не портировал, используем их
 RegExp quotesRex("""["\|][^"]*(?:["\n]|$)""");    // Для определения, заканчивается ли строка текста открытым литералом (т.е. без завершающей кавычки)
 RegExp indentRex("^\\s*");  // Получение отступа строки
+RegExp endLineRex("\\s*;*\\s*$");  // Получение завершения строки - пробелы и точка с запятой
 RegExp extractFileNameRex("[^\\\\/]+$");
 RegExp extractFileExtRex("(?<\\.)[^\\.]*$");
 RegExp whiteSpaceRex("\\s+");
 RegExp ucaseLetterRex("\\p{Upper}");
 RegExp scriptTagsRex("""^(?://(\w+)\:|\$(\w+))[ \t]*(.*?)\s*?\n""");
 RegExp newlines("\\n");
+RegExp typeMethodOnLeft("Тип\\s*\\(\\s*\"$|Тype\\s*\\(\\s*\"$");
+RegExp closedBracketOnRight("^\\s*\\)");
+RegExp quoteOnRight("^\\s*\"");
 
 // Проверка, завершается ли строка текста открытым литералом
 bool isLineEndWithOpenQuote(const string& line) {
