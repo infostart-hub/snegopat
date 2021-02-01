@@ -75,7 +75,9 @@ function storeSettings() {
 })();
 function runAnalyses(td) {
     try {
-        var tmpPath = pathToTemp + "bsl\\";
+        var tempFileName = GetTempFileName();
+        var tempDirName = v8New("File", tempFileName).BaseName;
+        var tmpPath = pathToTemp + tempDirName + "\\";
         CreateDirectory(tmpPath);
         var fPath = tmpPath + "text.bsl";
         td.Write(fPath);
