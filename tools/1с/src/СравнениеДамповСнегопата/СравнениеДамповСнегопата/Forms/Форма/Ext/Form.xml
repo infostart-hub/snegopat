@@ -51,6 +51,18 @@
 					<ShowTitle>false</ShowTitle>
 					<ExtendedTooltip name="ГруппаНастройкиПравРасширеннаяПодсказка" id="98"/>
 					<ChildItems>
+						<InputField name="ПутьКСтартеру" id="1">
+							<DataPath>Объект.ПутьКСтартеру</DataPath>
+							<EditMode>EnterOnInput</EditMode>
+							<ChoiceButton>true</ChoiceButton>
+							<OpenButton>true</OpenButton>
+							<ContextMenu name="ПутьКСтартеруКонтекстноеМеню" id="2"/>
+							<ExtendedTooltip name="ПутьКСтартеруРасширеннаяПодсказка" id="3"/>
+							<Events>
+								<Event name="StartChoice">ПутьКСтартеруНачалоВыбора</Event>
+								<Event name="Opening">ПутьКСтартеруОткрытие</Event>
+							</Events>
+						</InputField>
 						<InputField name="ДампыРабочие" id="4">
 							<DataPath>Объект.ДампыРабочие</DataPath>
 							<EditMode>EnterOnInput</EditMode>
@@ -93,18 +105,6 @@
 					<ShowTitle>false</ShowTitle>
 					<ExtendedTooltip name="ГруппаНастройкиЛевРасширеннаяПодсказка" id="96"/>
 					<ChildItems>
-						<InputField name="ПутьКСтартеру" id="1">
-							<DataPath>Объект.ПутьКСтартеру</DataPath>
-							<EditMode>EnterOnInput</EditMode>
-							<ChoiceButton>true</ChoiceButton>
-							<OpenButton>true</OpenButton>
-							<ContextMenu name="ПутьКСтартеруКонтекстноеМеню" id="2"/>
-							<ExtendedTooltip name="ПутьКСтартеруРасширеннаяПодсказка" id="3"/>
-							<Events>
-								<Event name="StartChoice">ПутьКСтартеруНачалоВыбора</Event>
-								<Event name="Opening">ПутьКСтартеруОткрытие</Event>
-							</Events>
-						</InputField>
 						<UsualGroup name="Группа5" id="121">
 							<Group>Horizontal</Group>
 							<Representation>None</Representation>
@@ -627,6 +627,21 @@
 			</Picture>
 			<Action>ФайлыТолькоСИзменениями</Action>
 			<Representation>TextPicture</Representation>
+		</Command>
+		<Command name="ПолучитьДампыОтСнегопата" id="3">
+			<Title>
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Получить дампы от снегопата</v8:content>
+				</v8:item>
+			</Title>
+			<ToolTip>
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Получить дампы от снегопата</v8:content>
+				</v8:item>
+			</ToolTip>
+			<Action>ПолучитьДампыОтСнегопата</Action>
 		</Command>
 	</Commands>
 </Form>
