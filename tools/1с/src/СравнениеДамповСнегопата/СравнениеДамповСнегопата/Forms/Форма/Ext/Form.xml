@@ -332,20 +332,39 @@
 							<ShowTitle>false</ShowTitle>
 							<ExtendedTooltip name="Группа3РасширеннаяПодсказка" id="106"/>
 							<ChildItems>
-								<InputField name="ФайлыЗаголовок1" id="107">
-									<DataPath>Items.Файлы.CurrentData.ЗаголовокРабочегоДампа</DataPath>
-									<ReadOnly>true</ReadOnly>
-									<AutoMaxWidth>false</AutoMaxWidth>
-									<ContextMenu name="ФайлыЗаголовок1КонтекстноеМеню" id="108"/>
-									<ExtendedTooltip name="ФайлыЗаголовок1РасширеннаяПодсказка" id="109"/>
-								</InputField>
-								<InputField name="ФайлыЗаголовок2" id="110">
-									<DataPath>Items.Файлы.CurrentData.ЗаголовокАнализируемогоДампа</DataPath>
-									<ReadOnly>true</ReadOnly>
-									<AutoMaxWidth>false</AutoMaxWidth>
-									<ContextMenu name="ФайлыЗаголовок2КонтекстноеМеню" id="111"/>
-									<ExtendedTooltip name="ФайлыЗаголовок2РасширеннаяПодсказка" id="112"/>
-								</InputField>
+								<UsualGroup name="ГруппаЗаголовокРабочего" id="164">
+									<Title>
+										<v8:item>
+											<v8:lang>ru</v8:lang>
+											<v8:content>Заголовки дампов</v8:content>
+										</v8:item>
+									</Title>
+									<ToolTip>
+										<v8:item>
+											<v8:lang>ru</v8:lang>
+											<v8:content>Группа заголовок рабочего</v8:content>
+										</v8:item>
+									</ToolTip>
+									<Behavior>Collapsible</Behavior>
+									<Collapsed>true</Collapsed>
+									<ExtendedTooltip name="ГруппаЗаголовокРабочегоРасширеннаяПодсказка" id="165"/>
+									<ChildItems>
+										<InputField name="ФайлыЗаголовок1" id="107">
+											<DataPath>Items.Файлы.CurrentData.ЗаголовокРабочегоДампа</DataPath>
+											<ReadOnly>true</ReadOnly>
+											<AutoMaxWidth>false</AutoMaxWidth>
+											<ContextMenu name="ФайлыЗаголовок1КонтекстноеМеню" id="108"/>
+											<ExtendedTooltip name="ФайлыЗаголовок1РасширеннаяПодсказка" id="109"/>
+										</InputField>
+										<InputField name="ФайлыЗаголовок2" id="110">
+											<DataPath>Items.Файлы.CurrentData.ЗаголовокАнализируемогоДампа</DataPath>
+											<ReadOnly>true</ReadOnly>
+											<AutoMaxWidth>false</AutoMaxWidth>
+											<ContextMenu name="ФайлыЗаголовок2КонтекстноеМеню" id="111"/>
+											<ExtendedTooltip name="ФайлыЗаголовок2РасширеннаяПодсказка" id="112"/>
+										</InputField>
+									</ChildItems>
+								</UsualGroup>
 							</ChildItems>
 						</UsualGroup>
 						<UsualGroup name="ГруппаФункции" id="39">
@@ -416,6 +435,59 @@
 											<ContextMenu name="ФункцииФайлКонтекстноеМеню" id="58"/>
 											<ExtendedTooltip name="ФункцииФайлРасширеннаяПодсказка" id="59"/>
 										</InputField>
+										<ColumnGroup name="ФункцииГруппаОшибки" id="156">
+											<Title>
+												<v8:item>
+													<v8:lang>ru</v8:lang>
+													<v8:content>Ошибки</v8:content>
+												</v8:item>
+											</Title>
+											<ToolTip>
+												<v8:item>
+													<v8:lang>ru</v8:lang>
+													<v8:content>Функции группа ошибки</v8:content>
+												</v8:item>
+											</ToolTip>
+											<Group>Horizontal</Group>
+											<ShowInHeader>true</ShowInHeader>
+											<ExtendedTooltip name="ФункцииГруппаОшибкиРасширеннаяПодсказка" id="157"/>
+											<ChildItems>
+												<CheckBoxField name="ФункцииОшибкаКоличестваПараметров" id="158">
+													<DataPath>Объект.Функции.ОшибкаКоличестваПараметров</DataPath>
+													<ReadOnly>true</ReadOnly>
+													<Title>
+														<v8:item>
+															<v8:lang>ru</v8:lang>
+															<v8:content>Параметры</v8:content>
+														</v8:item>
+													</Title>
+													<ToolTip>
+														<v8:item>
+															<v8:lang>ru</v8:lang>
+															<v8:content>Неверные параметры</v8:content>
+														</v8:item>
+													</ToolTip>
+													<EditMode>EnterOnInput</EditMode>
+													<CheckBoxType>Auto</CheckBoxType>
+													<ContextMenu name="ФункцииОшибкаКоличестваПараметровКонтекстноеМеню" id="159"/>
+													<ExtendedTooltip name="ФункцииОшибкаКоличестваПараметровРасширеннаяПодсказка" id="160"/>
+												</CheckBoxField>
+												<CheckBoxField name="ФункцииЕстьДругиеОшибки" id="161">
+													<DataPath>Объект.Функции.ЕстьДругиеОшибки</DataPath>
+													<ReadOnly>true</ReadOnly>
+													<Title>
+														<v8:item>
+															<v8:lang>ru</v8:lang>
+															<v8:content>Прочие</v8:content>
+														</v8:item>
+													</Title>
+													<EditMode>EnterOnInput</EditMode>
+													<CheckBoxType>Auto</CheckBoxType>
+													<ContextMenu name="ФункцииЕстьДругиеОшибкиКонтекстноеМеню" id="162"/>
+													<ExtendedTooltip name="ФункцииЕстьДругиеОшибкиРасширеннаяПодсказка" id="163"/>
+												</CheckBoxField>
+											</ChildItems>
+										</ColumnGroup>
 										<ColumnGroup name="ФункцииГруппаКоличество" id="141">
 											<EnableContentChange>true</EnableContentChange>
 											<Title>
