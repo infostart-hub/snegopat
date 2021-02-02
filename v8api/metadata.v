@@ -155,9 +155,9 @@
 		IMDObject@+ objById(const Guid& objId)
 	  #if ver < 8.3.17.1549
 	    +4
-	  #elif ver = 8.3.17.1549
+	  #elif ver < 8.3.18
 	    52
-	  #elif ver >= 8.3.18
+	  #else
 	    54
 	  #endif
 		IMDObject@+ objByTypeId(const Guid& typeId)
