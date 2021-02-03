@@ -1,7 +1,7 @@
 ---
 name: Сообщение об ошибке
 about: если Вы выявили ошибку - сообщите нам об этом
-title: '[BUG]'
+title: "[BUG] "
 labels: bug
 assignees: ''
 
