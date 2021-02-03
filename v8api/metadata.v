@@ -48,7 +48,7 @@
 		22
 	  #elif ver < 8.3.11
 	    23
-	  #elif ver < 8.3.18
+	  #elif ver < 8.3.18.1289
 	    22
 	  #else
 	    23
@@ -64,7 +64,7 @@
 		26
 	  #elif ver < 8.3.11
 	    27
-	  #elif ver < 8.3.18
+	  #elif ver < 8.3.18.1289
 	    26
 	  #else
 		27
@@ -80,7 +80,7 @@
 		bool isModified()
 		+4
 		v8string identifier()
-	  #if ver < 8.3.18
+	  #if ver < 8.3.18.1289
 		+3
 	  #else
 		47
@@ -153,11 +153,9 @@
 	    49
 	  #endif
 		IMDObject@+ objById(const Guid& objId)
-	  #if ver < 8.3.17.1549
+	  #if ver < 8.3.18.1289
 	    +4
-	  #elif ver = 8.3.17.1549
-	    52
-	  #elif ver >= 8.3.18
+	  #else
 	    54
 	  #endif
 		IMDObject@+ objByTypeId(const Guid& typeId)
@@ -179,11 +177,9 @@
 	  #endif
 		IConfigMngr@+ getConfigMngr()
 
-	  #if ver < 8.3.17.1549
+	  #if ver < 8.3.18.1829
 	    +1
-	  #elif ver = 8.3.17.1549
-	    59
-	  #elif ver >= 8.3.18
+	  #else
 	    61
 	  #endif
 		IMDContainer@+ masterContainer()
@@ -269,10 +265,12 @@
 	    53
 	  #elif ver < 8.3.13 | ver = 8.3.14.1993 | ver = 8.3.14.1976 | ver = 8.3.14.1565 | ver = 8.3.14.1630
 	    54
-	  #elif ver = 8.3.16.1814
-	    63
 	  #elif ver < 8.3.15
 	    53
+	  #elif ver = 8.3.16.1814
+	    63
+//	  #elif ver > 8.3.16.1814
+//	    52
 	  #elif ver < 8.3.17
 	    55
 	  #elif ver < 8.3.17.1823
