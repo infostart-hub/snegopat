@@ -11,6 +11,12 @@ exports.__esModule = true;
 /*@
 Данный скрипт осуществляет анализ текстов модулей с помощью bsl language server и выводит
 результат диагностики в форму, позволяя быстро перейти к нужному месту.
+
+Выполняется проверка текущего редактируемого модуля.
+Если в модуле выделено более одной строки - отображается результат проверки только для выделенных строк.
+Это позволяет отображать ошибки только по тем строкам, которые были изменены в рамках текущей задачи.
+
+Необходимо что бы была включена "Работа при наборе текста". См. настройки Снегопата.
 @*/
 var stdlib = require("./std/std");
 var stdcommands = require("./std/commands");
@@ -29,32 +35,49 @@ var mdObjId;
 var mdPropId;
 var filePath;
 var lastView;
-var pathToServer;
-var pflFolder = "Snegopat/bsl_analize/", pflPath = pflFolder + "pathToBsl";
+var lastSelection;
+var pathToBslServer;
+var pathToBslJson;
+var pathToTemp;
+var pflFolder = "Snegopat/bsl_analize/";
+var pflPathToBslServer = pflFolder + "pathToBsl";
+var pflPathToBslJson    = pflFolder + "pathToBslJson";
+var pflPathToBslTemp   = pflFolder + "pathToTemp";
 function tryFindPathToBsl(p) {
     if (v8New("File", p).Exist()) {
-        pathToServer = p;
+        pathToBslServer = p;
         return true;
     }
     return false;
 }
 function storeSettings() {
-    profileRoot.setValue(pflPath, pathToServer);
+    profileRoot.setValue(pflPathToBslServer, pathToBslServer);
+    profileRoot.setValue(pflPathToBslJson,    pathToBslJson);
+    profileRoot.setValue(pflPathToBslTemp,   pathToTemp);
 }
 (function () {
-    // Укажем, что сохранять эту настройку надо в файле настроек снегопата
-    profileRoot.createValue(pflPath, "", pflSnegopat);
-    pathToServer = profileRoot.getValue(pflPath);
-    if (!pathToServer) {
+    // Укажем, что сохранять настройки надо в файле настроек снегопата
+    profileRoot.createValue(pflPathToBslServer, "", pflSnegopat);
+    pathToBslServer = profileRoot.getValue(pflPathToBslServer);
+    if (!pathToBslServer) {
         if (!tryFindPathToBsl("c:\\Program Files\\bsl-language-server\\bsl-language-server.exe"))
             tryFindPathToBsl("c:\\Program Files\\phoenixbsl\\app\\bsl-language-server\\bsl-language-server.exe");
-        if (!!pathToServer)
+        if (!!pathToBslServer)
             storeSettings();
     }
+    profileRoot.createValue(pflPathToBslJson, "", pflSnegopat);
+    pathToBslJson = profileRoot.getValue(pflPathToBslJson);
+    profileRoot.createValue(pflPathToBslTemp, "", pflSnegopat);
+    pathToTemp = profileRoot.getValue(pflPathToBslTemp);
+    if (!pathToTemp) {
+        pathToTemp = TempFilesDir()
+    }    
 })();
 function runAnalyses(td) {
     try {
-        var tmpPath = GetTempFileName() + "\\";
+        var tempFileName = GetTempFileName();
+        var tempDirName = v8New("File", tempFileName).BaseName;
+        var tmpPath = pathToTemp + tempDirName + "\\";
         CreateDirectory(tmpPath);
         var fPath = tmpPath + "text.bsl";
         td.Write(fPath);
@@ -62,13 +85,18 @@ function runAnalyses(td) {
             MessageBox("Не удалось записать текст модуля во временный файл");
             return undefined;
         }
+        if (pathToBslJson)
+            var key_c = ' -c "' + pathToBslJson + '"'
+        else
+            var key_c = '';    
         var wsh = new ActiveXObject("Wscript.Shell");
         var escPath = tmpPath.replace(/\\/g, "\\\\");
-        var cmd = '"' + pathToServer + '" -a -s "' + escPath + '" -w "' + escPath + '" -o "' + escPath + '" -r json';
+        var cmd = '"' + pathToBslServer + '" -a -s "' + escPath + '" -w "' + escPath + '" -o "' + escPath + '" -r json' + key_c;
         wsh.Run(cmd, 1, 1);
         fPath = tmpPath + "bsl-json.json";
         if (!v8New("File", fPath).Exist()) {
-            MessageBox("Файл с результатом работы не найден");
+            MessageBox("Файл с результатом работы не найден " + fPath);
+            MessageBox("cmd: " + cmd);
             return undefined;
         }
         td = v8New("TextDocument");
@@ -112,12 +140,15 @@ function fillForm() {
     for (var k in diagList) {
         var diag = diagList[k];
         var rn = diag.range;
-        var row = form.msgList.Add();
-        row.НомерСтроки = rn.start.line + 1;
-        row.Позиция = rn.start.line + 1 + ":" + (rn.start.character + 1) + " - " + (rn.end.line + 1) + ":" + (rn.end.character + 1);
-        row.Важность = diag.severity;
-        row.Сообщение = diag.message;
-        row.ВажностьЧисло = GetSeverityNumber(diag.severity);
+        var nomRow = rn.start.line + 1;
+        if (lastSelection.beginRow == lastSelection.endRow || (lastSelection.beginRow<=nomRow && nomRow<=lastSelection.endRow)) {
+            var row = form.msgList.Add();
+            row.НомерСтроки = nomRow;
+            row.Позиция = rn.start.line + 1 + ":" + (rn.start.character + 1) + " - " + (rn.end.line + 1) + ":" + (rn.end.character + 1);
+            row.Важность = diag.severity;
+            row.Сообщение = diag.message;
+            row.ВажностьЧисло = GetSeverityNumber(diag.severity);
+        }
     }
     form.msgList.Сортировать("ВажностьЧисло Убыв");
 }
@@ -144,23 +175,50 @@ function openFormSettings() {
     loadFormSettings();
     formSettings.DoModal();
 }
-function SettingsOnOpen() {
-    formSettings.PathToBsl = pathToServer;
+function formSettingsПриОткрытии() {
+    formSettings.pathToBslServer = pathToBslServer;
+    formSettings.pathToBslJson    = pathToBslJson;
+    formSettings.pathToTemp      = pathToTemp;
 }
-function PathToBslНачалоВыбора(Элемент, СтандартнаяОбработка) {
-    var sel = v8New("FileDialog");
-    sel.Mode = FileDialogMode.Open;
-    sel.Title = "Укажите расположение выполняемого файла bsl-language-server";
-    if (sel.Choose())
-        formSettings.PathToBsl = sel.FullFileName;
-}
-function CommandBarOpenReleases(Кнопка) {
-    RunApp("https://github.com/1c-syntax/bsl-language-server/releases");
-}
-function CommandBarSaveClose(Кнопка) {
-    pathToServer = formSettings.PathToBsl;
+function formSettingsЗаписатьИЗакрыть(Кнопка) {
+    pathToBslServer = formSettings.pathToBslServer;
+    pathToBslJson    = formSettings.pathToBslJson;
+    pathToTemp      = formSettings.pathToTemp;
     storeSettings();
     formSettings.Close();
+}
+function formSettingsСкачатьbsl(Кнопка) {
+    RunApp("https://github.com/1c-syntax/bsl-language-server/releases");
+}
+function pathToBslServerНачалоВыбора(Элемент, СтандартнаяОбработка) {
+    var Dialog = FileDialog("Укажите расположение выполняемого файла bsl-language-server.exe", "exe", formSettings.pathToBslServer);
+    if (Dialog.Choose())
+        formSettings.pathToBslServer = Dialog.FullFileName;
+}
+function pathToBslJsonНачалоВыбора(Элемент, СтандартнаяОбработка) {
+    var Dialog = FileDialog("Укажите расположение файла .bsl-language-server.json", "json", formSettings.pathToBslJson);
+    if (Dialog.Choose())
+        formSettings.pathToBslJson = Dialog.FullFileName;
+}
+function pathToTempНачалоВыбора(Элемент, СтандартнаяОбработка) {
+    var Dialog = DirectoryDialog("Укажите расположение папки для временных файлов", formSettings.PathToTemp);
+    if (Dialog.Choose())
+        formSettings.PathToTemp = Dialog.Directory + "\\";
+}
+function FileDialog(title, extension, path) {
+    var fileDialog = v8New("FileDialog");
+    fileDialog.Title = title;
+    fileDialog.Filter = "(*." + extension + ")|*." + extension;
+    fileDialog.Directory = v8New("File", path).Path;
+    fileDialog.FullFileName = path;
+    return fileDialog;
+}
+function DirectoryDialog(Title, path) {
+    var Mode = FileDialogMode.ChooseDirectory;
+    var fileDialog = v8New("FileDialog", Mode);
+    fileDialog.Title = Title;
+    fileDialog.Directory = path;
+    return fileDialog;
 }
 function CmdBarOpenSettings(Кнопка) {
     openFormSettings();
@@ -212,7 +270,7 @@ function msgListВыбор(Элемент, ВыбраннаяСтрока, Ко�
     parsedTextWindow.setSelection(startLine, startCol, endLine, endCol);
 }
 stdlib.createMacros(SelfScript.self, "Расширеный анализ текущего модуля", "Вызывает анализ текущего модуля с помощью bsl language server", stdcommands.Frntend.SyntaxCheck.info.picture, function () {
-    if (!pathToServer || !v8New("File", pathToServer).Exist()) {
+    if (!pathToBslServer || !v8New("File", pathToBslServer).Exist()) {
         openFormSettings();
         return;
     }
@@ -229,6 +287,7 @@ stdlib.createMacros(SelfScript.self, "Расширеный анализ теку
         return;
     storeCurrentWindow(tw);
     lastResult = result;
+    lastSelection = tw.GetSelection();
     fillForm();
     openForm();
 }, "Ctrl+Shift+F7");
