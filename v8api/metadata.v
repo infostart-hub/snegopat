@@ -153,10 +153,8 @@
 	    49
 	  #endif
 		IMDObject@+ objById(const Guid& objId)
-	  #if ver < 8.3.17.1549
+	  #if ver < 8.3.18.1289
 	    +4
-	  #elif ver < 8.3.18
-	    52
 	  #else
 	    54
 	  #endif
@@ -179,11 +177,9 @@
 	  #endif
 		IConfigMngr@+ getConfigMngr()
 
-	  #if ver < 8.3.17.1549
+	  #if ver < 8.3.18.1829
 	    +1
-	  #elif ver = 8.3.17.1549
-	    59
-	  #elif ver >= 8.3.18
+	  #else
 	    61
 	  #endif
 		IMDContainer@+ masterContainer()
