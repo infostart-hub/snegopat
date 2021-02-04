@@ -80,7 +80,13 @@ function runAnalyses(td) {
         var tmpPath = pathToTemp + tempDirName + "\\";
         CreateDirectory(tmpPath);
         var fPath = tmpPath + "text.bsl";
-        td.Write(fPath);
+        
+        var text = td.GetText();
+        var text = text.replace(/\r/g, "");
+        td1 = v8New("TextDocument");
+        td1.setText(text);
+        td1.Write(fPath);
+
         if (!v8New("File", fPath).Exist()) {
             MessageBox("Не удалось записать текст модуля во временный файл");
             return undefined;
