@@ -1839,9 +1839,9 @@ ExtSearchGlobal = ExtSearch.extend({
 
 		lowString = testString.toLowerCase();
 
-		for(var s = 0; s <= filters.length - 1; s ++)
+		for(var i = 0; i < filters.length; i ++)
 		{
-			var index = lowString.indexOf(filters[s])
+			var index = lowString.indexOf(filters[i])
 			
 			if( index < 0 )
 				return false;
@@ -1899,9 +1899,9 @@ ExtSearchGlobal = ExtSearch.extend({
 		var filters = new Array();
 		if (this.form.mdFilterUse) {
 			var filtersToUpdate = this.form.mdFilter.split(' ');
-			for(var s = 0; s <= filtersToUpdate.length - 1; s ++)
+			for(var i = 0; i < filtersToUpdate.length; i ++)
 			{ 
-				filters.push(filtersToUpdate[s].toLowerCase());
+				filters.push(filtersToUpdate[i].toLowerCase());
 			}
 		}
 
