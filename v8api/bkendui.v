@@ -55,7 +55,9 @@
 
 	+1
 
-#if ver >= 8.3.17.1549
+#if ver = 8.3.17.1851
+    25
+#elif ver >= 8.3.17.1549
     24
 #endif
 
@@ -96,17 +98,19 @@
         43
     #endif
     save int doMsgLine(const v8string&in text, MessageMarker marker=mNone, const Guid&in g=IID_NULL, int i1=0, IUnknown@ pUnkObject=null, const V8Picture&in customMarker=V8Picture())
-  #if ver < 8.3.15
-		+21
-  #else
+    #if ver < 8.3.15
+        +21
+    #else
         +22
-  #endif
-#if ver >= 8.3.17.1549
-    75
-#elif ver >= 8.3.18
-    74
-#endif
-	save bool GetFileName(SelectFileName& data, int timeout, HWND parent)
+    #endif
+    #if ver >= 8.3.18
+        74
+    #elif ver >= 8.3.17.1851
+        76
+    #elif ver >= 8.3.17.1549
+        75
+    #endif
+        save bool GetFileName(SelectFileName& data, int timeout, HWND parent)
 
 
 :enum MessageMarker
