@@ -1839,7 +1839,7 @@ ExtSearchGlobal = ExtSearch.extend({
 
 		lowString = testString.toLowerCase();
 
-		for(var s in filters)
+		for(var s = 0; s <= filters.length - 1; s ++)
 		{
 			var index = lowString.indexOf(filters[s])
 			
@@ -1899,7 +1899,7 @@ ExtSearchGlobal = ExtSearch.extend({
 		var filters = new Array();
 		if (this.form.mdFilterUse) {
 			var filtersToUpdate = this.form.mdFilter.split(' ');
-			for(var s in filtersToUpdate)
+			for(var s = 0; s <= filtersToUpdate.length - 1; s ++)
 			{ 
 				filters.push(filtersToUpdate[s].toLowerCase());
 			}
