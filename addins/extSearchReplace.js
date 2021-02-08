@@ -312,11 +312,9 @@ function getCurrentTask() {
 }
 // СофтЛаб:Brad  (19.02.2015)
 
+// TODO: доделать определение текущего метаданного
 function getCurrentMdName() {
-
-	//доделать определение текущего метаданного
 	//не искать те, у кого родитель = корень
-	
 	return "";
 }
 
@@ -480,6 +478,10 @@ ExtSearchDialog = ScriptForm.extend({
 	SearchArea0_OnChange : function (Элемент) {
 		this.form.Controls.mdFilter.Enabled 	= (this.form.SearchArea == 2);
 		this.form.Controls.mdFilterUse.Enabled 	= (this.form.SearchArea == 2);
+	},
+	
+	mdFilter_OnChange : function (control) {
+		this.form.mdFilterUse = !(this.form.mdFilter.length === 0 || /^\s*$/.test(this.form.mdFilter));
 	},
 	
 	Query_StartListChoice : function (control, defaultHandler) {
@@ -1766,6 +1768,11 @@ ExtSearch = ScriptForm.extend({
 
 		this.form.caption = "Расширенный поиск и замена в модуле";
 	}
+	,
+	
+	mdFilter_OnChange : function (control) {
+		this.form.mdFilterUse = !(this.form.mdFilter.length === 0 || /^\s*$/.test(this.form.mdFilter));
+	},
 
 }); // end of ExtSearch class
 
@@ -1829,14 +1836,6 @@ ExtSearchGlobal = ExtSearch.extend({
 
 		if (!filters.length)
 			return true;
-
-		//проверка
-		//obj.title
-		//"Конфигурация ИмяКонфы: МодульСеанса"
-		//"Справочник ххх_НоменклКонтреев: МодульОбъекта"
-		//"Справочник Справочник1.Форма ФормаСписка: Форма"
-		//"ОбщийМодуль СерверныйМодуль: Модуль"
-		//"Константа Константа1: МодульМенеджераЗначения"
 
 		testString = obj.title.toLowerCase();
 
