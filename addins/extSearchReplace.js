@@ -1832,16 +1832,16 @@ ExtSearchGlobal = ExtSearch.extend({
 		ExtSearchGlobal._instance = this;
 	},
 
-	isNeedToCheckObject : function (obj, filters) {
+	isNeedToCheckObject : function (testString, filters) {
 
 		if (!filters.length)
 			return true;
 
-		testString = obj.title.toLowerCase();
+		lowString = testString.toLowerCase();
 
 		for(var s in filters)
 		{
-			var index = testString.indexOf(filters[s])
+			var index = lowString.indexOf(filters[s])
 			
 			if( index < 0 )
 				return false;
@@ -1860,8 +1860,7 @@ ExtSearchGlobal = ExtSearch.extend({
 								mdProp:row.mdProp,
 								title:row.title});
 			obj.sort = sort+1;
-			if (this.isNeedToCheckObject(obj, this.mdFilter))
-				docRow = this.search(obj, this.re);
+			docRow = this.search(obj, this.re);
 		}
 		return docRow;
 	},
@@ -1902,14 +1901,7 @@ ExtSearchGlobal = ExtSearch.extend({
 			var filtersToUpdate = this.form.mdFilter.split(' ');
 			for(var s in filtersToUpdate)
 			{ 
-				camelString = filtersToUpdate[s];
-				if (camelString.toLowerCase() == camelString){
-					for (var i=0; i<camelString.length; i++){
-						filters.unshift(camelString.charAt(i));
-					}
-				} else {
-					filters.push(camelString.toLowerCase());
-				}
+				filters.push(filtersToUpdate[s].toLowerCase());
 			}
 		}
 
@@ -2009,8 +2001,11 @@ ExtSearchGlobal = ExtSearch.extend({
 			if (this.curId<this.vtMD[currentId].Count()){
 				//docRow = this.searchByUuid(this.vtMD[currentId][this.curId]);
 				var currRow = this.vtMD[currentId].Get(this.curId);
-				docRow = this.searchByUuid(currRow, this.curId);
-				windows.caption = currRow.mdName;
+				//debugger
+				if (this.isNeedToCheckObject(currRow.title, this.mdFilter)) {
+					docRow = this.searchByUuid(currRow, this.curId);
+					windows.caption = currRow.mdName;
+				}
 			} else {
 				this.startGlobalSearch = false;
 				break;
