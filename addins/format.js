@@ -209,7 +209,7 @@ function MoveBlock(toLeft, spaceChar) {
     txtWnd.setSelection(sel.beginRow, 1, endRow + 1, 1)
 }
 
-function AlignByComa(byFirst) {
+function AlignByComma(byFirst) {
 	
 	var txtWnd = snegopat.activeTextWindow()
 	if (!txtWnd)
@@ -406,7 +406,7 @@ stdlib.createMacros(SelfScript.self, "УдалитьКонцевыеПробел
 stdlib.createMacros(SelfScript.self, "ВыровнятьПоПервойЗапятой",
     "Выровнять текст в выделенных строках по первой запятой", PictureLib.Char, 
     function () {
-        AlignByComa(true);
+        AlignByComma(true);
     });
 	
 /*@
@@ -418,7 +418,7 @@ stdlib.createMacros(SelfScript.self, "ВыровнятьПоПервойЗапя
 stdlib.createMacros(SelfScript.self, "ВыровнятьПоПоследнейЗапятой",
     "Выровнять текст в выделенных строках по последней запятой", PictureLib.Char, 
     function () {
-		AlignByComa(false);
+		AlignByComma(false);
     });
 
 /*@
