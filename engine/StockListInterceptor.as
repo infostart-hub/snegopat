@@ -282,7 +282,7 @@ class V8StockKeyword : V8StockItemBase {
         } else if (d.key == "функция") {
             insert = "Функция ¦()\nКонецФункции";
         } else if (d.key == "возврат") {
-            insert = "Возврат¦;";
+            insert = "Возврат ¦;";
         } else if (d.key == "иначеесли")
             insert = "ИначеЕсли ¦ Тогда";
         notIndent = true;
