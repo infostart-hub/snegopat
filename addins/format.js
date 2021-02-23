@@ -209,6 +209,67 @@ function MoveBlock(toLeft, spaceChar) {
     txtWnd.setSelection(sel.beginRow, 1, endRow + 1, 1)
 }
 
+function AlignByComma(byFirst) {
+	
+	var txtWnd = snegopat.activeTextWindow()
+	if (!txtWnd)
+		return
+	var sel = txtWnd.getSelection()
+	var endRow = sel.endRow
+	if (sel.endCol == 1)
+		endRow--
+	if (endRow <= sel.beginRow)
+		return
+	var tabSize = profileRoot.getValue("ModuleTextEditor/TabSize")
+	var replaceTabOnInput = profileRoot.getValue("ModuleTextEditor/ReplaceTabOnInput");
+	var lines = new Array()
+	var maxEqualPos = -1
+	for (var l = sel.beginRow; l <= endRow; l++) {
+		var line = { text: txtWnd.line(l) }
+		if (byFirst)
+			line.eqRealPos = line.text.indexOf(",")
+		else
+			line.eqRealPos = line.text.lastIndexOf(",");
+		if (line.eqRealPos >= 0) {
+			line.eqPosInSpaces = 0
+			for (var k = 0; k < line.eqRealPos; k++) {
+				if (line.text.charAt(k) == "\t")
+					line.eqPosInSpaces += tabSize - (line.eqPosInSpaces % tabSize)
+				else
+					line.eqPosInSpaces++
+			}
+			if (line.eqPosInSpaces > maxEqualPos)
+				maxEqualPos = line.eqPosInSpaces
+		}
+		lines.push(line)
+	}
+	var text = ""
+	if (!replaceTabOnInput) {
+		maxEqualPos = Math.ceil(maxEqualPos / tabSize) * tabSize;
+	}
+	for (var l in lines) {
+
+		var line = lines[l]
+
+		var symbol = replaceTabOnInput ? ' ' : '\t';
+		var count = (maxEqualPos - line.eqPosInSpaces);
+		if (!replaceTabOnInput) {
+			count = Math.ceil(count / tabSize);
+		}
+
+		//count = (count==0) ? 1 : count;
+
+		var t1 = line.text.substr(0, line.eqRealPos + 1)
+		var t2 = line.text.substr(line.eqRealPos + 1).replace(/^\s+/, "")
+		var newLine = t1 + fillLine(" ", maxEqualPos - line.eqPosInSpaces + 1) + t2 + "\n"
+		text += newLine;
+
+	}
+	txtWnd.setSelection(sel.beginRow, 1, endRow + 1, 1)
+	txtWnd.selectedText = text
+	txtWnd.setCaretPos(sel.beginRow + lines.length - 1, newLine.length);
+}
+
 /*@
 ## Макрос СдвинутьБлокВлевоНаПробел
 Макрос позволяет сдвинуть текст в многострочных литералах "за палкой" влево на один пробел.
@@ -345,60 +406,19 @@ stdlib.createMacros(SelfScript.self, "УдалитьКонцевыеПробел
 stdlib.createMacros(SelfScript.self, "ВыровнятьПоПервойЗапятой",
     "Выровнять текст в выделенных строках по первой запятой", PictureLib.Char, 
     function () {
-        var txtWnd = snegopat.activeTextWindow()
-        if (!txtWnd)
-            return
-        var sel = txtWnd.getSelection()
-        var endRow = sel.endRow
-        if (sel.endCol == 1)
-            endRow--
-        if (endRow <= sel.beginRow)
-            return
-        var tabSize = profileRoot.getValue("ModuleTextEditor/TabSize")
-        var replaceTabOnInput = profileRoot.getValue("ModuleTextEditor/ReplaceTabOnInput");
-        var lines = new Array()
-        var maxEqualPos = -1
-        for (var l = sel.beginRow; l <= endRow; l++) {
-            var line = { text: txtWnd.line(l) }
-            line.eqRealPos = line.text.indexOf(",")
-            if (line.eqRealPos >= 0) {
-                line.eqPosInSpaces = 0
-                for (var k = 0; k < line.eqRealPos; k++) {
-                    if (line.text.charAt(k) == "\t")
-                        line.eqPosInSpaces += tabSize - (line.eqPosInSpaces % tabSize)
-                    else
-                        line.eqPosInSpaces++
-                }
-                if (line.eqPosInSpaces > maxEqualPos)
-                    maxEqualPos = line.eqPosInSpaces
-            }
-            lines.push(line)
-        }
-        var text = ""
-        if (!replaceTabOnInput) {
-            maxEqualPos = Math.ceil(maxEqualPos / tabSize) * tabSize;
-        }
-        for (var l in lines) {
-    
-            var line = lines[l]
-    
-            var symbol = replaceTabOnInput ? ' ' : '\t';
-            var count = (maxEqualPos - line.eqPosInSpaces);
-            if (!replaceTabOnInput) {
-                count = Math.ceil(count / tabSize);
-            }
-    
-            //count = (count==0) ? 1 : count;
-    
-            var t1 = line.text.substr(0, line.eqRealPos + 1)
-            var t2 = line.text.substr(line.eqRealPos + 1).replace(/^\s+/, "")
-            var newLine = t1 + fillLine(" ", maxEqualPos - line.eqPosInSpaces + 1) + t2 + "\n"
-            text += newLine;
-    
-        }
-        txtWnd.setSelection(sel.beginRow, 1, endRow + 1, 1)
-        txtWnd.selectedText = text
-        txtWnd.setCaretPos(sel.beginRow + lines.length - 1, newLine.length);
+        AlignByComma(true);
+    });
+	
+/*@
+## Макрос ВыровнятьПоПоследнейЗапятой
+Макрос для выравнивания текста по последней запятой. Выстраивает текст в выделенных строках после знака `,` в одну колонку.
+[Видео](https://snegopat.ru/video/align_by_colon)
+
+@*/
+stdlib.createMacros(SelfScript.self, "ВыровнятьПоПоследнейЗапятой",
+    "Выровнять текст в выделенных строках по последней запятой", PictureLib.Char, 
+    function () {
+		AlignByComma(false);
     });
 
 /*@
