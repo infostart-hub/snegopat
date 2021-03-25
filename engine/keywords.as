@@ -11,6 +11,12 @@ Keywords&& getKeywordsGroup() {
 
 class Keywords {
     array<SmartBoxItem&&> keywordsEng = {
+        // Порядок и состав ключевых слов отсюда и до Val - менять нельзя!
+        // Так как парсер снегопата выдает номера допустимых в точке разбора ключевых слов
+        // именно в этом порядке. Можно менять шаблон вставки.
+        // Если на какое-то ключевое слово хочется задать несколько вариантов вставки, нужные варианты
+        // добавляйте после Val, и правьте processParseResult, добавляя их в список руками.
+        // Аналогично для списка русских слов, начиная с Если и до Знач.
         &&KeywordItem("If_EndIf", "If ¦ Then\nEndIf;"),
         &&KeywordItem("Then", "Then\n", formatAfterInsert),
         &&KeywordItem("ElsIf_Then", "ElsIf ¦ Then", formatAfterInsert),
@@ -65,26 +71,8 @@ class Keywords {
         &&KeywordItem("Пока_Цикл", "Пока ¦ Цикл\nКонецЦикла;"),
         &&KeywordItem("Цикл", "Цикл\n", formatAfterInsert),
         &&KeywordItem("КонецЦикла", "КонецЦикла;\n", formatAfterInsert),
-        &&KeywordItem("Процедура_КонецПроцедуры", 
-            //"Процедура ¦()\nКонецПроцедуры\n"
-
-            "Процедура ¦()\n"
-            "\n"
-            "\n"
-            "\n"
-            "КонецПроцедуры\n"
-            ),
-        &&KeywordItem("Функция_КонецФункции", 
-            //"Функция ¦()\n\nКонецФункции\n\n"
-
-            "Функция ¦()\n"
-            "\n"
-            "\n"
-            "\n"
-            "\tВозврат Результат;\n"
-            "\n"
-            "КонецФункции\n"
-            ),
+        &&KeywordItem("Процедура_КонецПроцедуры", "Процедура ¦()\n\n\n\nКонецПроцедуры\n"),
+        &&KeywordItem("Функция_КонецФункции", "Функция ¦()\n\n\n\n\tВозврат Результат;\n\nКонецФункции\n"),
         &&KeywordItem("КонецПроцедуры", "КонецПроцедуры\n", formatAfterInsert),
         &&KeywordItem("КонецФункции", "КонецФункции\n", formatAfterInsert),
         &&KeywordItem("Перем", "Перем ¦;"),
@@ -95,12 +83,23 @@ class Keywords {
         &&KeywordItem("И", "И "),
         &&KeywordItem("Или", "Или "),
         &&KeywordItem("Не", "Не "),
-
-        //TODO почему-то если написать как ниже, то будут показаны сервер и клиент-сервер
-        //если поменять порядок, будет выдаваться другое сочетание
-        //и только 2 вариант показывается (
+        &&KeywordItem("Попытка_Исключение", "Попытка\n\t¦\nИсключение\nКонецПопытки;"),
+        &&KeywordItem("Исключение", "Исключение\n", formatAfterInsert),
+        &&KeywordItem("ВызватьИсключение", "ВызватьИсключение ¦;"),
+        &&KeywordItem("КонецПопытки", "КонецПопытки;\n", formatAfterInsert),
+        &&KeywordItem("Новый", "Новый ", selectTypeAfterInsert),
+        &&KeywordItem("Выполнить", "Выполнить( \"¦\" );"),
+        &&KeywordItem("Истина", "Истина"),
+        &&KeywordItem("Ложь", "Ложь"),
+        &&KeywordItem("ДобавитьОбработчик", "ДобавитьОбработчик ¦, ;"),
+        &&KeywordItem("УдалитьОбработчик", "УдалитьОбработчик ¦, ;"),
+        &&KeywordItem("Экспорт", "Экспорт"),
+        &&KeywordItem("Null", "Null"),
+        &&KeywordItem("Неопределено", "Неопределено"),
+        &&KeywordItem("Знач", "Знач "),
+        // Здесь добавляем дополнительные варианты вставки ключевых слов.
+        &&KeywordItem("Для_По_Цикл", "Для ¦ =  По  Цикл\n\n\nКонецЦикла;"),
         &&KeywordItem("Попытка_сервер", 
-            //"Попытка\n\n\t¦\n\nИсключение\n1236\nКонецПопытки;"),
             "Попытка\n\n"
             "\t¦НужноНаписатьНужныйСерверныйКод\n"
             "\n"
@@ -121,8 +120,7 @@ class Keywords {
                 "\tВызватьИсключение;\n"
             "\n"
             "КонецПопытки;\n"
-            ),        
-
+            ),
         &&KeywordItem("Попытка_фейк", "Попытка\n// вызов сервера ВыполнитьОперациюСервер()\n\t¦\nИсключение\n1234\nКонецПопытки;"),
         &&KeywordItem("Попытка_клиент_сервер", 
             //"Попытка\n// вызов сервера ВыполнитьОперациюСервер()\n\t¦\nИсключение\n1234\nКонецПопытки;"
@@ -167,22 +165,7 @@ class Keywords {
             "КонецПроцедуры\n"
             "\n"
         ),
-        //&&KeywordItem("Попытка_Исключение_только_клиент", "Попытка\n\t¦\nИсключение\n1235\nКонецПопытки;"),
-
-        &&KeywordItem("Исключение", "Исключение\n", formatAfterInsert),
-        &&KeywordItem("ВызватьИсключение", "ВызватьИсключение ¦;"),
-        &&KeywordItem("КонецПопытки", "КонецПопытки;\n", formatAfterInsert),
-        &&KeywordItem("Новый", "Новый ", selectTypeAfterInsert),
-        &&KeywordItem("Выполнить", "Выполнить( \"¦\" );"),
-        &&KeywordItem("Истина", "Истина"),
-        &&KeywordItem("Ложь", "Ложь"),
-        &&KeywordItem("ДобавитьОбработчик", "ДобавитьОбработчик ¦, ;"),
-        &&KeywordItem("УдалитьОбработчик", "УдалитьОбработчик ¦, ;"),
-        &&KeywordItem("Экспорт", "Экспорт"),
-        &&KeywordItem("Null", "Null"),
-        &&KeywordItem("Неопределено", "Неопределено"),
-        &&KeywordItem("Знач", "Знач "),
-        &&KeywordItem("Для_По_Цикл", "Для ¦ =  По  Цикл\n\n\nКонецЦикла;"),
+        &&KeywordItem("Попытка_Исключение_только_клиент", "Попытка\n\t¦\nИсключение\n1235\nКонецПопытки;"),
         null // Странный глюк, вместо последнего элемента добавляет null, поэтому добавим пустой элемент
     };
     Keywords() {
@@ -191,26 +174,43 @@ class Keywords {
         keywordsRus.resize(keywordsRus.length - 1);
     }
     void processParseResult(ParseMethodResult&& result, IntelliSite&& isite) {
-        bool allExclude = true;
-        for (uint i = 0, im = keywordsEng.length - 1; i < im; i++) {
-            if (result.isKeywordAllowed(lexName + 1 + i))
-                keywordsEng[i].d.exclude = keywordsRus[i].d.exclude = allExclude = false;
-            else
-                keywordsEng[i].d.exclude = keywordsRus[i].d.exclude = true;
+        // Здесь мы должны поставить признак исключения ключевого слова из списка, если парсер считает, что
+        // оно здесь не допускается грамматикой языка. 
+        bool allExclude = true; // Признак, что ни одно из слов не допускается.
+        // Обходим список ключевых слов с If по Val, и спрашиваем у парсера, допустимо ли оно здесь.
+        for (uint iKeyVal = kwIf, idx = 0; iKeyVal <= kwVal; iKeyVal++) {
+            if (result.isKeywordAllowed(iKeyVal)) // слово допустимо, убираем признак исключения из списка и запоминаем, что список будет не пуст
+                keywordsEng[idx].d.exclude = keywordsRus[idx].d.exclude = allExclude = false;
+            else // Ставим слову признак исключения из списка.
+                keywordsEng[idx].d.exclude = keywordsRus[idx].d.exclude = true;
+            idx++;
         }
-        // Обработаем для другого блока "Для"
-        keywordsEng[kwVal - lexName].d.exclude = keywordsRus[kwVal - lexName].d.exclude = keywordsEng[kwFor - lexName - 1].d.exclude;
+        // Все слова исключены из списка - выходим.
+        if (allExclude)
+            return;
+        // Теперь обработаем дополнительные варианты вставки
+        
+        // Если можно вставить ключевое слово "Для", то в основном списке ключевых слов сделана вставка блока "Для Каждого"
+        // Скопируем его признак и для блока "Для По Цикл".
+        uint idxOfFor = kwFor - kwIf, idxOfExtFor = kwVal - kwIf + 1;
+        keywordsEng[idxOfExtFor].d.exclude = keywordsRus[idxOfExtFor].d.exclude = keywordsEng[idxOfFor].d.exclude;
 
-        // Обработаем для Null в случае активации обоих языков
-        if (useLangs == (useLangEng | useLangRus) && result.isKeywordAllowed(kwNull))
-            keywordsRus[kwNull - lexName - 1].d.exclude = true;
-
-        if (!allExclude) {
-            if (0 != (useLangs & useLangEng))
-                isite.addItemGroup(keywordsEng);
-            if (0 != (useLangs & useLangRus))
-                isite.addItemGroup(keywordsRus);
+        // Есть дополнительные варианты вставки для Попытки в русском варианте, числом 4
+        if (0 != (useLangs & useLangRus)) {
+            uint idxOfTry = kwTry - kwIf, idxOfExtTry = kwVal - kwIf + 2;
+            for (uint i = 0; i < 4; i++)
+                keywordsRus[idxOfExtTry + i].d.exclude = keywordsRus[idxOfTry].d.exclude;
         }
+        
+        // Обработаем для Null в случае активации обоих языков. Null присутствует в обоих списках, русском и английском
+        // Но в обоих пишется одинаково. Поэтому если у нас используются оба языка, то из русского списка всегда исключаем.
+        if (useLangs == (useLangEng | useLangRus))
+            keywordsRus[kwNull - kwIf].d.exclude = true;
+
+        if (0 != (useLangs & useLangEng))
+            isite.addItemGroup(keywordsEng);
+        if (0 != (useLangs & useLangRus))
+            isite.addItemGroup(keywordsRus);
     }
 };
 
