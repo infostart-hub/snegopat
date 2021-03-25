@@ -122,7 +122,6 @@ class Keywords {
             "\n"
             "КонецПопытки;\n"
             ),
-        &&KeywordItem("Попытка_фейк", "Попытка\n// вызов сервера ВыполнитьОперациюСервер()\n\t¦\nИсключение\n1234\nКонецПопытки;"),
         &&KeywordItem("Попытка_клиент_сервер", 
             //"Попытка\n// вызов сервера ВыполнитьОперациюСервер()\n\t¦\nИсключение\n1234\nКонецПопытки;"
             "// на клиенте\n"
@@ -166,7 +165,6 @@ class Keywords {
             "КонецПроцедуры\n"
             "\n"
         ),
-        &&KeywordItem("Попытка_Исключение_только_клиент", "Попытка\n\t¦\nИсключение\n1235\nКонецПопытки;"),
         null // Странный глюк, вместо последнего элемента добавляет null, поэтому добавим пустой элемент
     };
     Keywords() {
@@ -196,10 +194,10 @@ class Keywords {
         uint idxOfFor = kwFor - kwIf, idxOfExtFor = kwVal - kwIf + 1;
         keywordsEng[idxOfExtFor].d.exclude = keywordsRus[idxOfExtFor].d.exclude = keywordsEng[idxOfFor].d.exclude;
 
-        // Есть дополнительные варианты вставки для Попытки в русском варианте, числом 4
+        // Есть дополнительные варианты вставки для Попытки в русском варианте, числом 2
         if (0 != (useLangs & useLangRus)) {
             uint idxOfTry = kwTry - kwIf, idxOfExtTry = kwVal - kwIf + 2;
-            for (uint i = 0; i < 4; i++)
+            for (uint i = 0; i < 2; i++)
                 keywordsRus[idxOfExtTry + i].d.exclude = keywordsRus[idxOfTry].d.exclude;
         }
         
