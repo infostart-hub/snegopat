@@ -65,7 +65,7 @@ class Keywords {
         &&KeywordItem("ИначеЕсли_Тогда", "ИначеЕсли ¦ Тогда", formatAfterInsert),
         &&KeywordItem("КонецЕсли", "КонецЕсли;\n", formatAfterInsert),
         &&KeywordItem("Иначе", "Иначе\n", formatAfterInsert),
-        &&KeywordItem("Для_каждого_Цикл", "Для Каждого ¦ Из НужнаяКоллекция__ Цикл\nКонецЦикла;"),
+        &&KeywordItem("Для_каждого_Цикл", "Для Каждого ¦ Из  Цикл\nКонецЦикла;"),
         &&KeywordItem("Каждого", "Каждого "),
         &&KeywordItem("Из", "Из "),
         &&KeywordItem("По", "По "),
