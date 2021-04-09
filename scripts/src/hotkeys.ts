@@ -7,7 +7,7 @@
 //author: orefkov
 
 /// <reference path="../snegopat.d.ts"/>
-/// <reference path="../v8.d.ts"/>
+import { FormItems, Map, TextBox, ValueTable, ValueTableRow, Form } from "v8_1c";
 
 import { MacrosWnd } from "./macroswnd";
 

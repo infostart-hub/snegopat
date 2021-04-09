@@ -38,7 +38,7 @@
 @*/
 
 /// <reference path="../snegopat.d.ts"/>
-/// <reference path="../v8.d.ts"/>
+/// <reference path="../v8_1c.d.ts"/>
 
 // Описание команды
 class Command {

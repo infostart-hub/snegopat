@@ -8,7 +8,7 @@
 //help: inplace
 
 /// <reference path="../snegopat.d.ts"/>
-/// <reference path="../v8.d.ts"/>
+import { global, File, FormItems, Map, TextBox, ValueTable, ValueTableRow, Form, ЗначениеИзСтрокиВнутр, PictureLib } from "v8_1c";
 
 /*@
 В этом скрипте находятся основные макросы, которые предоставляет сам снегопат.
@@ -75,7 +75,7 @@ stdlib.createMacros(SelfScript.self, "Разработка\\Сдампить Sne
         MessageBox("Готово");
     });
 
-stdlib.createMacros(SelfScript.self, "Разработка\\Сдампить типы 1С в v8.d.ts",
+stdlib.createMacros(SelfScript.self, "Разработка\\Сдампить типы 1С в v8_1c.d.ts",
     "Сформировать файл описания типов 1С в формате TypeScript", undefined,
     function () {
         develop.dumpV8typesToDts();
