@@ -170,6 +170,7 @@ bool isLineEndWithOpenQuote(const string& line) {
     return res.matches > 0 && (res.len(res.matches - 1, 0) == 1 || res.text(res.matches - 1, 0).substr(-1) != "\"");
 }
 
+
 // Функция для чтения содержимого текстового файла.
 // Чтение осуществляется с помощью встроенного объекта 1С "ТекстовыйДокумент".
 // Можно указать кодировку текста.
@@ -195,7 +196,7 @@ bool readTextFile(v8string& result, const string& path, const string& encoding =
     
     ITextManager&& itm = textDoc.unk;
     itm.getTextManager().save(result);
-    return true;
+	return true;
 }
 
 class ValueParamsVector {
@@ -461,11 +462,18 @@ LexemTypes getMethodText(TextManager& pTextManager, uint& line, uint col, bool b
     uint startLine = line;
     array<string> lines;
     IUnknown&& cashObject;
-    pTextManager.getCashObject(cashObject);
+	#if ver < 8.3.19
+	//вроде в 19 кеша больше нет - дальше изменены вызовы - без него
+	pTextManager.getCashObject(cashObject);
+	#endif
     lex_provider lexSrc;
     lexem lex;
     v8string wline;
+	#if ver < 8.3.19
     pTextManager.getLineFast(line, wline, cashObject);
+	#else
+	pTextManager.getLineFast(line, wline);
+	#endif
     col--;
     string currLine = wline.str.rtrim("\r\n").padRight(' ', col);
     currLine.setLength(col);
@@ -497,7 +505,11 @@ LexemTypes getMethodText(TextManager& pTextManager, uint& line, uint col, bool b
         lines.insertLast(currLine);
         if (--line == 0)
             break;
+		#if ver < 8.3.19
         pTextManager.getLineFast(line, wline, cashObject);
+		#else
+		pTextManager.getLineFast(line, wline);
+		#endif
         currLine = wline.str;
     }
     if (typeOfMethodBegin == 1) {   // Начинается с Процедура/Функция
@@ -529,7 +541,11 @@ LexemTypes getMethodText(TextManager& pTextManager, uint& line, uint col, bool b
             testLine--;
             if (testLine == 0)
                 break;
+			#if ver < 8.3.19
             pTextManager.getLineFast(testLine, wline, cashObject);
+			#else
+			pTextManager.getLineFast(testLine, wline);
+			#endif
             currLine = wline.str;
         }
     }
@@ -546,7 +562,11 @@ LexemTypes getMethodText(TextManager& pTextManager, uint& line, uint col, bool b
         // то разрешить только методы, иначе методы и стэйтменты
         uint maxLine = pTextManager.getLinesCount();
         while (++startLine <= maxLine) {
+			#if ver < 8.3.19
             pTextManager.getLineFast(startLine, wline, cashObject);
+			#else
+			pTextManager.getLineFast(startLine, wline);
+			#endif
             lexSrc.setSource(wline.cstr);
             while (lexSrc.nextWithKeyword(lex)) {
                 if (lex.type == lexRemark || lex.type == lexPreproc)

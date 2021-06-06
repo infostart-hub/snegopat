@@ -42,7 +42,11 @@
 	void clearText()|?clearText@TextManager@core@@QAEXXZ
 	bool empty()|?empty@TextManager@core@@QAE_NXZ
 	int getLinesCount()|?getLinesCount@TextManager@core@@QAEHXZ
+	#if ver < 8.3.19
+	//не нашел точку входа - предположил, что от этого метода избавились
+	//далее в файлах - вызовы без этого объекта будут
 	uint getCashObject(IUnknown@&)|?getCashObject@TextManager@core@@QAE?AV?$InterfacePtr@VITextManagerCash@core@@@2@XZ
+	#endif
 	int getLineLength(int, bool)|?getLineLength@TextManager@core@@QAEHH_N@Z
 	void getSelectRange(TextPosition&, TextPosition&)|?getSelectRange@TextManager@core@@QAEXAAVTextPosition@2@0@Z
 	void setSelectRange(const TextPosition&in, const TextPosition&in)|?setSelectRange@TextManager@core@@QAEXABVTextPosition@2@0@Z
@@ -55,9 +59,17 @@
 	void getTextArea(const TextPosition&in, const TextPosition&in, int_ptr&out result)|?getTextArea@TextManager@core@@QAEXABVTextPosition@2@0PAPA_W@Z
 #else
 	bool save(v8string&)|?save@TextManager@core@@QAE_NAAV?$basic_string@_SU?$fix_char_traits@_S@stdx@@V?$allocator@_S@std@@@stdx@@@Z
+	#if ver > 8.3.19
+	bool getLineFast(int, v8string&)|?getLineFast@TextManager@core@@QAE_NHPAV?$basic_string@_SU?$fix_char_traits@_S@stdx@@V?$allocator@_S@std@@@stdx@@@Z
+	#else
 	bool getLineFast(int, v8string&, IUnknown& cash)|?getLineFast@TextManager@core@@QAE_NHPAV?$basic_string@_SU?$fix_char_traits@_S@stdx@@V?$allocator@_S@std@@@stdx@@PAVITextManagerCash@2@@Z
+	#endif
 	void setSelectText(int_ptr, bool)|?setSelectText@TextManager@core@@QAEXPB_S_N@Z
+	#if ver > 8.3.19
+	void getTextArea(const TextPosition&in, const TextPosition&in, int_ptr&out result)|?getTextAreaStartStop@TextManager@core@@IAEXABVTextPosition@2@0AAUTextPositionPlacementInText@12@1@Z
+	#else
 	void getTextArea(const TextPosition&in, const TextPosition&in, int_ptr&out result)|?getTextArea@TextManager@core@@QAEXABVTextPosition@2@0PAPA_S@Z
+	#endif
 #endif
 
 :struct LocalWString 4
