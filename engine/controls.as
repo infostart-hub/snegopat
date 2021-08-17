@@ -257,6 +257,7 @@ class IV8Form {
         return false;
     }
     IV8Control&& get_activeControl() {
+        if(form is null) {return null;}
         uint ai = form.getActiveControlId();
         if (ai != uint(-1))
             return _getControl(ai);
