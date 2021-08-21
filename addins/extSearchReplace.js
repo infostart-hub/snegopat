@@ -312,6 +312,12 @@ function getCurrentTask() {
 }
 // СофтЛаб:Brad  (19.02.2015)
 
+// TODO: доделать определение текущего метаданного
+function getCurrentMdName() {
+	//не искать те, у кого родитель = корень
+	return "";
+}
+
 /* Осуществляет поиск с предварительным открытием диалогового окна. */
 function openSearchDialog(initSearchArea) {
 
@@ -329,6 +335,11 @@ function openSearchDialog(initSearchArea) {
 		if (selText == '')
 			selText = w.GetWordUnderCursor();
 	}
+
+	// поиск по текущему элементу в дереве конфигурации
+	if (selText == '')
+		selText = getCurrentMdName();
+
 	//[+] СофтЛаб:Brad  (19.02.2015)
 	if (selText == '')
 		selText = getCurrentTask();
@@ -398,15 +409,19 @@ ExtSearchDialog = ScriptForm.extend({
 
 	settings : {
 		pflSnegopat : {
-			'IsRegExp'		: false, // Поиск регулярными выражениями.
-			'CaseSensetive'	: false, // Учитывать регистр при поиске.
-			'WholeWords'	: false, // Поиск слова целиком.
-			'SearchHistory'	: v8New('ValueList'), // История поиска.
-			'HistoryDepth'	: 15, // Количество элементов истории поиска.
-			'ProcessArea'	: 0, // Область поиска (0 - везде).
-			'threadCount'	: 25, // К-во потоков : не стал менять логику автора по к-ву по-умолчанию
-			'TreeView'		: false, // Группировать результаты поиска по методам.
-			'ShowReplace'	: false  // Показывать замену
+			'IsRegExp'			: false, // Поиск регулярными выражениями.
+			'CaseSensetive'		: false, // Учитывать регистр при поиске.
+			'WholeWords'		: false, // Поиск слова целиком.
+			'SearchHistory'		: v8New('ValueList'), // История поиска.
+			'HistoryDepth'		: 15, // Количество элементов истории поиска.
+			'ProcessArea'		: 0, // Область поиска (0 - везде).
+			'threadCount'		: 25, // К-во потоков : не стал менять логику автора по к-ву по-умолчанию
+			'TreeView'			: false, // Группировать результаты поиска по методам.
+			'ShowReplace'		: false,  // Показывать замену
+			'IsVertical'		: false, //показывать ли вертикально
+			'mdFilterHistory'	: v8New('ValueList'), // История отбора по именам.
+			'mdFilter'			: '', // Фильтр метаданных при поиске
+			'mdFilterUse'		: false //Использовать ли фильтр
 		}
 	},
 
@@ -427,7 +442,12 @@ ExtSearchDialog = ScriptForm.extend({
 		params.Insert('CaseSensetive',	this.form.CaseSensetive);
 		params.Insert('IsRegExp',		this.form.IsRegExp);
 		params.Insert('ProcessArea',	this.form.ProcessArea);
+		params.Insert('mdFilter',		this.form.mdFilter);
+		params.Insert('mdFilterUse',	this.form.mdFilterUse);
 		params.Insert('threadCount',	this.form.threadCount);
+		params.Insert('IsVertical',		this.form.IsVertical);
+		params.Insert('ShowReplace',	this.form.ShowReplace);
+		params.Insert('HistoryDepth',	this.form.HistoryDepth);
 		return params;
 	},
 
@@ -447,6 +467,7 @@ ExtSearchDialog = ScriptForm.extend({
 	Form_OnOpen : function () {
 		this.reEditorPresent = (this.getRegExpEditorScriptPath() != '');
 		this.form.Controls.Query.ChoiceButton = (this.form.IsRegExp ? this.reEditorPresent : false);
+		this.SearchArea0_OnChange(null);
 	},
 
 	Form_OnClose : function () {
@@ -454,12 +475,25 @@ ExtSearchDialog = ScriptForm.extend({
 		saveProfile();
 	},
 
+	SearchArea0_OnChange : function (Элемент) {
+		this.form.Controls.mdFilter.Enabled 	= (this.form.SearchArea == 2);
+		this.form.Controls.mdFilterUse.Enabled 	= (this.form.SearchArea == 2);
+	},
+	
+	mdFilter_OnChange : function (control) {
+		this.form.mdFilterUse = !(this.form.mdFilter.length === 0 || /^\s*$/.test(this.form.mdFilter));
+	},
+	
 	Query_StartListChoice : function (control, defaultHandler) {
 		control.val.ChoiceList = this.form.SearchHistory;
 	},
 
 	ReplaceStr_StartListChoice : function (control, defaultHandler) {
 		control.val.ChoiceList = this.form.ReplaceHistory;
+	},
+
+	mdFilter_StartListChoice : function (control, defaultHandler) {
+		control.val.ChoiceList = this.form.mdFilterHistory;
 	},
 
 	//открыть форму RegExp
@@ -503,6 +537,7 @@ ExtSearch = ScriptForm.extend({
 	settingsRootPath : SelfScript.uniqueName,
 
 	reEditorPresent : false,
+	lastVertical : undefined,
 
 	settings : {
 		pflSnegopat : {
@@ -515,16 +550,35 @@ ExtSearch = ScriptForm.extend({
 			'ProcessArea'		: 0, // Область поиска (0 - везде).
 			'threadCount'		: 25, // к-во потоков
 			'TreeView'			: false, // Группировать результаты поиска по методам.
-			'ShowReplace'		: false  // Показывать замену
+			'ShowReplace'		: false,  // Показывать замену
+			'IsVertical'		: false, //показывать ли вертикально
+			'mdFilterHistory'	: v8New('ValueList'), // История отбора по именам.
+			'mdFilter'			: '', // Фильтр метаданных при поиске
+			'mdFilterUse'		: false //Использовать ли фильтр
 		}
 	},
 
 	construct : function (isExtend) {
 
 		if (isExtend == undefined) isExtend = false;
-		this._super(SelfScript, 'ФормаРезультатов');
 
-		this.form.КлючСохраненияПоложенияОкна = "extSearchReplace.js"
+		//debugger
+		if (this.IsVertical == undefined) {
+			this.loadSettings();
+			this.IsVertical = this.settings.pflSnegopat.current.IsVertical;
+		}
+
+		if (this.IsVertical == true) {
+			this.lastVertical  = true;
+			this._super(SelfScript, 'ФормаРезультатовВерт');
+			this.form.КлючСохраненияПоложенияОкна = "extSearchReplaceVert.js"
+		} else if (this.IsVertical == false) {
+			this.lastVertical  = false;
+			this._super(SelfScript, 'ФормаРезультатов');
+			this.form.КлючСохраненияПоложенияОкна = "extSearchReplace.js"
+		}
+
+		
 		this.results = this.form.Controls.SearchResults.Value;
 		this.results.Columns.Add('_method');
 		this.results.Columns.Add('groupsCache');
@@ -560,13 +614,45 @@ ExtSearch = ScriptForm.extend({
 	},
 
 	setQuery : function (searchQueryParams) {
+		if (this.lastVertical != searchQueryParams.IsVertical) {
+			this.lastVertical = searchQueryParams.IsVertical;
+			if (this.form.IsOpen())
+				this.form.Close();
+
+			// никак не хочет переназначать кнопки в CmdBar -  шо делать ?
+			//this.form = null;
+			//this.handlers = {};
+			
+			if (searchQueryParams.IsVertical) {
+				this.loadForm(SelfScript.fullPath, 'ФормаРезультатовВерт');
+				this.form.КлючСохраненияПоложенияОкна = "extSearchReplaceVert.js"
+			} else {
+				this.loadForm(SelfScript.fullPath, 'ФормаРезультатов');
+				this.form.КлючСохраненияПоложенияОкна = "extSearchReplace.js"
+			}
+			
+			this.results = this.form.Controls.SearchResults.Value;
+			this.results.Columns.Add('_method');
+			this.results.Columns.Add('groupsCache');
+			this.results.Columns.Add('_object');
+			this.results.Columns.Add('_match');
+			this.results.Columns.Add('SortMetadata');
+			this.SetControlsVisible();
+		}
+
 		this.form.Query 		= searchQueryParams.Query;
 		this.form.IsRegExp 		= searchQueryParams.IsRegExp;
 		this.form.CaseSensetive = searchQueryParams.CaseSensetive;
 		this.form.WholeWords	= searchQueryParams.WholeWords;
 		this.form.ProcessArea	= searchQueryParams.ProcessArea;
+		this.form.mdFilter		= searchQueryParams.mdFilter;
+		this.form.mdFilterUse	= searchQueryParams.mdFilterUse;
 		this.form.threadCount	= searchQueryParams.threadCount;
+		this.form.IsVertical	= searchQueryParams.IsVertical;
+		this.form.ShowReplace	= searchQueryParams.ShowReplace;
+		this.form.HistoryDepth	= searchQueryParams.HistoryDepth;
 		this.addToHistory(this.form.Query);
+		this.addTomdFilterHistory(this.form.mdFilter);
 	},
 
 	expandTree : function (collapse) {
@@ -815,7 +901,6 @@ ExtSearch = ScriptForm.extend({
 			checkModule	= true;
 			checkArea	= false;
 			defSuit		= true;
-			//debugger
 			if (this.form.ProcessArea != ProcessAreaValues.AnyWhere) {
 				var curProps = {
 						'Client'	: ( (obj.obj.Property("ClientManagedApplication") == true) 
@@ -959,6 +1044,7 @@ ExtSearch = ScriptForm.extend({
 		this.results.Rows.Sort('SortMetadata, FoundLine', false);
 		// Запомним строку поиска в истории.
 		this.addToHistory(this.form.Query);
+		this.addTomdFilterHistory(this.form.mdFilter);
 
 		if (fromHotKey == true)
 		{
@@ -1229,6 +1315,25 @@ ExtSearch = ScriptForm.extend({
 			history.Delete(history.Count() - 1);
 	},
 
+	addTomdFilterHistory : function (query) {
+		if (!query) 
+			return;
+
+		// Добавляем в историю только если такой поисковой строки там нет.
+		var history = this.form.mdFilterHistory;
+		if (history.FindByValue(query))
+			return;
+
+		if (history.Count())
+			history.Insert(0, query);
+		else
+			history.Add(query);
+
+		// Не позволяем истории расти более заданной глубины.
+		while (history.Count() > this.form.HistoryDepth)
+			history.Delete(history.Count() - 1);
+	},
+
 	getRegExpEditorScriptPath : function () {
 		var scriptPath = env.pathes.addins + "RegExpEditor.js";
 		var f = v8New('File', scriptPath);
@@ -1240,6 +1345,7 @@ ExtSearch = ScriptForm.extend({
 	Form_OnOpen : function () {
 		this.reEditorPresent = (this.getRegExpEditorScriptPath() != '');
 		this.form.Controls.Query.ChoiceButton = (this.form.IsRegExp ? this.reEditorPresent : false);
+		this.form.Controls.CmdBar.Buttons.btShowReplace.Check = this.form.ShowReplace;
 		this.form.Controls.CmdBar.Buttons.btShowReplace.СочетаниеКлавиш = stdlib.v8hotkey("H".charCodeAt(0), 16);
 
 		this.SetControlsVisible();
@@ -1271,6 +1377,10 @@ ExtSearch = ScriptForm.extend({
 		control.val.ChoiceList = this.form.ReplaceHistory;
 	},
 
+	mdFilter_StartListChoice : function (control, defaultHandler) {
+		control.val.ChoiceList = this.form.mdFilterHistory;
+	},
+	
 	BtSearch_Click : function (control) {
 
 		if (this.form.Query == '')
@@ -1427,7 +1537,6 @@ ExtSearch = ScriptForm.extend({
 
 	BtReplace_Click : function (control) {
 
-		//debugger
 		if (this.form.Query == '')
 		{
 			DoMessageBox('Не задана строка поиска');
@@ -1609,14 +1718,14 @@ ExtSearch = ScriptForm.extend({
 		this.expandTree(true);
 	},
 
-	fShowReplace : function (setShowReplace) {
+	fShowReplace : function () {
 		this.SetControlsVisible();
 	},
 
 	CmdBar_btShowReplace : function (Button) {
 		this.form.ShowReplace = !this.form.ShowReplace;
 		Button.val.Check = this.form.ShowReplace;
-		this.fShowReplace(this.form.ShowReplace);
+		this.fShowReplace();
 	},
 
 	SetControlsVisible : function() {
@@ -1626,6 +1735,13 @@ ExtSearch = ScriptForm.extend({
 		ctr.CmdBar.Buttons.TreeView.Check = this.form.TreeView;
 		this.form.Controls.SearchResults.Columns.Method.Visible = !this.form.TreeView;
 		this.form.Controls.SearchResults.Columns.ExactMatch.Visible = this.form.IsRegExp;
+		if (this.form.IsRegExp)
+			this.form.Controls.SearchResults.Columns.Area.Location = this.form.Controls.SearchResults.Columns.Method.Location//в той же
+		else
+			this.form.Controls.SearchResults.Columns.Area.Location = this.form.Controls.SearchResults.Columns.RowType.Location;//
+		
+		this.form.Controls.mdFilter.Enabled		= this.isGlobalFind;
+		this.form.Controls.mdFilterUse.Enabled	= this.isGlobalFind;
 
 		if (this.form.ShowReplace)
 		{
@@ -1652,6 +1768,11 @@ ExtSearch = ScriptForm.extend({
 
 		this.form.caption = "Расширенный поиск и замена в модуле";
 	}
+	,
+	
+	mdFilter_OnChange : function (control) {
+		this.form.mdFilterUse = !(this.form.mdFilter.length === 0 || /^\s*$/.test(this.form.mdFilter));
+	},
 
 }); // end of ExtSearch class
 
@@ -1669,7 +1790,10 @@ ExtSearchGlobal = ExtSearch.extend({
 			'HistoryDepth'		: 15, // Количество элементов истории поиска.
 			'ProcessArea'		: 0, // текущая область
 			'threadCount'		: 25, // к-во потоков
-			'TreeView'			: false // Группировать результаты поиска по методам.
+			'TreeView'			: false, // Группировать результаты поиска по методам.
+			'IsVertical'		: false, //показывать ли вертикально
+			'mdFilter'			: "", // Фильтр метаданных при поиске
+			'mdFilterUse'		: false //Использовать ли фильтр
 		}
 	},
 
@@ -1708,6 +1832,24 @@ ExtSearchGlobal = ExtSearch.extend({
 		ExtSearchGlobal._instance = this;
 	},
 
+	isNeedToCheckObject : function (testString, filters) {
+
+		if (!filters.length)
+			return true;
+
+		lowString = testString.toLowerCase();
+
+		for(var i = 0; i < filters.length; i ++)
+		{
+			var index = lowString.indexOf(filters[i])
+			
+			if( index < 0 )
+				return false;
+		}
+
+		return true;
+	},
+	
 	searchByUuid: function(row, sort) {
 		mdObj = findMdObj(this.currentMdContainer, row.UUID);
 		if (sort == undefined) sort = 999;
@@ -1751,7 +1893,19 @@ ExtSearchGlobal = ExtSearch.extend({
 		this.currentMdContainer = md;
 		this.clearSearchResults();
 		this.re = this.buildSearchRegExpObject();
+
 		if (!this.re) return;
+
+		var filters = new Array();
+		if (this.form.mdFilterUse) {
+			var filtersToUpdate = this.form.mdFilter.split(' ');
+			for(var i = 0; i < filtersToUpdate.length; i ++)
+			{ 
+				filters.push(filtersToUpdate[i].toLowerCase());
+			}
+		}
+
+		this.mdFilter = filters;
 
 		this.curCaption = windows.caption; //а вдруг, еще кто-то не пользуется configCaption...
 
@@ -1847,8 +2001,11 @@ ExtSearchGlobal = ExtSearch.extend({
 			if (this.curId<this.vtMD[currentId].Count()){
 				//docRow = this.searchByUuid(this.vtMD[currentId][this.curId]);
 				var currRow = this.vtMD[currentId].Get(this.curId);
-				docRow = this.searchByUuid(currRow, this.curId);
-				windows.caption = currRow.mdName;
+				//debugger
+				if (this.isNeedToCheckObject(currRow.title, this.mdFilter)) {
+					docRow = this.searchByUuid(currRow, this.curId);
+					windows.caption = currRow.mdName;
+				}
 			} else {
 				this.startGlobalSearch = false;
 				break;
@@ -2142,8 +2299,7 @@ TextDocObject = stdlib.Class.extend({
 	}
 });
 
-function findMdObj(currentmd, uuid)
-{
+function findMdObj(currentmd, uuid) {
 	if(uuid == currentmd.rootObject.id)
 		return currentmd.rootObject
 	return currentmd.findByUUID(uuid);
