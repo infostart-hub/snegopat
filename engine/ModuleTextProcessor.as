@@ -42,15 +42,24 @@ enum ActivateModes {
 string getTextLine(TextManager&& tm, uint line) {
     v8string s;
     IUnknown&& u;
+	#if ver < 8.3.19
+	//вроде в 19 кеша больше нет
     tm.getCashObject(u);
     tm.getLineFast(line, s, u);
+	#else
+	tm.getLineFast(line, s);
+	#endif
     return s.str;
 }
 
 void getTextLine(TextManager&& tm, uint line, v8string& s) {
     IUnknown&& u;
+	#if ver < 8.3.19
     tm.getCashObject(u);
     tm.getLineFast(line, s, u);
+	#else
+	tm.getLineFast(line, s);
+	#endif
 }
 
 bool my_is_alpha(wchar_t symbol) {
@@ -260,13 +269,21 @@ class ModuleTextProcessor : TextProcessor, ModuleTextSource {
         v8string line;
         IUnknown&& cashObj;
         TextManager&& tm = editor.textDoc.tm;
+		#if ver < 8.3.19
         tm.getCashObject(cashObj);
         tm.getLineFast(caretPos.line - 1, lineOver, cashObj);
+		#else
+		tm.getLineFast(caretPos.line - 1, lineOver);
+		#endif
         lex_provider lexSrc(lineOver.cstr);
         lexem lex;
         while (lexSrc.next(lex)) {
             if (lexQuoteOpen == lex.type) {
+				#if ver < 8.3.19
                 tm.getLineFast(caretPos.line, line, cashObj);
+				#else
+				tm.getLineFast(caretPos.line, line);
+				#endif
                 if (line.str.ltrim().substr(0, 1) != "|") {
                     // Надо вставить |
                     // Получим пробельные символы для автоотступа
