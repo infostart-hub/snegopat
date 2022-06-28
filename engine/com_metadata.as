@@ -1,4 +1,4 @@
-﻿/* com_metadata.as
+/* com_metadata.as
     Работа с метаданными из аддинов.
 */
 // Данные строки нужны только для среды разработки и вырезаются препроцессором
@@ -798,7 +798,9 @@ IMDContainer&& editedMetaDataCont() {
 #if test = 0
     IConfigMngrUI&& pmdUI;
     getMDEditService().getTemplatesMainConfigMngrUI(pmdUI);
-    return pmdUI.getMDCont();
+    if (!checkInterface(&&pmdUI))
+		return null;
+	return pmdUI.getMDCont();
 #else
     IMDEditService&& mdes = getMDEditService();
     if (!checkInterface(&&mdes))
