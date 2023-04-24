@@ -8,7 +8,7 @@
 //help: inplace
 
 /// <reference path="../snegopat.d.ts"/>
-/// <reference path="../v8.d.ts"/>
+import { global } from "v8_1c";
 
 /*@
 Скрипт обеспечивает работу основного окна снегопата.
@@ -21,6 +21,7 @@ import * as repo from "./repo";
 import * as snmain from "./snegopat";
 import * as hks from "./hotkeys";
 import * as macroswnd from "./macroswnd";
+import { Form, FormItems, TableBox, HTMLDocumentField, CommandBar, Panel, ValueTreeRow, ValueTree, CommandBarButtons, CommandBarButton, CommandBarButtonType, ValueTreeRowCollection, RunApp, Color, ValueToStringInternal, Label, ValueTable, ValueTableRow, GetTempFileName, DeleteFiles, CreateDirectory, TextBox, PictureLib } from "v8_1c";
 
 var wndStateProfilePath = "Snegopat/WndOpened";
 var clrLoadedAddin = v8New("Color", 0, 150, 0);

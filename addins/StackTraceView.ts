@@ -16,7 +16,7 @@
 	Более универсально эту же задачу решает менеджер буфера обмена ClipAngel http://devtool1c.ucoz.ru/forum/3-609-1.
 @*/
 /// <reference path="./snegopat.d.ts" />
-/// <reference path="./v8.d.ts" />
+/// <reference path="./v8_1c.d.ts" />
 import * as stdlib from "./std/std";
 
 global.connectGlobals(SelfScript);
