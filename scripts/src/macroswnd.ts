@@ -7,7 +7,8 @@
 //help: inplace
 
 /// <reference path="../snegopat.d.ts"/>
-/// <reference path="../v8.d.ts"/>
+import { global, File, FormItems, Map, TextBox, ValueTable, ValueTableRow, Form, ЗначениеИзСтрокиВнутр, Label, TableBox, ValueTree, ValueTreeRow, ValueTreeRowCollection } from "v8_1c";
+
 import * as stdlib from "./std";
 import * as hks from "./hotkeys";
 /*@
