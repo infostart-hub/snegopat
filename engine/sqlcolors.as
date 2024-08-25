@@ -217,7 +217,7 @@ void ITextExtColors_getColorsTrap(ITextExtColors& pThis, const v8string& sourceL
     }
 }
 
-RegExp reGroupComment("(//\\{)|(//\\})");
+RegExp reGroupComment("(?i)(//\\{|#Удаление|#Вставка)|(//\\}|#КонецУдаления|#КонецВставки)");
 // Проверка на группирующий комментарий
 bool checkForGroupingRemark(const string& srcLine, Vector& infos) {
     if (infos.start > 0) {
